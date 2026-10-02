@@ -16,6 +16,7 @@
 - Include about eight nearby, recognizable buildings; only include targets with usable footprint data.
 - Make building geometry and details local to the repository; do not require a map API key or live map service at runtime.
 - Record source URLs, access date, and source fields; display OpenStreetMap and ODbL attribution.
+- Because direct OSM/UMich requests return proxy 403 in this environment, use OSM-derived building center points as verified anchors and clearly mark locally drawn footprint polygons as schematic estimates; do not claim they are OSM outlines.
 - Keep the view an orientation prototype; do not add full-campus coverage, indoor geometry, routing, positioning, accounts, backend services, or editing.
 - Retain the existing Vite, React, Three.js stack, Chinese interface style, responsive layout, visible keyboard focus, and reduced-motion support.
 
@@ -39,10 +40,10 @@
 - `src/campusData.js` exports `MAP_CENTER`, `CAMPUS_CONTEXT`, and `BUILDINGS`.
 - `MAP_CENTER` is the latitude/longitude origin used when deriving local coordinates.
 - `CAMPUS_CONTEXT` contains local-meter polygon rings for the Diag lawn, primary paths, and nearby street/context surfaces.
-- Every `BUILDINGS` entry has `{ id, name, category, description, footprint, levels, heightMeters, heightIsEstimate, sources }`; `footprint` is a closed ring of `[x, z]` local-meter pairs and `sources` contains source URLs and accessed fields.
+- Every `BUILDINGS` entry has `{ id, name, category, description, footprint, footprintIsEstimate, levels, heightMeters, heightIsEstimate, sources }`; `footprint` is a closed ring of `[x, z]` local-meter pairs and `sources` contains source URLs and accessed fields. For the approved fallback, set `footprintIsEstimate: true` on all entries.
 
-- [ ] Retrieve Diag-area building footprints from OpenStreetMap and verify candidate building names and roles against University of Michigan public pages or campus maps.
-- [ ] Keep approximately eight targets from the agreed candidate list where data fits the view; normalize each footprint to local meters relative to `MAP_CENTER` and store it in `src/campusData.js`.
+- [ ] Retrieve Diag-area building centers from the available OSM-attributed dataset and verify candidate building names and roles against its source fields and accessible University of Michigan information.
+- [ ] Keep approximately eight targets from the agreed candidate list where data fits the view; normalize each anchor to local meters relative to `MAP_CENTER`, create a visibly schematic footprint estimate, and store both in `src/campusData.js`.
 - [ ] Add source URL, retrieval date, source fields, and attribution wording to `docs/umich-diag-map-sources.md`; identify estimated heights/levels in the data.
 - [ ] Check coordinate conversion, ring closure, and building coverage by inspecting the resulting data and source notes.
 - [ ] Commit with `feat: add Diag campus map data`.
@@ -77,6 +78,7 @@
 
 - [ ] Replace fictional North Quay copy and floor controls with a Diag/Central Campus heading, overview/reset controls, mapped-building list, selected-building details, and visible OSM attribution.
 - [ ] Show the building name, category/role, and floor count in its detail panel; distinguish estimated values from sourced values and show the empty-selection prompt when nothing is selected.
+- [ ] Add a visible statement that the scene uses schematic footprint estimates anchored to OSM building coordinates.
 - [ ] Connect list selection, scene selection, and clear-selection behavior to the same React state; keep reset independent from selection.
 - [ ] Update page title and description for the UMich Diag campus explorer.
 - [ ] Adapt desktop and narrow-screen layout while preserving focus indicators and reduced-motion behavior.

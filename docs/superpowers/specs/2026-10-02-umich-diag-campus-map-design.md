@@ -10,6 +10,7 @@ Replace the fictional single-building demo as the app's primary view with a Chin
 - Include about eight nearby, recognizable buildings. The initial candidates are Angell Hall, Burton Memorial Tower, Hatcher Graduate Library, Shapiro Library, Rackham Graduate School, Michigan League, Hill Auditorium, and Lorch Hall. Keep the final set limited to buildings that fit the selected view and have usable footprint data.
 - Show the Diag lawn, main paths, and adjacent streets as simple context geometry.
 - Use actual building footprints where available. Extrude them to approximate heights; add only a small amount of silhouette detail where it materially improves recognition.
+- If footprint services are unavailable, use OSM-derived building centers as anchors and create simple schematic footprint estimates. Mark estimated outlines in local data and visibly describe the map as schematic; never present estimated outlines as OSM geometry.
 - Reuse the existing Vite, React, and Three.js stack and the current Chinese interface style.
 - Make the initial scene and building data local to the repository. Do not require a map API key or a live map service at runtime.
 
@@ -35,7 +36,7 @@ Replace the fictional single-building demo as the app's primary view with a Chin
 ## Technical design
 
 - Replace the current app content/data with a Diag-area campus explorer. Keep Three.js scene setup in a dedicated component and keep selection and detail state in React.
-- Store each mapped building as an ID, official/display name, category or short description, footprint polygon, height or floor estimate, estimate/source status, and provenance.
+- Store each mapped building as an ID, official/display name, category or short description, footprint polygon, height or floor estimate, separate footprint/height estimate flags, and provenance.
 - Convert source latitude/longitude coordinates to a local meter-based coordinate system centered near the Diag before creating Three.js geometry. This avoids rendering campus coordinates at their raw geographic scale.
 - Build footprints as extruded meshes and give the Diag, paths, streets, and ground separate, restrained materials. Use raycasting for 3D selection and keep accessible DOM controls outside the canvas.
 - Use shared selection callbacks so scene clicks and the accessible list update the same React state. Keep reset camera behavior independent of selection.
@@ -57,3 +58,4 @@ Replace the fictional single-building demo as the app's primary view with a Chin
 - A user can select every mapped building using either the 3D scene or accessible list, see its information, and clear the selection by clicking empty ground.
 - The layout remains usable on desktop and narrow mobile widths, with visible keyboard focus and reduced-motion support.
 - Map geometry and details load from local project data, and visible source attribution is present.
+- Estimated outlines are identified as schematic in both the data provenance and the interface.

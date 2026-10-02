@@ -165,14 +165,21 @@ export default function CampusScene({
     let pointerDown = null;
     const onPointerDown = (event) => {
       if (event.button !== 0) return;
-      pointerDown = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      pointerDown = { id: event.pointerId, x: event.clientX, y: event.clientY, dragged: false };
+    };
+    const onPointerMove = (event) => {
+      if (!pointerDown || pointerDown.id !== event.pointerId) return;
+      if (Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 5) {
+        pointerDown.dragged = true;
+      }
     };
     const onPointerCancel = () => { pointerDown = null; };
     const onPointerUp = (event) => {
       if (!pointerDown || pointerDown.id !== event.pointerId) return;
-      const moved = Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y);
+      const moved = pointerDown.dragged
+        || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 5;
       pointerDown = null;
-      if (moved > 5) return;
+      if (moved) return;
 
       const bounds = renderer.domElement.getBoundingClientRect();
       if (!bounds.width || !bounds.height) return;
@@ -186,6 +193,7 @@ export default function CampusScene({
       else if (raycaster.intersectObject(ground, false).length) clearRef.current();
     };
     renderer.domElement.addEventListener('pointerdown', onPointerDown);
+    renderer.domElement.addEventListener('pointermove', onPointerMove);
     renderer.domElement.addEventListener('pointerup', onPointerUp);
     renderer.domElement.addEventListener('pointercancel', onPointerCancel);
 
@@ -214,6 +222,7 @@ export default function CampusScene({
       window.cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
       renderer.domElement.removeEventListener('pointerdown', onPointerDown);
+      renderer.domElement.removeEventListener('pointermove', onPointerMove);
       renderer.domElement.removeEventListener('pointerup', onPointerUp);
       renderer.domElement.removeEventListener('pointercancel', onPointerCancel);
       controls.dispose();

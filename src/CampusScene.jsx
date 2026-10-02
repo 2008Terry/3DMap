@@ -100,7 +100,6 @@ export default function CampusScene({
 
     const labelRenderer = new CSS2DRenderer();
     labelRenderer.domElement.className = 'campus-label-layer';
-    labelRenderer.domElement.setAttribute('aria-hidden', 'true');
     mount.appendChild(labelRenderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -112,7 +111,8 @@ export default function CampusScene({
     controls.maxPolarAngle = Math.PI * 0.47;
     controls.target.copy(INITIAL_TARGET);
     controls.update();
-    sceneStateRef.current = { camera, controls, buildingMeshes: new Map() };
+    const buildingLabels = new Map();
+    sceneStateRef.current = { camera, controls, buildingMeshes: new Map(), buildingLabels, selectedBuildingId: null };
 
     scene.add(new THREE.HemisphereLight('#ffffff', '#758f84', 2.4));
     const sunlight = new THREE.DirectionalLight('#fff8e9', 2.25);
@@ -142,47 +142,82 @@ export default function CampusScene({
     context.paths.forEach(({ footprint }) => scene.add(surface(footprint, '#d9d0ba', 0.09)));
 
     const buildingMeshes = [];
+    let suppressLabelClick = false;
+    const onLabelClick = (event) => {
+      // Native button activation also provides Enter/Space keyboard selection.
+      if (event.detail === 0 || !suppressLabelClick) {
+        selectRef.current(event.currentTarget.dataset.buildingId);
+      }
+    };
     buildings.forEach((building) => {
       const mesh = buildingMesh(building);
       scene.add(mesh);
       buildingMeshes.push(mesh);
       sceneStateRef.current.buildingMeshes.set(building.id, mesh);
 
-      const labelElement = document.createElement('span');
+      const labelElement = document.createElement('button');
+      labelElement.type = 'button';
       labelElement.className = 'campus-building-label';
       labelElement.textContent = LABEL_NAMES[building.id] || building.name;
       labelElement.title = building.name;
+      labelElement.setAttribute('aria-label', `Select ${building.name}`);
+      labelElement.setAttribute('aria-pressed', 'false');
       labelElement.dataset.buildingId = building.id;
+      labelElement.addEventListener('click', onLabelClick);
       const label = new CSS2DObject(labelElement);
       const [x, z] = buildingCenter(building.footprint);
       label.position.set(x, building.heightMeters + 3, z);
       label.userData.buildingId = building.id;
       scene.add(label);
+      buildingLabels.set(building.id, label);
     });
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
-    let pointerDown = null;
+    const activePointers = new Map();
+    let multiPointerGesture = false;
     const onPointerDown = (event) => {
-      if (event.button !== 0) return;
-      pointerDown = { id: event.pointerId, x: event.clientX, y: event.clientY, dragged: false };
-    };
-    const onPointerMove = (event) => {
-      if (!pointerDown || pointerDown.id !== event.pointerId) return;
-      if (Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 5) {
-        pointerDown.dragged = true;
+      if (activePointers.size === 0) suppressLabelClick = false;
+      activePointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+        dragged: false,
+        canvas: event.target === renderer.domElement,
+        primaryButton: event.button === 0,
+      });
+      if (activePointers.size > 1) {
+        multiPointerGesture = true;
+        suppressLabelClick = true;
       }
     };
-    const onPointerCancel = () => { pointerDown = null; };
+    const onPointerMove = (event) => {
+      const pointerDown = activePointers.get(event.pointerId);
+      if (!pointerDown) return;
+      if (Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 5) {
+        pointerDown.dragged = true;
+        suppressLabelClick = true;
+      }
+    };
+    const onPointerCancel = (event) => {
+      if (!activePointers.delete(event.pointerId)) return;
+      suppressLabelClick = true;
+      if (activePointers.size === 0) multiPointerGesture = false;
+    };
     const onPointerUp = (event) => {
-      if (!pointerDown || pointerDown.id !== event.pointerId) return;
+      const pointerDown = activePointers.get(event.pointerId);
+      if (!pointerDown) return;
       const moved = pointerDown.dragged
         || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 5;
-      pointerDown = null;
-      if (moved) return;
+      const suppressed = multiPointerGesture || moved || !pointerDown.primaryButton;
+      suppressLabelClick = suppressLabelClick || suppressed;
+      activePointers.delete(event.pointerId);
+      if (activePointers.size === 0) multiPointerGesture = false;
+      if (suppressed || !pointerDown.canvas || event.target !== renderer.domElement) return;
 
       const bounds = renderer.domElement.getBoundingClientRect();
       if (!bounds.width || !bounds.height) return;
+      if (event.clientX < bounds.left || event.clientX > bounds.right
+        || event.clientY < bounds.top || event.clientY > bounds.bottom) return;
       pointer.set(
         ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
         -((event.clientY - bounds.top) / bounds.height) * 2 + 1,
@@ -192,10 +227,11 @@ export default function CampusScene({
       if (hit) selectRef.current(hit.object.userData.buildingId);
       else if (raycaster.intersectObject(ground, false).length) clearRef.current();
     };
-    renderer.domElement.addEventListener('pointerdown', onPointerDown);
-    renderer.domElement.addEventListener('pointermove', onPointerMove);
-    renderer.domElement.addEventListener('pointerup', onPointerUp);
-    renderer.domElement.addEventListener('pointercancel', onPointerCancel);
+    // Capture starts on both canvas and labels; window listeners follow releases outside the map.
+    mount.addEventListener('pointerdown', onPointerDown, true);
+    window.addEventListener('pointermove', onPointerMove, true);
+    window.addEventListener('pointerup', onPointerUp, true);
+    window.addEventListener('pointercancel', onPointerCancel, true);
 
     const resize = () => {
       const { width, height } = mount.getBoundingClientRect();
@@ -210,21 +246,44 @@ export default function CampusScene({
     resize();
 
     let frameId;
+    const resolveLabelOverlaps = () => {
+      const selectedId = sceneStateRef.current.selectedBuildingId;
+      const labels = [...buildingLabels.values()].sort((a, b) => {
+        if (a.userData.buildingId === selectedId) return -1;
+        if (b.userData.buildingId === selectedId) return 1;
+        return 0;
+      });
+      const visibleBounds = [];
+      labels.forEach((label, index) => {
+        const element = label.element;
+        // CSS2DRenderer sets display for labels outside the camera's depth range.
+        element.style.visibility = '';
+        element.style.zIndex = String(labels.length - index);
+        if (element.style.display === 'none') return;
+        const bounds = element.getBoundingClientRect();
+        const overlaps = visibleBounds.some((other) => bounds.left < other.right
+          && bounds.right > other.left && bounds.top < other.bottom && bounds.bottom > other.top);
+        if (overlaps) element.style.visibility = 'hidden';
+        else visibleBounds.push(bounds);
+      });
+    };
     const render = () => {
       frameId = window.requestAnimationFrame(render);
       if (controls.enableDamping) controls.update();
       renderer.render(scene, camera);
       labelRenderer.render(scene, camera);
+      resolveLabelOverlaps();
     };
     render();
 
     return () => {
       window.cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
-      renderer.domElement.removeEventListener('pointerdown', onPointerDown);
-      renderer.domElement.removeEventListener('pointermove', onPointerMove);
-      renderer.domElement.removeEventListener('pointerup', onPointerUp);
-      renderer.domElement.removeEventListener('pointercancel', onPointerCancel);
+      mount.removeEventListener('pointerdown', onPointerDown, true);
+      window.removeEventListener('pointermove', onPointerMove, true);
+      window.removeEventListener('pointerup', onPointerUp, true);
+      window.removeEventListener('pointercancel', onPointerCancel, true);
+      buildingLabels.forEach((label) => label.element.removeEventListener('click', onLabelClick));
       controls.dispose();
       scene.traverse((object) => {
         object.geometry?.dispose();
@@ -242,14 +301,17 @@ export default function CampusScene({
   useEffect(() => {
     const state = sceneStateRef.current;
     if (!state) return;
+    state.selectedBuildingId = selectedBuildingId;
     state.buildingMeshes.forEach((mesh, id) => {
       const selected = id === selectedBuildingId;
       mesh.material.color.set(selected ? '#e8d393' : mesh.userData.baseColor);
       mesh.material.emissive.set(selected ? '#514021' : '#000000');
       mesh.material.emissiveIntensity = selected ? 0.24 : 0;
     });
-    mountRef.current?.querySelectorAll('.campus-building-label').forEach((element) => {
-      element.classList.toggle('is-selected', element.dataset.buildingId === selectedBuildingId);
+    state.buildingLabels.forEach((label, id) => {
+      const selected = id === selectedBuildingId;
+      label.element.classList.toggle('is-selected', selected);
+      label.element.setAttribute('aria-pressed', String(selected));
     });
   }, [selectedBuildingId, buildings, context]);
 

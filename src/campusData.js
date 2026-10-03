@@ -1,14 +1,10 @@
-// Coordinates are a local orientation model, not survey or navigation data.
-// Positive x is east; positive z is south. Source details: docs/umich-diag-map-sources.md.
+import sourceFootprints from './campusBuildingFootprints.json';
+
+// Local orientation origin for the City of Ann Arbor WGS84 building outlines.
 export const MAP_CENTER = { lat: 42.2772, lon: -83.7385 };
 
 const METERS_PER_DEGREE_LAT = 111_195;
 const METERS_PER_DEGREE_LON = METERS_PER_DEGREE_LAT * Math.cos(MAP_CENTER.lat * Math.PI / 180);
-
-const localPoint = (lat, lon) => [
-  Number(((lon - MAP_CENTER.lon) * METERS_PER_DEGREE_LON).toFixed(1)),
-  Number((-(lat - MAP_CENTER.lat) * METERS_PER_DEGREE_LAT).toFixed(1)),
-];
 
 const rectangle = (x, z, width, depth) => {
   const west = Number((x - width / 2).toFixed(1));
@@ -18,13 +14,7 @@ const rectangle = (x, z, width, depth) => {
   return [[west, north], [east, north], [east, south], [west, south], [west, north]];
 };
 
-const anchoredRectangle = (lat, lon, width, depth) => {
-  const [x, z] = localPoint(lat, lon);
-  return rectangle(x, z, width, depth);
-};
-
-// Lawn, walkways, and road strips are interpretive context surfaces.
-// Their outlines are sketched in local meters and are not OSM polygons.
+// Context outlines remain schematic; building footprints come from the cited City dataset.
 export const CAMPUS_CONTEXT = {
   diagLawn: [
     [-63, -108], [7, -139], [87, -89], [105, -18], [36, 59],
@@ -43,67 +33,124 @@ export const CAMPUS_CONTEXT = {
   ],
 };
 
-const CENTER_SOURCE = {
-  url: 'https://github.com/BereZone/umichfreepark/blob/main/src/engine/data/buildings.json',
-  accessed: '2026-10-02',
-  fields: ['id', 'name', 'lat', 'lon', 'coordSource', 'coordConfidence'],
+const CITY_SOURCE = {
+  label: 'City of Ann Arbor Building Footprints',
+  url: sourceFootprints.sourceUrl,
+  datasetUrl: sourceFootprints.downloadUrl,
+  accessed: sourceFootprints.accessed,
 };
 
-const schematicBuilding = ({ id, name, category, description, lat, lon, width, depth, levels, heightMeters }) => ({
-  id,
-  name,
-  category,
-  description,
-  center: { lat, lon },
-  footprint: anchoredRectangle(lat, lon, width, depth),
-  footprintIsEstimate: true,
-  levels,
-  heightMeters,
-  heightIsEstimate: true,
-  sources: [CENTER_SOURCE],
-});
+const UNIVERSITY_SOURCES = {
+  angell: { label: 'Angell Hall architecture', url: 'https://sites.lsa.umich.edu/greekcampus/centralcampus/angell-hall/' },
+  angellFloors: { label: 'U-M campus buildings guide', url: 'https://bentley.umich.edu/wp-content/uploads/2014/09/University_of_Michigan_History_Subject_Guide.pdf' },
+  burton: { label: 'Burton Tower details', url: 'https://bentley.umich.edu/discover/bentley-materials/campus-tour/building-index/burton-tower/' },
+  burtonHistory: { label: 'Burton Tower historical description', url: 'https://milproj.dc.umich.edu/mort/central/north%20of%20north%20u/Burton%20Tower/index.html' },
+  hatcher: { label: 'Hatcher floor information and official plans', url: 'https://www.lib.umich.edu/locations-and-hours/hatcher-library/navigating-building/' },
+  shapiro: { label: 'Shapiro floor plans', url: 'https://www.lib.umich.edu/locations-and-hours/shapiro-library/' },
+  rackham: { label: 'Rackham building facts', url: 'https://umaec.umich.edu/projects/completed-projects/horace-h-rackham-school-of-graduate-studies-building/' },
+  rackhamHistory: { label: 'Rackham architectural history', url: 'https://rackham.umich.edu/about/rackham-building/history-of-the-rackham-building/' },
+  league: { label: 'Michigan League historical architecture', url: 'https://milproj.dc.umich.edu/mort/central/north%20of%20north%20u/Michigan%20League/index.html' },
+  hill: { label: 'Hill Auditorium exterior and floor details', url: 'https://news.umich.edu/history-of-hill-auditorium/' },
+  hillDesign: { label: 'Hill Auditorium official elevations and design', url: 'https://umaec.umich.edu/projects/completed-projects/hill-auditorium-renovation/design/' },
+  lorch: { label: 'Lorch Hall historical architecture', url: 'https://milproj.dc.umich.edu/mort/central/south%20of%20south%20U/Lorch%20Hall/index.html' },
+  lorchProject: { label: 'Lorch Hall renovation and addition', url: 'https://umaec.umich.edu/projects/major-projects/lorch-hall-renovation-and-addition/project-details/' },
+};
 
-// The centers below are OSM-derived values from the cited upstream dataset.
-// Widths, depths, levels, and heights are illustrative estimates.
+const cityParts = (id) => sourceFootprints.buildings[id].map((part) => ({
+  ...part,
+  // The city's height field is stored in feet; this is only an extrusion height, not a roof survey.
+  heightMeters: id === 'burton-memorial-tower'
+    ? 192 * 0.3048
+    : part.averageHeightFeet * 0.3048,
+}));
+
+const building = ({ id, name, category, description, floors, facts, sources, floorPlanUrl, color }) => {
+  const parts = cityParts(id);
+  const maxHeight = Math.max(...parts.map((part) => part.heightMeters));
+  return {
+    id,
+    name,
+    category,
+    description,
+    parts,
+    footprint: parts[0].footprint,
+    heightMeters: maxHeight,
+    heightLabel: id === 'burton-memorial-tower'
+      ? '192 英尺（Bentley 记录的塔楼总高）'
+      : `市数据平均结构高度 ${Math.max(...parts.map((part) => part.averageHeightFeet)).toFixed(1)} 英尺`,
+    floors,
+    facts,
+    sources: [CITY_SOURCE, ...sources],
+    floorPlanUrl,
+    color,
+  };
+};
+
 export const BUILDINGS = [
-  schematicBuilding({
+  building({
     id: 'angell-hall', name: 'Angell Hall', category: 'Academic',
-    description: 'Central Campus academic building facing the Diag.',
-    lat: 42.27677, lon: -83.73975, width: 112, depth: 42, levels: 4, heightMeters: 19,
+    description: '密歇根大学中央校区的古典风格建筑。',
+    floors: '主楼 4 层；市数据将 Auditorium 部件记为 1 层。',
+    facts: ['南立面有 8 根多立克柱和古典檐部。'],
+    sources: [UNIVERSITY_SOURCES.angell, UNIVERSITY_SOURCES.angellFloors],
+    color: '#b8b2a4',
   }),
-  schematicBuilding({
+  building({
     id: 'burton-memorial-tower', name: 'Burton Memorial Tower', category: 'Landmark',
-    description: 'Bell tower and campus landmark north of the Diag.',
-    lat: 42.27945, lon: -83.73871, width: 22, depth: 22, levels: 10, heightMeters: 59,
+    description: '以钟楼和校园钟琴闻名的地标。',
+    floors: '楼层口径不一致：市数据记录 13 stories；密歇根大学历史资料记为地下室加 10 层。',
+    facts: ['外墙为石灰岩；钟楼总高按 Bentley 资料显示为 192 英尺。'],
+    sources: [UNIVERSITY_SOURCES.burton, UNIVERSITY_SOURCES.burtonHistory],
+    color: '#c4c0b6',
   }),
-  schematicBuilding({
+  building({
     id: 'hatcher-graduate-library', name: 'Harlan Hatcher Graduate Library', category: 'Library',
-    description: 'Graduate research library beside the Diag.',
-    lat: 42.27622, lon: -83.73819, width: 81, depth: 57, levels: 5, heightMeters: 24,
+    description: '由相连的 Hatcher North 与 Hatcher South 两部分组成。',
+    floors: 'North：地下室、1–4 层及 A 半层；South：1–8 层。',
+    facts: ['North 与 South 在第 2 层相连；第 4 层可通往两侧书库。'],
+    sources: [UNIVERSITY_SOURCES.hatcher],
+    floorPlanUrl: UNIVERSITY_SOURCES.hatcher.url,
+    color: '#b9c0bb',
   }),
-  schematicBuilding({
+  building({
     id: 'shapiro-undergraduate-library', name: 'Shapiro Undergraduate Library', category: 'Library',
-    description: 'Undergraduate library south of the Diag.',
-    lat: 42.27563, lon: -83.73718, width: 65, depth: 50, levels: 5, heightMeters: 22,
+    description: '位于 Diag 南侧的本科图书馆。',
+    floors: '市建筑图层记录 4 stories；校方提供逐层平面图。',
+    facts: ['校方历史资料描述其原始外观为简洁立面。'],
+    sources: [UNIVERSITY_SOURCES.shapiro],
+    floorPlanUrl: UNIVERSITY_SOURCES.shapiro.url,
+    color: '#aaaead',
   }),
-  schematicBuilding({
+  building({
     id: 'rackham-building', name: 'Rackham Graduate School', category: 'Academic',
-    description: 'Graduate school landmark north of the Diag.',
-    lat: 42.28062, lon: -83.73726, width: 92, depth: 64, levels: 4, heightMeters: 21,
+    description: '1938 年建成的研究生院建筑。',
+    floors: '校方资料称 5 层；市图层该建筑记录 3 stories，数值有差异。',
+    facts: ['印第安纳石灰岩外墙、铜屋顶；第 2 与第 4 层设外部露台。'],
+    sources: [UNIVERSITY_SOURCES.rackham, UNIVERSITY_SOURCES.rackhamHistory],
+    color: '#c3bba8',
   }),
-  schematicBuilding({
+  building({
     id: 'michigan-league', name: 'Michigan League', category: 'Campus life',
-    description: 'Campus gathering and event building east of the Diag.',
-    lat: 42.27932, lon: -83.73756, width: 65, depth: 52, levels: 4, heightMeters: 20,
+    description: '带有多翼体量的校园活动建筑。',
+    floors: '校方历史资料称地上 5 层；市图层记录 3 stories，数值有差异。',
+    facts: ['红砖与白色石材饰边；资料提到老虎窗、平开窗和阳台。'],
+    sources: [UNIVERSITY_SOURCES.league],
+    color: '#a87560',
   }),
-  schematicBuilding({
+  building({
     id: 'hill-auditorium', name: 'Hill Auditorium', category: 'Performance',
-    description: 'Performance hall on North University Avenue.',
-    lat: 42.27918, lon: -83.73908, width: 67, depth: 60, levels: 4, heightMeters: 24,
+    description: '以大型演出空间和南立面入口著称。',
+    floors: '校方资料称 4 层；市图层记录 3 stories，数值有差异。',
+    facts: ['南立面入口有 4 根多立克柱；楼层之间有石质或陶土腰线。'],
+    sources: [UNIVERSITY_SOURCES.hill, UNIVERSITY_SOURCES.hillDesign],
+    color: '#a66d59',
   }),
-  schematicBuilding({
+  building({
     id: 'lorch-hall', name: 'Lorch Hall', category: 'Academic',
-    description: 'Academic building at the southern edge of the core view.',
-    lat: 42.2737, lon: -83.7376, width: 67, depth: 45, levels: 3, heightMeters: 17,
+    description: '历史建筑轮廓来自安娜堡市建筑数据。',
+    floors: '历史资料记载原建筑各翼为 4 层；校园图层记录 4 stories。',
+    facts: ['历史资料描述砖墙、石板坡屋顶及拱形大窗。校方正在推进翻修与扩建。'],
+    sources: [UNIVERSITY_SOURCES.lorch, UNIVERSITY_SOURCES.lorchProject],
+    color: '#a87560',
   }),
 ];

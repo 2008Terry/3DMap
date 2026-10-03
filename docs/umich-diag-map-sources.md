@@ -1,54 +1,45 @@
-# Diag map data and attribution
+# UMich Diag map data and attribution
 
-Accessed 2026-10-02. This is an orientation prototype centered on the University of Michigan Diag. Its visible building outlines, lawn, paths, and street strips are **schematic estimates**. They must not be used for survey work or official navigation.
+Accessed 2026-10-02. The eight campus targets use building polygons from the City of Ann Arbor's public **Building Footprints** dataset. The lawn, paths, and street strips remain schematic orientation context and are not survey or navigation data.
 
-## Building anchors
+## City building geometry
 
-The eight named center coordinates in `src/campusData.js` come from [UMichFreePark's buildings.json](https://github.com/BereZone/umichfreepark/blob/main/src/engine/data/buildings.json), accessed 2026-10-02. For each record we used `id`, `name`, `lat`, `lon`, `coordSource`, and `coordConfidence`. The upstream file labels these coordinates `coordSource: "osm"`, identifies OpenStreetMap via Overpass as its source, and reports `lastVerified: "2026-08-07"`. It contains **center points only**; it does not contain building footprint polygons. We could not independently retrieve the underlying OSM ways or University of Michigan building pages in this environment: requests to OSM, Overpass, and maps.umich.edu returned proxy CONNECT 403.
+- Dataset page: https://data.a2gov.org/@city-of-ann-arbor/building-footprints
+- Feature service: https://a2maps.a2gov.org/a2arcgis/rest/services/OSI/BuildingFootprints/FeatureServer/0
+- Current records were queried by `FacilityID` with WGS84 output (`outSR=4326`) on 2026-10-02. The August 31, 2026 downloadable GeoJSON snapshot has older names and does not expose all current service fields, so the app's compact geometry file was generated from the live City feature service response.
+- City metadata says the outlines were generated semi-automatically from 2009 LiDAR and 2005–2008 orthophotography, quality checked, and later updated from construction plans and checked against newer aerial imagery. The City page lists the dataset as updated August 31, 2026.
+- The City layer credits Woolpert and City of Ann Arbor Community Services. The data page does not expose a license label, so this project records attribution without claiming a particular open-data license.
+- Geometry is simplified by at most 0.35 local meters for compact rendering and projected into the existing local-meter scene around `MAP_CENTER` using the WGS84 latitude/longitude values returned by the service. Source `FacilityID`, current `Bldg_Name`, `ABG_BLD_HG`, and `STORIES` values are preserved in `src/campusBuildingFootprints.json`.
+- `ABG_BLD_HG` is described by the City as average structure height. Its unit is not separately declared in the layer schema. The project interprets the values as international feet for extrusion: the layer's coordinate system uses international feet, and Burton Tower's value of 120 matches the University's published 120-foot bell-chamber floor height. This is a documented interpretation, not a City-declared field unit. Burton Tower's displayed model height instead uses the University's 192-foot overall-height figure; the City average field remains preserved.
+- The City `STORIES` values are retained per footprint component. They are not blindly promoted to one building-wide fact. Where University materials disagree, the detail panel names both values and the model does not add guessed floor bands.
 
-| Upstream ID | Upstream building name | Latitude | Longitude |
-| --- | --- | ---: | ---: |
-| `angell-hall` | Angell Hall | 42.27677 | -83.73975 |
-| `burton-memorial-tower` | Burton Memorial Tower | 42.27945 | -83.73871 |
-| `hatcher-graduate-library` | Harlan Hatcher Graduate Library | 42.27622 | -83.73819 |
-| `shapiro-undergraduate-library` | Shapiro Undergraduate Library | 42.27563 | -83.73718 |
-| `rackham-building` | Rackham Graduate School | 42.28062 | -83.73726 |
-| `michigan-league` | Michigan League | 42.27932 | -83.73756 |
-| `hill-auditorium` | Hill Auditorium | 42.27918 | -83.73908 |
-| `lorch-hall` | Lorch Hall | 42.27370 | -83.73760 |
+## Matched City records
 
-The names and short role descriptions are orientation copy derived from these names and familiar building functions. Direct verification against University of Michigan pages remains pending because those pages could not be reached. Do not interpret the prose as a verified department or use listing.
+| Map building | City `FacilityID` | Current City name | City average height field | City stories |
+| --- | --- | --- | ---: | ---: |
+| Angell Hall | `BLD-034824` | UM Angell Hall | 70 ft | 4 |
+| Angell Hall auditoriums | `BLD-034821` | UM Angell Hall | 25 ft | 1 |
+| Burton Memorial Tower | `BLD-000825` | UM Burton Memorial Tower | 120 ft | 13 |
+| Hatcher North | `BLD-034813` | UM Hatcher Graduate Library | 55 ft | 4 |
+| Hatcher South | `BLD-034814` | UM Hatcher Graduate Library | 85 ft | 8 |
+| Hatcher connector | `BLD-034815` | UM Hatcher Graduate Library | 12 ft | 1 |
+| Shapiro Library | `BLD-034816` | UM Shapiro Library | 59.526 ft | 4 |
+| Rackham | `BLD-021687` | UM HW Rackham Building | 82.118 ft | 3 |
+| Michigan League | `BLD-000026` | UM Michigan League / Mendelssohn | 54.860 ft | 3 |
+| Hill Auditorium | `BLD-008864` | UM Hill Auditorium | 60 ft | 3 |
+| Lorch Hall | `BLD-008871` | UM Lorch Hall | 54.938 ft | 4 |
 
-## Geometry and estimates
+The current City service names Angell's attached auditorium polygon as Angell Hall. Three Hatcher polygons, including a narrow connector, are kept together as one library selection. The separate Mason Hall polygons were excluded.
 
-`MAP_CENTER` is 42.2772° N, 83.7385° W. Longitude is projected to eastward local meters using `111195 × cos(center latitude)` meters per degree; latitude uses 111195 meters per degree and is negated so north is negative `z`. The mapped core is roughly 800 meters across. This is a small-area approximation.
+## University materials used for visible facts and floor-plan links
 
-Each building's `footprint` is a closed, axis-aligned rectangle centered on its OSM-derived point. Width and depth were selected for legible relative massing, without measurement from a footprint source. Every building sets `footprintIsEstimate: true`. Every `levels` and `heightMeters` value is illustrative; every building sets `heightIsEstimate: true`. The Diag lawn, primary paths, and street surfaces were also sketched for context and have no sourced outline claim.
+- Angell Hall: https://sites.lsa.umich.edu/greekcampus/centralcampus/angell-hall/ and https://bentley.umich.edu/wp-content/uploads/2014/09/University_of_Michigan_History_Subject_Guide.pdf. The sources describe the eight-column classical facade and four-story building.
+- Burton Memorial Tower: https://bentley.umich.edu/discover/bentley-materials/campus-tour/building-index/burton-tower/ and https://milproj.dc.umich.edu/mort/central/north%20of%20north%20u/Burton%20Tower/index.html. Bentley gives 192 feet overall; the historical survey describes ten floors plus a basement, while the City `STORIES` record says 13.
+- Hatcher Library: https://www.lib.umich.edu/locations-and-hours/hatcher-library/navigating-building/. The page describes North full floors 1–4 plus basement and A floors, South floors 1–8, their level-2 connection, and links to official floor plans.
+- Shapiro Library: https://www.lib.umich.edu/locations-and-hours/shapiro-library/. The official page links to published floor plans.
+- Rackham: https://umaec.umich.edu/projects/completed-projects/horace-h-rackham-school-of-graduate-studies-building/ and https://rackham.umich.edu/about/rackham-building/history-of-the-rackham-building/. U-M describes a five-story limestone building with copper roof and terraces at levels 2 and 4; the City record says 3 stories.
+- Michigan League: https://milproj.dc.umich.edu/mort/central/north%20of%20north%20u/Michigan%20League/index.html. The U-M history describes five floors, red brick with white trim, dormer and casement windows, alcoves, and balconies; the City record says 3 stories.
+- Hill Auditorium: https://news.umich.edu/history-of-hill-auditorium/ and https://umaec.umich.edu/projects/completed-projects/hill-auditorium-renovation/design/. U-M describes a four-story brick building, its entrance columns and facade bands, and publishes design/elevation materials; the City record says 3 stories.
+- Lorch Hall: https://milproj.dc.umich.edu/mort/central/south%20of%20south%20U/Lorch%20Hall/index.html and https://umaec.umich.edu/projects/major-projects/lorch-hall-renovation-and-addition/project-details/. Historical materials describe four-story wings, brick, slate roofs, and arched upper windows. U-M lists a renovation/addition with construction beginning in spring 2026 and estimated completion in winter 2030, so this snapshot may not represent the final project design.
 
-## Source credits and license
-
-**© OpenStreetMap contributors.** The underlying OSM coordinate data is available under the [Open Database License (ODbL)](https://www.openstreetmap.org/copyright). See [OpenStreetMap](https://www.openstreetmap.org/) and [Overpass API](https://overpass-api.de/) for the upstream source named by UMichFreePark. These citations do **not** mean the estimated outline polygons came from OpenStreetMap.
-
-Eight center records were adapted from [UMichFreePark](https://github.com/BereZone/umichfreepark), [MIT LICENSE](https://github.com/BereZone/umichfreepark/blob/main/LICENSE), copyright (c) 2026 UMichFreePark contributors. The source file was accessed 2026-10-02.
-
-MIT License
-
-Copyright (c) 2026 UMichFreePark contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Only directly supported facts and source links appear in building details. No internal rooms are synthesized. The current selection provides official floor-plan links where the University's public pages make plans available.

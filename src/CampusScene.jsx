@@ -34,15 +34,15 @@ function surface(ring, color, y) {
   return mesh;
 }
 
-function buildingMesh(building) {
+function buildingMesh(building, part) {
   const material = new THREE.MeshStandardMaterial({
-    color: building.category === 'Landmark' ? '#c5cbbd' : '#b7c9c5',
+    color: building.color,
     roughness: 0.83,
     metalness: 0.04,
   });
   const mesh = new THREE.Mesh(
-    new THREE.ExtrudeGeometry(polygonShape(building.footprint), {
-      depth: building.heightMeters,
+    new THREE.ExtrudeGeometry(polygonShape(part.footprint), {
+      depth: part.heightMeters,
       bevelEnabled: false,
       steps: 1,
     }),
@@ -57,8 +57,8 @@ function buildingMesh(building) {
   return mesh;
 }
 
-function buildingCenter(ring) {
-  const points = ring.slice(0, -1);
+function buildingCenter(rings) {
+  const points = rings.flatMap((ring) => ring.slice(0, -1));
   const [x, z] = points.reduce(([sumX, sumZ], point) => [sumX + point[0], sumZ + point[1]], [0, 0]);
   return [x / points.length, z / points.length];
 }
@@ -136,10 +136,10 @@ export default function CampusScene({
     ground.receiveShadow = true;
     scene.add(ground);
 
-    context.streets.forEach(({ footprint }) => scene.add(surface(footprint, '#899997', 0.025)));
-    const lawn = surface(context.diagLawn, '#79a47a', 0.055);
+    context.streets.forEach(({ footprint }) => scene.add(surface(footprint, '#b8c4bc', 0.025)));
+    const lawn = surface(context.diagLawn, '#8eaa8d', 0.055);
     scene.add(lawn);
-    context.paths.forEach(({ footprint }) => scene.add(surface(footprint, '#d9d0ba', 0.09)));
+    context.paths.forEach(({ footprint }) => scene.add(surface(footprint, '#d9d6c8', 0.09)));
 
     const buildingMeshes = [];
     let suppressLabelClick = false;
@@ -150,10 +150,13 @@ export default function CampusScene({
       }
     };
     buildings.forEach((building) => {
-      const mesh = buildingMesh(building);
-      scene.add(mesh);
-      buildingMeshes.push(mesh);
-      sceneStateRef.current.buildingMeshes.set(building.id, mesh);
+      const meshes = building.parts.map((part) => {
+        const mesh = buildingMesh(building, part);
+        scene.add(mesh);
+        buildingMeshes.push(mesh);
+        return mesh;
+      });
+      sceneStateRef.current.buildingMeshes.set(building.id, meshes);
 
       const labelElement = document.createElement('button');
       labelElement.type = 'button';
@@ -165,7 +168,7 @@ export default function CampusScene({
       labelElement.dataset.buildingId = building.id;
       labelElement.addEventListener('click', onLabelClick);
       const label = new CSS2DObject(labelElement);
-      const [x, z] = buildingCenter(building.footprint);
+      const [x, z] = buildingCenter(building.parts.map((part) => part.footprint));
       label.position.set(x, building.heightMeters + 3, z);
       label.userData.buildingId = building.id;
       scene.add(label);
@@ -302,11 +305,13 @@ export default function CampusScene({
     const state = sceneStateRef.current;
     if (!state) return;
     state.selectedBuildingId = selectedBuildingId;
-    state.buildingMeshes.forEach((mesh, id) => {
+    state.buildingMeshes.forEach((meshes, id) => {
       const selected = id === selectedBuildingId;
-      mesh.material.color.set(selected ? '#e8d393' : mesh.userData.baseColor);
-      mesh.material.emissive.set(selected ? '#514021' : '#000000');
-      mesh.material.emissiveIntensity = selected ? 0.24 : 0;
+      meshes.forEach((mesh) => {
+        mesh.material.color.set(selected ? '#e8d393' : mesh.userData.baseColor);
+        mesh.material.emissive.set(selected ? '#514021' : '#000000');
+        mesh.material.emissiveIntensity = selected ? 0.24 : 0;
+      });
     });
     state.buildingLabels.forEach((label, id) => {
       const selected = id === selectedBuildingId;

@@ -57,26 +57,38 @@ function buildingMesh(building, part) {
   return mesh;
 }
 
-function southFacadeDetails(building, part) {
+function facadeDetails(building, part) {
   const details = building.facadeDetails;
-  if (!details) return [];
+  if (!details || part.facilityId !== details.targetFacilityId) return [];
 
   const ring = part.footprint;
   const edges = ring.slice(0, -1).map((point, index) => {
     const next = ring[index + 1];
     const dx = next[0] - point[0];
     const dz = next[1] - point[1];
-    return { point, next, dx, dz, length: Math.hypot(dx, dz), midSouth: (point[1] + next[1]) / 2 };
-  }).filter((edge) => Math.abs(edge.dx) > Math.abs(edge.dz) * 2);
-  const facade = edges.sort((a, b) => b.midSouth - a.midSouth)[0];
+    return {
+      point,
+      next,
+      dx,
+      dz,
+      length: Math.hypot(dx, dz),
+      sideCoordinate: details.side === 'east'
+        ? (point[0] + next[0]) / 2
+        : (point[1] + next[1]) / 2,
+      alignedWithSide: details.side === 'east'
+        ? Math.abs(dz) > Math.abs(dx) * 2
+        : Math.abs(dx) > Math.abs(dz) * 2,
+    };
+  }).filter((edge) => edge.alignedWithSide);
+  const facade = edges.sort((a, b) => b.sideCoordinate - a.sideCoordinate)[0];
   if (!facade) return [];
 
   const baseY = 0.18;
   const height = part.heightMeters * 0.44;
   const radius = facade.length * 0.018;
   const bodyHeight = height * 0.88;
-  const normalX = -facade.dz / facade.length;
-  const normalZ = facade.dx / facade.length;
+  const normalX = details.side === 'east' ? 1 : 0;
+  const normalZ = details.side === 'south' ? 1 : 0;
   const material = new THREE.MeshStandardMaterial({ color: '#c5bda8', roughness: 0.86 });
   const meshes = [];
   const addCylinder = (x, z, y, cylinderHeight, bottomRadius, topRadius) => {
@@ -89,11 +101,12 @@ function southFacadeDetails(building, part) {
     mesh.receiveShadow = true;
     mesh.userData.buildingId = building.id;
     mesh.userData.baseColor = material.color.clone();
+    mesh.userData.preserveBaseColor = true;
     meshes.push(mesh);
   };
 
   const anchors = [];
-  const count = details.southPorticoColumns || 0;
+  const count = details.columns || 0;
   for (let index = 0; index < count; index += 1) {
     const progress = 0.12 + (0.76 * index) / (count - 1);
     const x = facade.point[0] + facade.dx * progress + normalX * radius * 0.2;
@@ -117,10 +130,34 @@ function southFacadeDetails(building, part) {
     beam.receiveShadow = true;
     beam.userData.buildingId = building.id;
     beam.userData.baseColor = material.color.clone();
+    beam.userData.preserveBaseColor = true;
     meshes.push(beam);
   }
 
-  details.southStringcourses?.forEach((fraction, index) => {
+  const windowCount = details.windowBays || 0;
+  if (windowCount && count > 1) {
+    const windowMaterial = new THREE.MeshStandardMaterial({ color: '#425552', roughness: 0.38, metalness: 0.12 });
+    for (let index = 0; index < windowCount; index += 1) {
+      const progress = 0.12 + (0.76 * (index + 0.5)) / windowCount;
+      const window = new THREE.Mesh(
+        new THREE.BoxGeometry(facade.length * 0.76 / windowCount, part.heightMeters * 0.25, 0.18),
+        windowMaterial,
+      );
+      window.position.set(
+        facade.point[0] + facade.dx * progress - normalX * 0.035,
+        baseY + part.heightMeters * 0.18,
+        facade.point[1] + facade.dz * progress - normalZ * 0.035,
+      );
+      window.rotation.y = -Math.atan2(facade.dz, facade.dx);
+      window.castShadow = true;
+      window.userData.buildingId = building.id;
+      window.userData.baseColor = windowMaterial.color.clone();
+      window.userData.preserveBaseColor = true;
+      meshes.push(window);
+    }
+  }
+
+  details.stringcourses?.forEach((fraction, index) => {
     const course = new THREE.Mesh(
       new THREE.BoxGeometry(facade.length, 0.24, radius * 0.8),
       new THREE.MeshStandardMaterial({ color: index === 0 ? '#d2cbbc' : '#a87560', roughness: 0.9 }),
@@ -131,6 +168,7 @@ function southFacadeDetails(building, part) {
     course.receiveShadow = true;
     course.userData.buildingId = building.id;
     course.userData.baseColor = course.material.color.clone();
+    course.userData.preserveBaseColor = true;
     meshes.push(course);
   });
   return meshes;
@@ -240,12 +278,12 @@ export default function CampusScene({
         const mesh = buildingMesh(building, part);
         scene.add(mesh);
         buildingMeshes.push(mesh);
-        const details = southFacadeDetails(building, part);
-        details.forEach((detail) => {
+        const facadeObjects = facadeDetails(building, part);
+        facadeObjects.forEach((detail) => {
           scene.add(detail);
           buildingMeshes.push(detail);
         });
-        return [mesh, ...details];
+        return [mesh, ...facadeObjects];
       });
       sceneStateRef.current.buildingMeshes.set(building.id, meshes);
       const rings = building.parts.map((part) => part.footprint);
@@ -410,9 +448,10 @@ export default function CampusScene({
     state.buildingMeshes.forEach((meshes, id) => {
       const selected = id === selectedBuildingId;
       meshes.forEach((mesh) => {
-        mesh.material.color.set(selected ? '#e8d393' : mesh.userData.baseColor);
-        mesh.material.emissive.set(selected ? '#514021' : '#000000');
-        mesh.material.emissiveIntensity = selected ? 0.24 : 0;
+        const highlightMesh = selected && !mesh.userData.preserveBaseColor;
+        mesh.material.color.set(highlightMesh ? '#e8d393' : mesh.userData.baseColor);
+        mesh.material.emissive.set(highlightMesh ? '#514021' : '#000000');
+        mesh.material.emissiveIntensity = highlightMesh ? 0.24 : 0;
       });
     });
     state.buildingLabels.forEach((label, id) => {

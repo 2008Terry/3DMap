@@ -92,8 +92,11 @@ export const BUILDINGS = [
     id: 'angell-hall', name: 'Angell Hall', category: 'Academic',
     description: '密歇根大学中央校区的古典风格建筑。',
     floors: '主楼 4 层；市数据将 Auditorium 部件记为 1 层。',
-    facts: ['南立面有 8 根多立克柱和古典檐部。'],
+    facts: ['主立面有 8 根多立克柱和古典檐部；校方照片显示柱廊后方有窗面。'],
     sources: [UNIVERSITY_SOURCES.angell, UNIVERSITY_SOURCES.angellFloors],
+    facadeDetails: {
+      side: 'east', targetFacilityId: 'BLD-034824', columns: 8, windowBays: 7, source: UNIVERSITY_SOURCES.angell,
+    },
     color: '#b8b2a4',
   }),
   building({
@@ -144,7 +147,9 @@ export const BUILDINGS = [
     floors: '校方资料称 4 层；市图层记录 3 stories，数值有差异。',
     facts: ['南立面入口有 4 根多立克柱；楼层之间有石质或陶土腰线。'],
     sources: [UNIVERSITY_SOURCES.hill, UNIVERSITY_SOURCES.hillDesign],
-    facadeDetails: { southPorticoColumns: 4, southStringcourses: [0.28, 0.76], source: UNIVERSITY_SOURCES.hill },
+    facadeDetails: {
+      side: 'south', targetFacilityId: 'BLD-008864', columns: 4, stringcourses: [0.28, 0.76], source: UNIVERSITY_SOURCES.hill,
+    },
     color: '#a66d59',
   }),
   building({

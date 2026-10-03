@@ -26,7 +26,7 @@ export default function CampusExplorer() {
         <p className="intro-note">沿着 Diag 探索周边建筑。<br />拖动地图，点选建筑查看并聚焦立面。</p>
       </section>
 
-      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。Hill Auditorium 南立面柱廊按校方资料作示意建模，细部尺寸不是测量值。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航；没有可靠平面图的楼不绘制内部结构。</span></p>
+      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。Angell Hall 与 Hill Auditorium 的柱廊、窗面和腰线为校方资料支持的立面示意，细部尺寸不是测量值。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航；没有可靠平面图的楼不绘制内部结构。</span></p>
 
       <section className="workspace" aria-label="Diag 校园建筑探索器">
         <aside className="building-panel panel" aria-label="建筑列表">

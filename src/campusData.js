@@ -64,7 +64,7 @@ const cityParts = (id) => sourceFootprints.buildings[id].map((part) => ({
     : part.averageHeightFeet * 0.3048,
 }));
 
-const building = ({ id, name, category, description, floors, facts, sources, floorPlanUrl, color }) => {
+const building = ({ id, name, category, description, floors, facts, sources, floorPlanUrl, facadeDetails, color }) => {
   const parts = cityParts(id);
   const maxHeight = Math.max(...parts.map((part) => part.heightMeters));
   return {
@@ -80,6 +80,7 @@ const building = ({ id, name, category, description, floors, facts, sources, flo
       : `市数据平均结构高度 ${Math.max(...parts.map((part) => part.averageHeightFeet)).toFixed(1)} 英尺`,
     floors,
     facts,
+    facadeDetails,
     sources: [CITY_SOURCE, ...sources],
     floorPlanUrl,
     color,
@@ -116,7 +117,7 @@ export const BUILDINGS = [
     id: 'shapiro-undergraduate-library', name: 'Shapiro Undergraduate Library', category: 'Library',
     description: '位于 Diag 南侧的本科图书馆。',
     floors: '市建筑图层记录 4 stories；校方提供逐层平面图。',
-    facts: ['校方历史资料描述其原始外观为简洁立面。'],
+    facts: [],
     sources: [UNIVERSITY_SOURCES.shapiro],
     floorPlanUrl: UNIVERSITY_SOURCES.shapiro.url,
     color: '#aaaead',
@@ -143,6 +144,7 @@ export const BUILDINGS = [
     floors: '校方资料称 4 层；市图层记录 3 stories，数值有差异。',
     facts: ['南立面入口有 4 根多立克柱；楼层之间有石质或陶土腰线。'],
     sources: [UNIVERSITY_SOURCES.hill, UNIVERSITY_SOURCES.hillDesign],
+    facadeDetails: { southPorticoColumns: 4, southStringcourses: [0.28, 0.76], source: UNIVERSITY_SOURCES.hill },
     color: '#a66d59',
   }),
   building({

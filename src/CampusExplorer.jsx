@@ -23,10 +23,10 @@ export default function CampusExplorer() {
           <p className="eyebrow"><span>美国 · 密歇根大学</span><span className="eyebrow-line" /><span>CENTRAL CAMPUS</span></p>
           <h1 id="page-title">对角广场与中央校区<span>The Diag · University of Michigan</span></h1>
         </div>
-        <p className="intro-note">沿着 Diag 探索周边建筑。<br />拖动地图，点选建筑查看概况。</p>
+        <p className="intro-note">沿着 Diag 探索周边建筑。<br />拖动地图，点选建筑查看并聚焦立面。</p>
       </section>
 
-      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航。没有可靠平面图的楼不绘制内部结构。</span></p>
+      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。Hill Auditorium 南立面柱廊按校方资料作示意建模，细部尺寸不是测量值。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航；没有可靠平面图的楼不绘制内部结构。</span></p>
 
       <section className="workspace" aria-label="Diag 校园建筑探索器">
         <aside className="building-panel panel" aria-label="建筑列表">
@@ -81,11 +81,12 @@ export default function CampusExplorer() {
                 <div><dt>模型挤出高度</dt><dd>{selectedBuilding.heightLabel}<small>用于显示体量；市数据字段为平均结构高度</small></dd></div>
                 <div><dt>轮廓组成</dt><dd>{selectedBuilding.parts.length} 个市图层建筑部件<small>按 City of Ann Arbor Facility ID 匹配</small></dd></div>
               </dl>
-              <div className="detail-architecture">
+              {selectedBuilding.facts.length > 0 && <div className="detail-architecture">
                 <h3>已核实的建筑特征</h3>
                 <ul>{selectedBuilding.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul>
                 {selectedBuilding.floorPlanUrl && <a className="floor-plan-link" href={selectedBuilding.floorPlanUrl} target="_blank" rel="noreferrer">查看校方楼层平面图 ↗</a>}
-              </div>
+              </div>}
+              {selectedBuilding.floorPlanUrl && selectedBuilding.facts.length === 0 && <a className="floor-plan-link" href={selectedBuilding.floorPlanUrl} target="_blank" rel="noreferrer">查看校方楼层平面图 ↗</a>}
               <div className="building-sources">
                 <h3>资料来源</h3>
                 {selectedBuilding.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}

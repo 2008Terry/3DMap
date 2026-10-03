@@ -32,6 +32,7 @@
 
 - The checkout contains uncommitted gesture-recognition work that changed the root app entry. Keep that work intact and expose the campus map through a separate `/campus.html` Vite entrypoint.
 - Use the City of Ann Arbor's live Building Footprints FeatureServer query for WGS84 polygons and per-record fields; it contains current names and a `STORIES` field that differ from the August downloadable snapshot.
+- Render Hill Auditorium's verified south-portico column count and documented stringcourses with schematic dimensions. Keep the other buildings' supported exterior facts in the detail panel until reliable sources establish their locations and dimensions; do not infer window grids.
 
 ---
 
@@ -70,9 +71,9 @@
 - Building selection, label IDs, and reset-camera behavior remain unchanged.
 
 - [x] Review official University materials and clear, attributable building photographs for the eight targets; record which visible façade features each source verifies.
-- [x] Add only confirmed exterior details, such as a supported roof profile or façade divisions, to the corresponding building records and render those details in the scene. Do not add generic window grids or unsupported floor counts.
+- [x] Add Hill Auditorium's source-confirmed four south-facade columns and documented stringcourses to its building record and render them with explicitly schematic dimensions. Do not add generic window grids or unsupported floor counts.
 - [x] Keep buildings with no verified façade imagery as simple sourced footprint extrusions, with no unsupported decorative detail.
 - [x] Reduce the contrast and visual weight of street strips and paths through map-specific styles; retain enough Diag context for orientation.
-- [x] Add a dedicated map page that preserves the current root app, updates the map detail panel and caveat to distinguish sourced height from unknown floor counts, and is included in the production Vite build.
+- [x] Add a dedicated map page that preserves the current root app, updates the map detail panel and caveat to distinguish sourced height from unknown floor counts, focuses selected buildings, and is included in the production Vite build.
 - [x] Run `npm run build`; open the local map and inspect all eight shapes, labels, selection, camera reset, and visual hierarchy.
 - [x] Commit with `feat: render verified campus building details`.

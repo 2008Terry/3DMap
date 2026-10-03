@@ -57,6 +57,85 @@ function buildingMesh(building, part) {
   return mesh;
 }
 
+function southFacadeDetails(building, part) {
+  const details = building.facadeDetails;
+  if (!details) return [];
+
+  const ring = part.footprint;
+  const edges = ring.slice(0, -1).map((point, index) => {
+    const next = ring[index + 1];
+    const dx = next[0] - point[0];
+    const dz = next[1] - point[1];
+    return { point, next, dx, dz, length: Math.hypot(dx, dz), midSouth: (point[1] + next[1]) / 2 };
+  }).filter((edge) => Math.abs(edge.dx) > Math.abs(edge.dz) * 2);
+  const facade = edges.sort((a, b) => b.midSouth - a.midSouth)[0];
+  if (!facade) return [];
+
+  const baseY = 0.18;
+  const height = part.heightMeters * 0.44;
+  const radius = facade.length * 0.018;
+  const bodyHeight = height * 0.88;
+  const normalX = -facade.dz / facade.length;
+  const normalZ = facade.dx / facade.length;
+  const material = new THREE.MeshStandardMaterial({ color: '#c5bda8', roughness: 0.86 });
+  const meshes = [];
+  const addCylinder = (x, z, y, cylinderHeight, bottomRadius, topRadius) => {
+    const mesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(topRadius, bottomRadius, cylinderHeight, 12),
+      material,
+    );
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.userData.buildingId = building.id;
+    mesh.userData.baseColor = material.color.clone();
+    meshes.push(mesh);
+  };
+
+  const anchors = [];
+  const count = details.southPorticoColumns || 0;
+  for (let index = 0; index < count; index += 1) {
+    const progress = 0.12 + (0.76 * index) / (count - 1);
+    const x = facade.point[0] + facade.dx * progress + normalX * radius * 0.2;
+    const z = facade.point[1] + facade.dz * progress + normalZ * radius * 0.2;
+    anchors.push([x, z]);
+    addCylinder(x, z, baseY + bodyHeight / 2, bodyHeight, radius * 0.72, radius * 0.58);
+    addCylinder(x, z, baseY + bodyHeight + 0.12, 0.24, radius * 0.9, radius * 0.9);
+    addCylinder(x, z, baseY + height - 0.18, 0.36, radius * 0.95, radius * 0.95);
+  }
+
+  const midpointX = (facade.point[0] + facade.next[0]) / 2 + normalX * radius * 0.2;
+  const midpointZ = (facade.point[1] + facade.next[1]) / 2 + normalZ * radius * 0.2;
+  if (count) {
+    const beam = new THREE.Mesh(
+      new THREE.BoxGeometry(facade.length * 0.82, 0.62, radius * 1.8),
+      material,
+    );
+    beam.position.set(midpointX, baseY + height + 0.14, midpointZ);
+    beam.rotation.y = -Math.atan2(facade.dz, facade.dx);
+    beam.castShadow = true;
+    beam.receiveShadow = true;
+    beam.userData.buildingId = building.id;
+    beam.userData.baseColor = material.color.clone();
+    meshes.push(beam);
+  }
+
+  details.southStringcourses?.forEach((fraction, index) => {
+    const course = new THREE.Mesh(
+      new THREE.BoxGeometry(facade.length, 0.24, radius * 0.8),
+      new THREE.MeshStandardMaterial({ color: index === 0 ? '#d2cbbc' : '#a87560', roughness: 0.9 }),
+    );
+    course.position.set(midpointX, baseY + part.heightMeters * fraction, midpointZ);
+    course.rotation.y = -Math.atan2(facade.dz, facade.dx);
+    course.castShadow = true;
+    course.receiveShadow = true;
+    course.userData.buildingId = building.id;
+    course.userData.baseColor = course.material.color.clone();
+    meshes.push(course);
+  });
+  return meshes;
+}
+
 function buildingCenter(rings) {
   const points = rings.flatMap((ring) => ring.slice(0, -1));
   const [x, z] = points.reduce(([sumX, sumZ], point) => [sumX + point[0], sumZ + point[1]], [0, 0]);
@@ -112,7 +191,14 @@ export default function CampusScene({
     controls.target.copy(INITIAL_TARGET);
     controls.update();
     const buildingLabels = new Map();
-    sceneStateRef.current = { camera, controls, buildingMeshes: new Map(), buildingLabels, selectedBuildingId: null };
+    sceneStateRef.current = {
+      camera,
+      controls,
+      buildingMeshes: new Map(),
+      buildingLabels,
+      buildingFocus: new Map(),
+      selectedBuildingId: null,
+    };
 
     scene.add(new THREE.HemisphereLight('#ffffff', '#758f84', 2.4));
     const sunlight = new THREE.DirectionalLight('#fff8e9', 2.25);
@@ -150,13 +236,29 @@ export default function CampusScene({
       }
     };
     buildings.forEach((building) => {
-      const meshes = building.parts.map((part) => {
+      const meshes = building.parts.flatMap((part) => {
         const mesh = buildingMesh(building, part);
         scene.add(mesh);
         buildingMeshes.push(mesh);
-        return mesh;
+        const details = southFacadeDetails(building, part);
+        details.forEach((detail) => {
+          scene.add(detail);
+          buildingMeshes.push(detail);
+        });
+        return [mesh, ...details];
       });
       sceneStateRef.current.buildingMeshes.set(building.id, meshes);
+      const rings = building.parts.map((part) => part.footprint);
+      const [centerX, centerZ] = buildingCenter(rings);
+      const points = rings.flatMap((ring) => ring.slice(0, -1));
+      const width = Math.max(...points.map(([x]) => x)) - Math.min(...points.map(([x]) => x));
+      const depth = Math.max(...points.map(([, z]) => z)) - Math.min(...points.map(([, z]) => z));
+      sceneStateRef.current.buildingFocus.set(building.id, {
+        centerX,
+        centerZ,
+        height: building.heightMeters,
+        distance: Math.max(125, Math.max(width, depth) * 1.8, building.heightMeters * 2.2),
+      });
 
       const labelElement = document.createElement('button');
       labelElement.type = 'button';
@@ -318,6 +420,15 @@ export default function CampusScene({
       label.element.classList.toggle('is-selected', selected);
       label.element.setAttribute('aria-pressed', String(selected));
     });
+    const focus = state.buildingFocus.get(selectedBuildingId);
+    if (focus) {
+      const offset = state.camera.position.clone().sub(state.controls.target);
+      const target = new THREE.Vector3(focus.centerX, focus.height * 0.34, focus.centerZ);
+      offset.setLength(focus.distance);
+      state.controls.target.copy(target);
+      state.camera.position.copy(target).add(offset);
+      state.controls.update();
+    }
   }, [selectedBuildingId, buildings, context]);
 
   useEffect(() => {

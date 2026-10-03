@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { chooseInitialCamera } from './cameraDevices.js';
 
 const { toGestureViewModel } = await import('./gestureResults.js').catch(() => ({}));
 
@@ -31,4 +32,24 @@ test('marks unsupported model categories as unrecognized', () => {
     gestures: [[{ categoryName: 'Custom_Sign', score: 0.8 }]],
     landmarks: [[{ x: 0.5, y: 0.5, z: 0 }]],
   }).state, 'unrecognized');
+});
+
+test('prefers an integrated webcam over a virtual camera when no camera was chosen', () => {
+  assert.equal(chooseInitialCamera([
+    { deviceId: 'virtual', label: 'TranScreen Camera' },
+    { deviceId: 'integrated', label: 'Integrated Camera (04f2:b7b4)' },
+  ], ''), 'integrated');
+});
+
+test('preserves an explicit camera selection', () => {
+  assert.equal(chooseInitialCamera([
+    { deviceId: 'integrated', label: 'Integrated Camera' },
+  ], 'external'), 'external');
+});
+
+test('leaves browser default selected when no integrated webcam is identifiable', () => {
+  assert.equal(chooseInitialCamera([
+    { deviceId: 'virtual', label: 'TranScreen Camera' },
+    { deviceId: 'usb', label: 'Logitech BRIO' },
+  ], ''), '');
 });

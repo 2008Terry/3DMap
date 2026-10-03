@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { chooseInitialCamera } from './cameraDevices.js';
 import { GESTURE_LABELS, toGestureViewModel } from './gestureResults.js';
 
 const CONNECTIONS = [
@@ -35,9 +36,12 @@ export default function GestureRecognition() {
   const [cameraDevices, setCameraDevices] = useState([]);
   const [selectedCameraId, setSelectedCameraId] = useState('');
 
-  const refreshCameras = useCallback(async () => {
+  const refreshCameras = useCallback(async ({ chooseDefault = true } = {}) => {
     const devices = await navigator.mediaDevices?.enumerateDevices().catch(() => []);
-    setCameraDevices((devices ?? []).filter((device) => device.kind === 'videoinput'));
+    const videoDevices = (devices ?? []).filter((device) => device.kind === 'videoinput');
+    setCameraDevices(videoDevices);
+    if (chooseDefault) setSelectedCameraId((current) => chooseInitialCamera(videoDevices, current));
+    return videoDevices;
   }, []);
 
   const stopCamera = useCallback(() => {
@@ -95,7 +99,11 @@ export default function GestureRecognition() {
         return;
       }
       streamRef.current = stream;
-      refreshCameras();
+      const cameras = await refreshCameras({ chooseDefault: false });
+      const activeDeviceId = stream.getVideoTracks()[0]?.getSettings().deviceId;
+      if (!selectedCameraId && cameras.some((device) => device.deviceId === activeDeviceId)) {
+        setSelectedCameraId(activeDeviceId);
+      }
       videoRef.current.srcObject = stream;
       await videoRef.current.play();
       if (cameraRunRef.current !== cameraRun) {

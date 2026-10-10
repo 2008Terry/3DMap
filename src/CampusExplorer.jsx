@@ -70,7 +70,7 @@ export default function CampusExplorer({ gestureControl = false }) {
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span>空间档案<span className="brand-en"> / CAMPUS SPACES</span></span>
         </a>
-        <div className="topbar-meta"><span className="live-dot" />建筑轮廓来源：安娜堡市 <span className="meta-divider">/</span> 08 栋{!gestureControl && <a className="gesture-map-link" href="/gesture-map.html">手势地图 ↗</a>}</div>
+        <div className="topbar-meta"><span className="live-dot" />建筑轮廓来源：安娜堡市 <span className="meta-divider">/</span> Central Campus{!gestureControl && <a className="gesture-map-link" href="/gesture-map.html">手势地图 ↗</a>}</div>
       </header>
 
       <section className="intro" aria-labelledby="page-title">
@@ -81,7 +81,7 @@ export default function CampusExplorer({ gestureControl = false }) {
         <p className="intro-note">从 Diag 鸟瞰 Central Campus。<br />拖动或张开手掌平移，滚轮或拇指缩放；胜利手势重置。</p>
       </section>
 
-      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。Angell Hall 与 Hill Auditorium 的柱廊、窗面和腰线为校方资料支持的立面示意，细部尺寸不是测量值。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航；没有可靠平面图的楼不绘制内部结构。</span></p>
+      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。其它校园建筑以平面轮廓显示，不含高度或建筑详情。Angell Hall 与 Hill Auditorium 的柱廊、窗面和腰线为校方资料支持的立面示意，细部尺寸不是测量值。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航；没有可靠平面图的楼不绘制内部结构。</span></p>
 
       <section className="workspace" aria-label="Diag 校园建筑探索器">
         <aside className="building-panel panel" aria-label="建筑列表">
@@ -102,7 +102,7 @@ export default function CampusExplorer({ gestureControl = false }) {
               </button>
             ))}
           </div>
-          <div className="panel-footer"><span className="status-mark" />{BUILDINGS.length} 栋 <span>·</span> 市建筑轮廓</div>
+          <div className="panel-footer"><span className="status-mark" />{BUILDINGS.length} 栋重点建筑 <span>·</span> 详细资料</div>
         </aside>
 
         <section className="model-panel" aria-label="可交互密歇根大学中央校区全域地图">
@@ -131,7 +131,7 @@ export default function CampusExplorer({ gestureControl = false }) {
               <div className="gesture-map-action" aria-live="polite">{gestureAction}</div>
             </div>}
           </div>
-          <div className="model-legend"><span><i className="legend-dot legend-active" />已选建筑</span><span><i className="legend-dot legend-rest" />其他建筑</span><span className="model-scale">Central Campus 全域视野 · {BUILDINGS.length} 栋重点建筑轮廓</span></div>
+          <div className="model-legend"><span><i className="legend-dot legend-active" />重点建筑</span><span><i className="legend-dot legend-rest" />校园建筑轮廓</span><span className="model-scale">Central Campus 全域 · {CAMPUS_CONTEXT.buildings.length} 个背景轮廓</span></div>
         </section>
 
         <aside className="detail-panel panel" aria-label="建筑详情">

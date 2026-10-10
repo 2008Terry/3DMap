@@ -1,4 +1,5 @@
 import sourceFootprints from './campusBuildingFootprints.json';
+import campusContextSource from './campusContextFootprints.json';
 
 // Local orientation origin for the City of Ann Arbor WGS84 building outlines.
 export const MAP_CENTER = { lat: 42.2772, lon: -83.7385 };
@@ -16,6 +17,7 @@ const rectangle = (x, z, width, depth) => {
 
 // Context outlines remain schematic; building footprints come from the cited City dataset.
 export const CAMPUS_CONTEXT = {
+  buildings: campusContextSource.buildings,
   diagLawn: [
     [-63, -108], [7, -139], [87, -89], [105, -18], [36, 59],
     [-47, 57], [-92, -14], [-63, -108],

@@ -285,7 +285,7 @@ export default function CampusScene({
     scene.add(sunlight);
 
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(2400, 2800),
+      new THREE.PlaneGeometry(3000, 3000),
       new THREE.MeshStandardMaterial({ color: '#a5bdb0', roughness: 1 }),
     );
     ground.rotation.x = -Math.PI / 2;
@@ -296,6 +296,7 @@ export default function CampusScene({
     const lawn = surface(context.diagLawn, '#8eaa8d', 0.055);
     scene.add(lawn);
     context.paths.forEach(({ footprint }) => scene.add(surface(footprint, '#d9d6c8', 0.09)));
+    context.buildings.forEach(({ footprint }) => scene.add(surface(footprint, '#c8d2cb', 0.12)));
 
     const buildingMeshes = [];
     let suppressLabelClick = false;

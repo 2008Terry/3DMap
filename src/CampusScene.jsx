@@ -187,14 +187,17 @@ export default function CampusScene({
   resetCameraKey,
   onBuildingSelect,
   onClearSelection,
+  onGestureControlsReady,
 }) {
   const mountRef = useRef(null);
   const sceneStateRef = useRef(null);
   const selectRef = useRef(onBuildingSelect);
   const clearRef = useRef(onClearSelection);
+  const gestureControlsReadyRef = useRef(onGestureControlsReady);
 
   useEffect(() => { selectRef.current = onBuildingSelect; }, [onBuildingSelect]);
   useEffect(() => { clearRef.current = onClearSelection; }, [onClearSelection]);
+  useEffect(() => { gestureControlsReadyRef.current = onGestureControlsReady; }, [onGestureControlsReady]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -237,6 +240,35 @@ export default function CampusScene({
       buildingFocus: new Map(),
       selectedBuildingId: null,
     };
+
+    const gestureControls = {
+      panBy: (deltaX, deltaY) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        if (!rect.height) return;
+        const distance = camera.position.distanceTo(controls.target);
+        const worldPerPixel = (2 * distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / rect.height;
+        const right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0).setY(0).normalize();
+        const forward = new THREE.Vector3(-right.z, 0, right.x);
+        const movement = right.multiplyScalar(-deltaX * rect.width * worldPerPixel)
+          .add(forward.multiplyScalar(deltaY * rect.height * worldPerPixel));
+        controls.target.add(movement);
+        camera.position.add(movement);
+        controls.update();
+      },
+      zoomBy: (factor) => {
+        const offset = camera.position.clone().sub(controls.target);
+        const nextDistance = THREE.MathUtils.clamp(offset.length() * factor, controls.minDistance, controls.maxDistance);
+        offset.setLength(nextDistance);
+        camera.position.copy(controls.target).add(offset);
+        controls.update();
+      },
+      reset: () => {
+        controls.target.copy(INITIAL_TARGET);
+        camera.position.copy(INITIAL_CAMERA);
+        controls.update();
+      },
+    };
+    gestureControlsReadyRef.current?.(gestureControls);
 
     scene.add(new THREE.HemisphereLight('#ffffff', '#758f84', 2.4));
     const sunlight = new THREE.DirectionalLight('#fff8e9', 2.25);
@@ -438,6 +470,7 @@ export default function CampusScene({
       mount.removeChild(renderer.domElement);
       mount.removeChild(labelRenderer.domElement);
       sceneStateRef.current = null;
+      gestureControlsReadyRef.current?.(null);
     };
   }, [buildings, context]);
 

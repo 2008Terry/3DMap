@@ -17,7 +17,7 @@ const CAMERA_ERRORS = {
   OverconstrainedError: '摄像头不支持请求的视频尺寸，请更换摄像头后重试。',
 };
 
-export default function GestureRecognition() {
+export default function GestureRecognition({ onGestureChange, compact = false }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -35,6 +35,9 @@ export default function GestureRecognition() {
   const [inferenceBackend, setInferenceBackend] = useState('');
   const [cameraDevices, setCameraDevices] = useState([]);
   const [selectedCameraId, setSelectedCameraId] = useState('');
+  const gestureChangeRef = useRef(onGestureChange);
+
+  useEffect(() => { gestureChangeRef.current = onGestureChange; }, [onGestureChange]);
 
   const refreshCameras = useCallback(async ({ chooseDefault = true } = {}) => {
     const devices = await navigator.mediaDevices?.enumerateDevices().catch(() => []);
@@ -56,7 +59,9 @@ export default function GestureRecognition() {
     frameTimesRef.current = [];
     setCameraState('idle');
     setCameraError('');
-    setGesture(toGestureViewModel(null));
+    const noGesture = toGestureViewModel(null);
+    setGesture(noGesture);
+    gestureChangeRef.current?.(noGesture);
     setFps(0);
     setInferenceMs(null);
     setInferenceBackend('');
@@ -148,7 +153,9 @@ export default function GestureRecognition() {
           frameTimesRef.current = [...frameTimesRef.current.filter((time) => now - time < 1000), now];
           setFps(frameTimesRef.current.length);
           setInferenceMs(data.inferenceMs);
-          setGesture(toGestureViewModel(data.result));
+          const nextGesture = toGestureViewModel(data.result);
+          setGesture(nextGesture);
+          gestureChangeRef.current?.(nextGesture);
           return;
         }
         if (data.type === 'error') {
@@ -159,6 +166,7 @@ export default function GestureRecognition() {
           if (videoRef.current) videoRef.current.srcObject = null;
           workerRef.current?.terminate();
           workerRef.current = null;
+          gestureChangeRef.current?.(toGestureViewModel(null));
           setCameraError(`手势模型无法启动或识别失败：${data.message}`);
           setCameraState('error');
         }
@@ -171,6 +179,7 @@ export default function GestureRecognition() {
         if (videoRef.current) videoRef.current.srcObject = null;
         workerRef.current?.terminate();
         workerRef.current = null;
+        gestureChangeRef.current?.(toGestureViewModel(null));
         setCameraError('识别 Worker 无法运行。请刷新页面后重试。');
         setCameraState('error');
       };
@@ -243,6 +252,39 @@ export default function GestureRecognition() {
         ? '无法启动识别'
         : '摄像头未启动';
 
+  if (compact) {
+    return (
+      <section className="gesture-controller" aria-label="手势地图控制器">
+        <div className="gesture-controller-heading">
+          <span className={`camera-status-dot${cameraState === 'running' ? ' is-live' : ''}`} />
+          <span>{cameraState === 'running' ? '手势控制已连接' : cameraState === 'starting' ? '正在启动识别…' : '手势控制'}</span>
+          <strong>{gesture.label}</strong>
+        </div>
+        <div className={`gesture-controller-stage${isActive ? ' is-active' : ''}`}>
+          <video ref={videoRef} className="camera-video" muted playsInline aria-label="镜像摄像头预览" />
+          <canvas ref={canvasRef} className="landmark-canvas" aria-hidden="true" />
+          {!isActive && <div className="gesture-controller-placeholder">{cameraError || '启动摄像头后，用手控制地图'}</div>}
+          {cameraState === 'starting' && <div className="camera-loading">正在加载模型</div>}
+        </div>
+        <div className="gesture-controller-actions">
+          <select aria-label="选择摄像头" value={selectedCameraId} onChange={(event) => setSelectedCameraId(event.target.value)} disabled={isActive}>
+            <option value="">系统默认摄像头</option>
+            {cameraDevices.map((device, index) => (
+              <option value={device.deviceId} key={device.deviceId}>{device.label || `摄像头 ${index + 1}`}</option>
+            ))}
+          </select>
+          {isActive ? (
+            <button className="camera-button stop-button" type="button" onClick={stopCamera}><i />停止</button>
+          ) : (
+            <button className="camera-button start-button" type="button" onClick={startCamera} disabled={cameraState === 'starting'}>
+              {cameraState === 'starting' ? '连接中…' : '启动手势控制'}
+            </button>
+          )}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <main className="gesture-shell">
       <header className="gesture-topbar">
@@ -250,7 +292,7 @@ export default function GestureRecognition() {
           <span className="gesture-brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span>手势实验室<span className="gesture-brand-en"> / GESTURE LAB</span></span>
         </a>
-        <span className="local-badge"><i />ON-DEVICE INFERENCE</span>
+        <a className="local-badge gesture-map-link" href="/gesture-map.html">手势地图 ↗</a>
       </header>
 
       <section className="gesture-intro" id="top">

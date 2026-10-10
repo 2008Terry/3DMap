@@ -1,12 +1,67 @@
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import CampusScene from './CampusScene.jsx';
+import GestureRecognition from './GestureRecognition.jsx';
 import { BUILDINGS, CAMPUS_CONTEXT, MAP_CENTER } from './campusData.js';
 
-export default function CampusExplorer() {
+export default function CampusExplorer({ gestureControl = false }) {
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
   const [resetCameraKey, setResetCameraKey] = useState(0);
+  const gestureControlsRef = useRef(null);
+  const previousPalmRef = useRef(null);
+  const lastGestureRef = useRef(null);
+  const lastDiscreteActionAtRef = useRef(0);
+  const [gestureAction, setGestureAction] = useState('等待手势');
   const selectedBuilding = BUILDINGS.find((building) => building.id === selectedBuildingId);
   const clearSelection = () => setSelectedBuildingId(null);
+
+  const handleGestureChange = useCallback((gesture) => {
+    const controller = gestureControlsRef.current;
+    if (!gestureControl || !controller) return;
+    if (gesture.state !== 'recognized' || gesture.confidence < 0.68) {
+      previousPalmRef.current = null;
+      lastGestureRef.current = null;
+      setGestureAction('等待手势');
+      return;
+    }
+
+    if (gesture.key === 'Open_Palm') {
+      setGestureAction((current) => current === '张开手掌 · 移动地图' ? current : '张开手掌 · 移动地图');
+      const palm = gesture.landmarks?.[9];
+      if (!palm) return;
+      const position = { x: 1 - palm.x, y: palm.y };
+      const previous = previousPalmRef.current;
+      if (previous) {
+        const deltaX = position.x - previous.x;
+        const deltaY = position.y - previous.y;
+        const filteredX = Math.abs(deltaX) < 0.003 ? 0 : Math.max(-0.06, Math.min(0.06, deltaX));
+        const filteredY = Math.abs(deltaY) < 0.003 ? 0 : Math.max(-0.06, Math.min(0.06, deltaY));
+        gestureControlsRef.current?.panBy(filteredX, filteredY);
+      }
+      previousPalmRef.current = position;
+      lastGestureRef.current = 'Open_Palm';
+      return;
+    }
+
+    previousPalmRef.current = null;
+    if (lastGestureRef.current === gesture.key) return;
+    lastGestureRef.current = gesture.key;
+    if (gesture.key === 'Thumb_Up') {
+      if (Date.now() - lastDiscreteActionAtRef.current < 700) return;
+      lastDiscreteActionAtRef.current = Date.now();
+      setGestureAction('拇指向上 · 放大地图');
+      gestureControlsRef.current?.zoomBy(0.82);
+    } else if (gesture.key === 'Thumb_Down') {
+      if (Date.now() - lastDiscreteActionAtRef.current < 700) return;
+      lastDiscreteActionAtRef.current = Date.now();
+      setGestureAction('拇指向下 · 缩小地图');
+      gestureControlsRef.current?.zoomBy(1.22);
+    } else if (gesture.key === 'Victory') {
+      setGestureAction('胜利手势 · 重置视角');
+      gestureControlsRef.current?.reset();
+    } else {
+      setGestureAction(gesture.label);
+    }
+  }, [gestureControl]);
 
   return (
     <main className="app-shell" id="top">
@@ -15,7 +70,7 @@ export default function CampusExplorer() {
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span>空间档案<span className="brand-en"> / CAMPUS SPACES</span></span>
         </a>
-        <div className="topbar-meta"><span className="live-dot" />建筑轮廓来源：安娜堡市 <span className="meta-divider">/</span> 08 栋</div>
+        <div className="topbar-meta"><span className="live-dot" />建筑轮廓来源：安娜堡市 <span className="meta-divider">/</span> 08 栋{!gestureControl && <a className="gesture-map-link" href="/gesture-map.html">手势地图 ↗</a>}</div>
       </header>
 
       <section className="intro" aria-labelledby="page-title">
@@ -63,8 +118,18 @@ export default function CampusExplorer() {
               resetCameraKey={resetCameraKey}
               onBuildingSelect={setSelectedBuildingId}
               onClearSelection={clearSelection}
+              onGestureControlsReady={(controls) => { gestureControlsRef.current = controls; }}
             />
             <div className="scene-caption"><span className="caption-rule" />拖动旋转 <span>·</span> 滚轮缩放 <span>·</span> 点击建筑查看</div>
+            {gestureControl && <div className="gesture-map-overlay">
+              <GestureRecognition compact onGestureChange={handleGestureChange} />
+              <div className="gesture-map-instructions" aria-label="手势操作说明">
+                <span><b>张开手掌</b> 移动地图</span>
+                <span><b>拇指 ↑ / ↓</b> 缩放地图</span>
+                <span><b>胜利手势</b> 重置视角</span>
+              </div>
+              <div className="gesture-map-action" aria-live="polite">{gestureAction}</div>
+            </div>}
           </div>
           <div className="model-legend"><span><i className="legend-dot legend-active" />已选建筑</span><span><i className="legend-dot legend-rest" />其他建筑</span><span className="model-scale">约 800 米核心区域 · 建筑轮廓取自市数据</span></div>
         </section>

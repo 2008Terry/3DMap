@@ -9,3 +9,29 @@
 .building-sources a:hover, .floor-plan-link:hover { color: #fff; }
 @media (max-width: 1180px) { .detail-populated { max-height: 560px; } }
 @media (max-width: 720px) { .detail-populated { max-height: none; } }
+
+.gesture-map-overlay { position: absolute; z-index: 3; top: 65px; right: 13px; width: min(264px, calc(100% - 26px)); display: flex; flex-direction: column; gap: 7px; }
+.gesture-controller { overflow: hidden; border: 1px solid rgba(38,76,72,.32); background: rgba(7,26,39,.95); box-shadow: 0 8px 28px rgba(5,24,31,.24); }
+.gesture-controller-heading { min-height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 9px; border-bottom: 1px solid rgba(173,204,210,.13); color: #c4d6d7; font-size: 9px; }
+.gesture-controller-heading strong { overflow: hidden; margin-left: auto; color: #9be5d2; font-size: 9px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.gesture-controller-stage { position: relative; height: 128px; overflow: hidden; background: #081a23; }
+.gesture-controller-stage .camera-video { display: none; }
+.gesture-controller-stage.is-active .camera-video { display: block; }
+.gesture-controller-actions { min-height: 43px; display: flex; align-items: center; gap: 6px; padding: 5px 7px; border-top: 1px solid rgba(173,204,210,.12); }
+.gesture-controller-actions select { flex: 1; min-width: 0; height: 30px; padding: 0 4px; border: 1px solid rgba(173,204,210,.2); background: #0c2733; color: #c6d8d9; font-size: 8px; }
+.gesture-controller-actions .camera-button { min-width: 92px; min-height: 30px; padding: 0 7px; font-size: 8px; }
+.gesture-controller-placeholder { position: absolute; inset: 0; display: grid; place-items: center; padding: 14px; color: #90a9af; font-size: 9px; line-height: 1.6; text-align: center; }
+.gesture-map-instructions { display: grid; grid-template-columns: 1fr; gap: 3px; padding: 7px 9px; border: 1px solid rgba(38,76,72,.26); background: rgba(7,26,39,.9); color: #9eb3b6; font-size: 8px; }
+.gesture-map-instructions span { display: flex; justify-content: space-between; gap: 9px; }
+.gesture-map-instructions b { color: #d3e6df; font-weight: 500; }
+.gesture-map-action { align-self: flex-start; padding: 5px 8px; border: 1px solid rgba(38,76,72,.26); background: rgba(7,26,39,.9); color: #9be5d2; font: 8px var(--mono); }
+.gesture-map-overlay .landmark-canvas { z-index: 2; }
+.gesture-map-link { color: #a8dacf; text-decoration: none; white-space: nowrap; }
+.gesture-map-link:hover { color: #fff; }
+@media (max-width: 720px) {
+  .gesture-map-overlay { top: 58px; right: 7px; width: min(205px, calc(100% - 14px)); gap: 5px; }
+  .gesture-controller-stage { height: 100px; }
+  .gesture-map-instructions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 6px; font-size: 7px; }
+  .gesture-map-instructions span { flex-direction: column; gap: 2px; }
+  .gesture-map-action { font-size: 7px; }
+}

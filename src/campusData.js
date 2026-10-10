@@ -26,9 +26,9 @@ export const CAMPUS_CONTEXT = {
     { id: 'diag-southwest-northeast', footprint: [[-101, 58], [-94, 65], [104, -110], [97, -117], [-101, 58]] },
   ],
   streets: [
-    { id: 'state-street', name: 'State Street', footprint: rectangle(-207, 0, 18, 820) },
-    { id: 'north-university', name: 'North University Avenue', footprint: rectangle(0, -174, 810, 17) },
-    { id: 'south-university', name: 'South University Avenue', footprint: rectangle(0, 254, 810, 17) },
+    { id: 'state-street', name: 'State Street', footprint: rectangle(-207, 0, 18, 2400) },
+    { id: 'north-university', name: 'North University Avenue', footprint: rectangle(0, -174, 1800, 17) },
+    { id: 'south-university', name: 'South University Avenue', footprint: rectangle(0, 254, 1800, 17) },
     { id: 'east-university', name: 'East University Avenue', footprint: rectangle(232, 0, 17, 810) },
   ],
 };

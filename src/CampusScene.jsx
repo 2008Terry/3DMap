@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
-const INITIAL_CAMERA = new THREE.Vector3(390, 475, 570);
+const INITIAL_CAMERA = new THREE.Vector3(1650, 2000, 2375);
 const INITIAL_TARGET = new THREE.Vector3(0, 0, 0);
 const LABEL_NAMES = {
   'hatcher-graduate-library': 'Hatcher Library',
@@ -205,9 +205,9 @@ export default function CampusScene({
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#dbe8e3');
-    scene.fog = new THREE.Fog('#dbe8e3', 850, 1500);
+    scene.fog = new THREE.Fog('#dbe8e3', 2100, 4300);
 
-    const camera = new THREE.PerspectiveCamera(46, 1, 1, 2200);
+    const camera = new THREE.PerspectiveCamera(46, 1, 1, 5000);
     camera.position.copy(INITIAL_CAMERA);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -215,7 +215,7 @@ export default function CampusScene({
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.className = 'campus-canvas';
-    renderer.domElement.setAttribute('aria-label', 'Interactive three-dimensional map centered on the University of Michigan Diag');
+    renderer.domElement.setAttribute('aria-label', 'Interactive three-dimensional overview of the University of Michigan Central Campus');
     mount.appendChild(renderer.domElement);
 
     const labelRenderer = new CSS2DRenderer();
@@ -227,7 +227,7 @@ export default function CampusScene({
     controls.enableDamping = !reduceMotion.matches;
     controls.dampingFactor = 0.08;
     controls.minDistance = 135;
-    controls.maxDistance = 1250;
+    controls.maxDistance = 3800;
     controls.maxPolarAngle = Math.PI * 0.47;
     controls.target.copy(INITIAL_TARGET);
     controls.update();
@@ -275,17 +275,17 @@ export default function CampusScene({
     sunlight.position.set(-270, 480, 210);
     sunlight.castShadow = true;
     sunlight.shadow.mapSize.set(2048, 2048);
-    sunlight.shadow.camera.left = -510;
-    sunlight.shadow.camera.right = 510;
-    sunlight.shadow.camera.top = 510;
-    sunlight.shadow.camera.bottom = -510;
+    sunlight.shadow.camera.left = -1400;
+    sunlight.shadow.camera.right = 1400;
+    sunlight.shadow.camera.top = 1400;
+    sunlight.shadow.camera.bottom = -1400;
     sunlight.shadow.camera.near = 1;
-    sunlight.shadow.camera.far = 1100;
+    sunlight.shadow.camera.far = 4500;
     sunlight.shadow.bias = -0.0003;
     scene.add(sunlight);
 
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(860, 860),
+      new THREE.PlaneGeometry(2400, 2800),
       new THREE.MeshStandardMaterial({ color: '#a5bdb0', roughness: 1 }),
     );
     ground.rotation.x = -Math.PI / 2;

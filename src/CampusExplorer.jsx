@@ -78,7 +78,7 @@ export default function CampusExplorer({ gestureControl = false }) {
           <p className="eyebrow"><span>美国 · 密歇根大学</span><span className="eyebrow-line" /><span>CENTRAL CAMPUS</span></p>
           <h1 id="page-title">对角广场与中央校区<span>The Diag · University of Michigan</span></h1>
         </div>
-        <p className="intro-note">沿着 Diag 探索周边建筑。<br />拖动地图，点选建筑查看并聚焦立面。</p>
+        <p className="intro-note">从 Diag 鸟瞰 Central Campus。<br />拖动或张开手掌平移，滚轮或拇指缩放；胜利手势重置。</p>
       </section>
 
       <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。Angell Hall 与 Hill Auditorium 的柱廊、窗面和腰线为校方资料支持的立面示意，细部尺寸不是测量值。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航；没有可靠平面图的楼不绘制内部结构。</span></p>
@@ -105,9 +105,9 @@ export default function CampusExplorer({ gestureControl = false }) {
           <div className="panel-footer"><span className="status-mark" />{BUILDINGS.length} 栋 <span>·</span> 市建筑轮廓</div>
         </aside>
 
-        <section className="model-panel" aria-label="可交互中央校区建筑地图">
+        <section className="model-panel" aria-label="可交互密歇根大学中央校区全域地图">
           <div className="model-toolbar">
-            <div className="view-label"><span className="view-dot" />Diag 鸟瞰 <span className="view-coordinate">{MAP_CENTER.lat.toFixed(4)}° N&nbsp; {Math.abs(MAP_CENTER.lon).toFixed(4)}° W</span></div>
+            <div className="view-label"><span className="view-dot" />Central Campus 鸟瞰 <span className="view-coordinate">{MAP_CENTER.lat.toFixed(4)}° N&nbsp; {Math.abs(MAP_CENTER.lon).toFixed(4)}° W</span></div>
             <button className="reset-button" type="button" onClick={() => setResetCameraKey((key) => key + 1)}><span aria-hidden="true">⟳</span> 重置视角</button>
           </div>
           <div className="scene-placeholder">
@@ -131,7 +131,7 @@ export default function CampusExplorer({ gestureControl = false }) {
               <div className="gesture-map-action" aria-live="polite">{gestureAction}</div>
             </div>}
           </div>
-          <div className="model-legend"><span><i className="legend-dot legend-active" />已选建筑</span><span><i className="legend-dot legend-rest" />其他建筑</span><span className="model-scale">约 800 米核心区域 · 建筑轮廓取自市数据</span></div>
+          <div className="model-legend"><span><i className="legend-dot legend-active" />已选建筑</span><span><i className="legend-dot legend-rest" />其他建筑</span><span className="model-scale">Central Campus 全域视野 · {BUILDINGS.length} 栋重点建筑轮廓</span></div>
         </section>
 
         <aside className="detail-panel panel" aria-label="建筑详情">

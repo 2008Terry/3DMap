@@ -111,8 +111,12 @@
 **Files:**
 - Create: native/gesture_worker.py
 - Create: native/assets/gesture_recognizer.task
+- Create: native/tests/test_gesture_worker.py
+- Modify: native/setup.ps1
+- Modify: native/README.md
 - Modify: native/Main.qml
 - Modify: native/main.py
+- Modify: native/map_controller.py
 - Modify: native/requirements.txt
 
 **Interfaces:**

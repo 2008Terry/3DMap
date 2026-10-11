@@ -26,7 +26,7 @@ if (-not (Test-Path -LiteralPath $venvPython)) {
     if ($LASTEXITCODE -ne 0) { throw "Could not create native/.venv with $pythonExe" }
 }
 
-& $venvPython -m pip install --disable-pip-version-check -r (Join-Path $nativeDir "requirements.txt")
+& $venvPython -m pip install --disable-pip-version-check --no-deps -r (Join-Path $nativeDir "requirements.txt")
 if ($LASTEXITCODE -ne 0) { throw "Could not install native runtime requirements." }
 
 Write-Host "Native map environment is ready. Launch with .\native\run.ps1"

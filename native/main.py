@@ -11,6 +11,7 @@ from campus_data import load_buildings
 from geometry_provider import SelectionOverlay, geometry_from_buffers
 from mesh_builder import build_campus_mesh, build_featured_mesh, build_selection_mesh
 from map_controller import MapController
+from gesture_worker import GestureWorker
 
 
 def main() -> int:
@@ -36,6 +37,7 @@ def main() -> int:
         for building in buildings if building.featured
     ]
     map_controller = MapController(buildings, extent)
+    gesture_worker = GestureWorker(repo_root / "native" / "assets" / "gesture_recognizer.task")
     selection_overlay = SelectionOverlay()
     buildings_by_id = {building.id: building for building in buildings}
 
@@ -45,6 +47,9 @@ def main() -> int:
         selection_overlay.setGeometry(geometry)
 
     map_controller.selectionChanged.connect(update_selection)
+    gesture_worker.status_changed.connect(map_controller.set_gesture_status)
+    gesture_worker.gesture_changed.connect(map_controller.handle_gesture)
+    app.aboutToQuit.connect(gesture_worker.stop)
 
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty("campusBuildings", [building.to_qml() for building in buildings])
@@ -53,6 +58,7 @@ def main() -> int:
     engine.rootContext().setContextProperty("geometryFeatured", featured_geometries)
     engine.rootContext().setContextProperty("mapControllerObject", map_controller)
     engine.rootContext().setContextProperty("selectionOverlayState", selection_overlay)
+    engine.rootContext().setContextProperty("gestureWorkerObject", gesture_worker)
     engine.rootContext().setContextProperty("campusBounds", {
         "centerX": extent.center_x,
         "centerZ": extent.center_z,

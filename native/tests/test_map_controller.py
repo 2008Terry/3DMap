@@ -59,3 +59,33 @@ def test_camera_methods_emit_qml_requests():
     controller.zoom_by(0.8)
 
     assert events == [("reset",), ("pan", 20.0, -10.0), ("zoom", 0.8)]
+
+
+def test_gesture_actions_match_existing_mapping_and_cooldown(monkeypatch):
+    module = load_controller()
+    buildings, extent = __import__("native.campus_data", fromlist=["load_buildings"]).load_buildings(ROOT)
+    controller = module.MapController(buildings, extent)
+    events = []
+    clock = [100.0]
+    monkeypatch.setattr(module.time, "monotonic", lambda: clock[0])
+    controller.panRequested.connect(lambda x, y: events.append(("pan", x, y)))
+    controller.zoomRequested.connect(lambda factor: events.append(("zoom", factor)))
+    controller.resetCameraRequested.connect(lambda: events.append(("reset",)))
+    landmarks = [(0.0, 0.0)] * 9 + [(0.5, 0.5)]
+
+    controller.handle_gesture("Open_Palm", 0.9, landmarks)
+    landmarks[9] = (0.45, 0.53)
+    controller.handle_gesture("Open_Palm", 0.9, landmarks)
+    controller.handle_gesture("Thumb_Up", 0.9, [])
+    controller.handle_gesture("Thumb_Down", 0.9, [])
+    controller.handle_gesture("", 0.0, [])
+    clock[0] += 0.8
+    controller.handle_gesture("Thumb_Down", 0.9, [])
+    controller.handle_gesture("Victory", 0.9, [])
+    controller.handle_gesture("Thumb_Up", 0.67, [])
+
+    assert events[0][0] == "pan"
+    assert events[0][1] < 0 and events[0][2] > 0
+    assert events[1] == ("zoom", 0.82)
+    assert events[2] == ("zoom", 1.22)
+    assert events[3] == ("reset",)

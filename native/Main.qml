@@ -122,6 +122,20 @@ ApplicationWindow {
                         Button { text: "+"; onClicked: mapControllerObject.zoom_by(0.82) }
                         Button { text: "Reset view"; Layout.fillWidth: true; onClicked: mapControllerObject.reset_camera() }
                     }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Button {
+                            Layout.fillWidth: true
+                            text: "Start hand control"
+                            enabled: !gestureWorkerObject || !gestureWorkerObject.running
+                            onClicked: if (gestureWorkerObject) gestureWorkerObject.start()
+                        }
+                        Button {
+                            text: "Stop"
+                            enabled: !!gestureWorkerObject && gestureWorkerObject.running
+                            onClicked: if (gestureWorkerObject) gestureWorkerObject.stop()
+                        }
+                    }
                     Label {
                         Layout.fillWidth: true
                         text: mapControllerObject ? mapControllerObject.gesture_status : ""

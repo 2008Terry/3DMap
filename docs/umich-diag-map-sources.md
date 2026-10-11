@@ -1,13 +1,13 @@
 # UMich Diag map data and attribution
 
-Accessed 2026-10-10. The eight selectable campus targets use building polygons from the City of Ann Arbor's public **Building Footprints** dataset. The overview also includes 260 campus building-footprint outlines from the portal GeoJSON, updated October 4, 2026. The lawn, paths, and street strips remain schematic orientation context and are not survey or navigation data.
+Accessed 2026-10-10. The eight featured campus targets use City of Ann Arbor building polygons and university sources for verified facade details. The campus-wide 3D model includes 615 additional named or university-owned buildings across Central Campus and North Campus, grouped from the City's public **Building Footprints** GeoJSON updated October 4, 2026. The lawn, paths, and street strips remain schematic orientation context and are not survey or navigation data.
 
-## Central Campus overview footprints
+## Central and North Campus building models
 
 - Source: https://data.a2gov.org/@city-of-ann-arbor/building-footprints (GeoJSON resource `AA_Building_Footprints.json`, updated October 4, 2026).
-- `src/campusContextFootprints.json` contains the campus-owned features whose average exterior-ring coordinate falls within WGS84 bounds `[-83.751, 42.268, -83.721, 42.288]`, plus records named with a `UM ` prefix. The 11 FacilityIDs used by the eight selectable targets are excluded to avoid drawing duplicate outlines.
-- These 260 contextual outlines are flat and non-selectable. The city source's height field is not used for them; detailed 3D models and building facts remain limited to the eight selected targets.
-- The bounds are a regional overview extent around the Central Campus academic core and adjacent university areas. They do not imply an official survey boundary. U-M Campus Plan 2050 describes Central Campus as several connected sub-campus areas; its framework page is https://campusplan2050.umich.edu/plans-and-maps/central-campus/.
+- `src/campusBuildings.json` stores 615 additional buildings selected from Central and North Campus regional bounds. Records are included when `Owned_By` is `University` or the source name starts with `UM `; the eight featured targets are excluded to avoid duplicates. Polygon parts with the same `FacilityID` are grouped into one selectable building.
+- Each campus-wide building is extruded using `ABG_BLD_HG`, the City's average structure height. The source does not declare this field's unit; this project interprets it as feet and records that inference in the UI. These models do not claim surveyed roof heights, stories, or facade features. The downloadable GeoJSON snapshot does not contain a stories field.
+- The regional bounds are an overview selection, not official survey boundaries. U-M Campus Plan 2050 describes Central Campus as connected sub-campus areas and has a separate North Campus plan: https://campusplan2050.umich.edu/plans-and-maps/central-campus/ and https://campusplan2050.umich.edu/plans-and-maps/north-campus/.
 
 ## City building geometry
 

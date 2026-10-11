@@ -3,8 +3,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
-const INITIAL_CAMERA = new THREE.Vector3(1650, 2000, 2375);
-const INITIAL_TARGET = new THREE.Vector3(0, 0, 0);
 const LABEL_NAMES = {
   'hatcher-graduate-library': 'Hatcher Library',
   'shapiro-undergraduate-library': 'Shapiro Library',
@@ -50,8 +48,8 @@ function buildingMesh(building, part) {
   );
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = 0.18;
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
+  mesh.castShadow = Boolean(building.featured);
+  mesh.receiveShadow = Boolean(building.featured);
   mesh.userData.buildingId = building.id;
   mesh.userData.baseColor = material.color.clone();
   return mesh;
@@ -183,6 +181,7 @@ function buildingCenter(rings) {
 export default function CampusScene({
   buildings,
   context,
+  extent,
   selectedBuildingId,
   resetCameraKey,
   onBuildingSelect,
@@ -205,17 +204,22 @@ export default function CampusScene({
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#dbe8e3');
-    scene.fog = new THREE.Fog('#dbe8e3', 2100, 4300);
+    const initialTarget = new THREE.Vector3(extent.centerX, 0, extent.centerZ);
+    const cameraDistance = Math.max(extent.width, extent.depth) * 1.2;
+    const cameraOffset = new THREE.Vector3(cameraDistance * 0.42, cameraDistance * 0.88, cameraDistance * 0.38);
+    cameraOffset.setLength(cameraDistance);
+    const initialCamera = initialTarget.clone().add(cameraOffset);
+    scene.fog = new THREE.Fog('#dbe8e3', cameraDistance * 1.2, cameraDistance * 2);
 
-    const camera = new THREE.PerspectiveCamera(46, 1, 1, 5000);
-    camera.position.copy(INITIAL_CAMERA);
+    const camera = new THREE.PerspectiveCamera(46, 1, 1, cameraDistance * 3);
+    camera.position.copy(initialCamera);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.className = 'campus-canvas';
-    renderer.domElement.setAttribute('aria-label', 'Interactive three-dimensional overview of the University of Michigan Central Campus');
+    renderer.domElement.setAttribute('aria-label', 'Interactive three-dimensional overview of the University of Michigan Central and North Campuses');
     mount.appendChild(renderer.domElement);
 
     const labelRenderer = new CSS2DRenderer();
@@ -227,9 +231,9 @@ export default function CampusScene({
     controls.enableDamping = !reduceMotion.matches;
     controls.dampingFactor = 0.08;
     controls.minDistance = 135;
-    controls.maxDistance = 3800;
+    controls.maxDistance = cameraDistance * 2.8;
     controls.maxPolarAngle = Math.PI * 0.47;
-    controls.target.copy(INITIAL_TARGET);
+    controls.target.copy(initialTarget);
     controls.update();
     const buildingLabels = new Map();
     sceneStateRef.current = {
@@ -263,8 +267,8 @@ export default function CampusScene({
         controls.update();
       },
       reset: () => {
-        controls.target.copy(INITIAL_TARGET);
-        camera.position.copy(INITIAL_CAMERA);
+        controls.target.copy(initialTarget);
+        camera.position.copy(initialCamera);
         controls.update();
       },
     };
@@ -272,23 +276,26 @@ export default function CampusScene({
 
     scene.add(new THREE.HemisphereLight('#ffffff', '#758f84', 2.4));
     const sunlight = new THREE.DirectionalLight('#fff8e9', 2.25);
-    sunlight.position.set(-270, 480, 210);
+    sunlight.position.set(extent.centerX - 700, cameraDistance * 0.8, extent.centerZ + 900);
     sunlight.castShadow = true;
     sunlight.shadow.mapSize.set(2048, 2048);
-    sunlight.shadow.camera.left = -1400;
-    sunlight.shadow.camera.right = 1400;
-    sunlight.shadow.camera.top = 1400;
-    sunlight.shadow.camera.bottom = -1400;
+    sunlight.shadow.camera.left = -extent.width * 0.58;
+    sunlight.shadow.camera.right = extent.width * 0.58;
+    sunlight.shadow.camera.top = extent.depth * 0.58;
+    sunlight.shadow.camera.bottom = -extent.depth * 0.58;
     sunlight.shadow.camera.near = 1;
-    sunlight.shadow.camera.far = 4500;
+    sunlight.shadow.camera.far = cameraDistance * 2;
     sunlight.shadow.bias = -0.0003;
     scene.add(sunlight);
+    sunlight.target.position.copy(initialTarget);
+    scene.add(sunlight.target);
 
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(3000, 3000),
+      new THREE.PlaneGeometry(extent.width + 800, extent.depth + 800),
       new THREE.MeshStandardMaterial({ color: '#a5bdb0', roughness: 1 }),
     );
     ground.rotation.x = -Math.PI / 2;
+    ground.position.set(extent.centerX, 0, extent.centerZ);
     ground.receiveShadow = true;
     scene.add(ground);
 
@@ -296,7 +303,6 @@ export default function CampusScene({
     const lawn = surface(context.diagLawn, '#8eaa8d', 0.055);
     scene.add(lawn);
     context.paths.forEach(({ footprint }) => scene.add(surface(footprint, '#d9d6c8', 0.09)));
-    context.buildings.forEach(({ footprint }) => scene.add(surface(footprint, '#c8d2cb', 0.12)));
 
     const buildingMeshes = [];
     let suppressLabelClick = false;
@@ -331,6 +337,7 @@ export default function CampusScene({
         distance: Math.max(125, Math.max(width, depth) * 1.8, building.heightMeters * 2.2),
       });
 
+      if (!building.featured) return;
       const labelElement = document.createElement('button');
       labelElement.type = 'button';
       labelElement.className = 'campus-building-label';
@@ -473,7 +480,7 @@ export default function CampusScene({
       sceneStateRef.current = null;
       gestureControlsReadyRef.current?.(null);
     };
-  }, [buildings, context]);
+  }, [buildings, context, extent]);
 
   useEffect(() => {
     const state = sceneStateRef.current;
@@ -507,10 +514,13 @@ export default function CampusScene({
   useEffect(() => {
     const state = sceneStateRef.current;
     if (!state) return;
-    state.controls.target.copy(INITIAL_TARGET);
-    state.camera.position.copy(INITIAL_CAMERA);
+    state.controls.target.set(extent.centerX, 0, extent.centerZ);
+    const cameraDistance = Math.max(extent.width, extent.depth) * 1.2;
+    const cameraOffset = new THREE.Vector3(cameraDistance * 0.42, cameraDistance * 0.88, cameraDistance * 0.38);
+    cameraOffset.setLength(cameraDistance);
+    state.camera.position.copy(state.controls.target).add(cameraOffset);
     state.controls.update();
-  }, [resetCameraKey]);
+  }, [resetCameraKey, extent]);
 
   return <div className="campus-scene" ref={mountRef} />;
 }

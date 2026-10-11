@@ -1,17 +1,22 @@
 import React, { useCallback, useRef, useState } from 'react';
 import CampusScene from './CampusScene.jsx';
 import GestureRecognition from './GestureRecognition.jsx';
-import { BUILDINGS, CAMPUS_CONTEXT, MAP_CENTER } from './campusData.js';
+import { ALL_BUILDINGS, BUILDINGS, CAMPUS_BUILDINGS, CAMPUS_CONTEXT, CAMPUS_EXTENT } from './campusData.js';
 
 export default function CampusExplorer({ gestureControl = false }) {
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
+  const [buildingQuery, setBuildingQuery] = useState('');
   const [resetCameraKey, setResetCameraKey] = useState(0);
   const gestureControlsRef = useRef(null);
   const previousPalmRef = useRef(null);
   const lastGestureRef = useRef(null);
   const lastDiscreteActionAtRef = useRef(0);
   const [gestureAction, setGestureAction] = useState('等待手势');
-  const selectedBuilding = BUILDINGS.find((building) => building.id === selectedBuildingId);
+  const selectedBuilding = ALL_BUILDINGS.find((building) => building.id === selectedBuildingId);
+  const query = buildingQuery.trim().toLocaleLowerCase();
+  const visibleBuildings = query
+    ? ALL_BUILDINGS.filter((building) => `${building.name} ${building.facilityId ?? building.parts[0]?.facilityId ?? ''}`.toLocaleLowerCase().includes(query)).slice(0, 20)
+    : BUILDINGS;
   const clearSelection = () => setSelectedBuildingId(null);
 
   const handleGestureChange = useCallback((gesture) => {
@@ -70,25 +75,26 @@ export default function CampusExplorer({ gestureControl = false }) {
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span>空间档案<span className="brand-en"> / CAMPUS SPACES</span></span>
         </a>
-        <div className="topbar-meta"><span className="live-dot" />建筑轮廓来源：安娜堡市 <span className="meta-divider">/</span> Central Campus{!gestureControl && <a className="gesture-map-link" href="/gesture-map.html">手势地图 ↗</a>}</div>
+        <div className="topbar-meta"><span className="live-dot" />建筑数据：安娜堡市 <span className="meta-divider">/</span> Central + North Campus{!gestureControl && <a className="gesture-map-link" href="/gesture-map.html">手势地图 ↗</a>}</div>
       </header>
 
       <section className="intro" aria-labelledby="page-title">
         <div>
-          <p className="eyebrow"><span>美国 · 密歇根大学</span><span className="eyebrow-line" /><span>CENTRAL CAMPUS</span></p>
-          <h1 id="page-title">对角广场与中央校区<span>The Diag · University of Michigan</span></h1>
+          <p className="eyebrow"><span>美国 · 密歇根大学</span><span className="eyebrow-line" /><span>CENTRAL + NORTH CAMPUS</span></p>
+          <h1 id="page-title">密歇根大学校园全景<span>Central + North Campus · University of Michigan</span></h1>
         </div>
-        <p className="intro-note">从 Diag 鸟瞰 Central Campus。<br />拖动或张开手掌平移，滚轮或拇指缩放；胜利手势重置。</p>
+        <p className="intro-note">从 Central Campus 到 North Campus。<br />拖动或张开手掌平移，滚轮或拇指缩放；胜利手势重置。</p>
       </section>
 
-      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>建筑轮廓来自安娜堡市数据</strong> 楼层数和建筑特征按已链接的校方资料展示；来源存在差异时会明确标出。其它校园建筑以平面轮廓显示，不含高度或建筑详情。Angell Hall 与 Hill Auditorium 的柱廊、窗面和腰线为校方资料支持的立面示意，细部尺寸不是测量值。Diag 草坪、道路和步道仍为简化示意，不用于测绘或正式导航；没有可靠平面图的楼不绘制内部结构。</span></p>
+      <p className="map-caveat" role="note"><span className="caveat-mark" aria-hidden="true">!</span><span><strong>两校区建筑均可点选</strong> 校园轮廓和平均结构高度来自安娜堡市数据，平均高度按项目记录推定为英尺，并非精确屋顶测量；公开快照未包含大多数建筑的楼层与立面资料。8 栋重点建筑保留了已核实的立面和校方资料。道路、步道及校区范围为导览示意，不用于测绘或正式导航。</span></p>
 
-      <section className="workspace" aria-label="Diag 校园建筑探索器">
+      <section className="workspace" aria-label="密歇根大学 Central 与 North 校区建筑探索器">
         <aside className="building-panel panel" aria-label="建筑列表">
-          <div className="panel-heading"><span>建筑索引</span><span className="panel-index">BUILDINGS / {String(BUILDINGS.length).padStart(2, '0')}</span></div>
-          <p className="panel-subtitle">选择建筑查看真实轮廓、已核实的楼层与外观资料</p>
+          <div className="panel-heading"><span>校园建筑索引</span><span className="panel-index">BUILDINGS / {ALL_BUILDINGS.length}</span></div>
+          <p className="panel-subtitle">搜索建筑名称或 Facility ID；也可直接点选地图上的楼</p>
+          <input className="building-search" type="search" value={buildingQuery} onChange={(event) => setBuildingQuery(event.target.value)} placeholder="搜索校园建筑" aria-label="搜索校园建筑" />
           <div className="building-list" role="group" aria-label="选择建筑">
-            {BUILDINGS.map((building, index) => (
+            {visibleBuildings.map((building, index) => (
               <button
                 className={`building-option${selectedBuildingId === building.id ? ' is-current' : ''}`}
                 type="button"
@@ -101,19 +107,21 @@ export default function CampusExplorer({ gestureControl = false }) {
                 <span className="building-indicator" aria-hidden="true" />
               </button>
             ))}
+            {visibleBuildings.length === 0 && <p className="building-empty">没有匹配的建筑</p>}
           </div>
-          <div className="panel-footer"><span className="status-mark" />{BUILDINGS.length} 栋重点建筑 <span>·</span> 详细资料</div>
+          <div className="panel-footer"><span className="status-mark" />{ALL_BUILDINGS.length} 栋可查看 <span>·</span> Central + North</div>
         </aside>
 
-        <section className="model-panel" aria-label="可交互密歇根大学中央校区全域地图">
+        <section className="model-panel" aria-label="可交互密歇根大学中央校区与北校区地图">
           <div className="model-toolbar">
-            <div className="view-label"><span className="view-dot" />Central Campus 鸟瞰 <span className="view-coordinate">{MAP_CENTER.lat.toFixed(4)}° N&nbsp; {Math.abs(MAP_CENTER.lon).toFixed(4)}° W</span></div>
+            <div className="view-label"><span className="view-dot" />Central + North Campus 鸟瞰 <span className="view-coordinate">{ALL_BUILDINGS.length} 栋 3D 建筑</span></div>
             <button className="reset-button" type="button" onClick={() => setResetCameraKey((key) => key + 1)}><span aria-hidden="true">⟳</span> 重置视角</button>
           </div>
           <div className="scene-placeholder">
             <CampusScene
-              buildings={BUILDINGS}
+              buildings={ALL_BUILDINGS}
               context={CAMPUS_CONTEXT}
+              extent={CAMPUS_EXTENT}
               selectedBuildingId={selectedBuildingId}
               resetCameraKey={resetCameraKey}
               onBuildingSelect={setSelectedBuildingId}
@@ -131,7 +139,7 @@ export default function CampusExplorer({ gestureControl = false }) {
               <div className="gesture-map-action" aria-live="polite">{gestureAction}</div>
             </div>}
           </div>
-          <div className="model-legend"><span><i className="legend-dot legend-active" />重点建筑</span><span><i className="legend-dot legend-rest" />校园建筑轮廓</span><span className="model-scale">Central Campus 全域 · {CAMPUS_CONTEXT.buildings.length} 个背景轮廓</span></div>
+          <div className="model-legend"><span><i className="legend-dot legend-active" />已选建筑</span><span><i className="legend-dot legend-rest" />3D 校园建筑</span><span className="model-scale">{CAMPUS_BUILDINGS.length} 栋新增建模 · North Campus 已覆盖</span></div>
         </section>
 
         <aside className="detail-panel panel" aria-label="建筑详情">

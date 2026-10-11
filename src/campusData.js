@@ -1,5 +1,5 @@
 import sourceFootprints from './campusBuildingFootprints.json';
-import campusContextSource from './campusContextFootprints.json';
+import campusBuildingsSource from './campusBuildings.json';
 
 // Local orientation origin for the City of Ann Arbor WGS84 building outlines.
 export const MAP_CENTER = { lat: 42.2772, lon: -83.7385 };
@@ -17,7 +17,6 @@ const rectangle = (x, z, width, depth) => {
 
 // Context outlines remain schematic; building footprints come from the cited City dataset.
 export const CAMPUS_CONTEXT = {
-  buildings: campusContextSource.buildings,
   diagLawn: [
     [-63, -108], [7, -139], [87, -89], [105, -18], [36, 59],
     [-47, 57], [-92, -14], [-63, -108],
@@ -86,6 +85,7 @@ const building = ({ id, name, category, description, floors, facts, sources, flo
     sources: [CITY_SOURCE, ...sources],
     floorPlanUrl,
     color,
+    featured: true,
   };
 };
 
@@ -163,3 +163,42 @@ export const BUILDINGS = [
     color: '#a87560',
   }),
 ];
+
+const campusModel = (source) => {
+  const parts = source.parts.map((part) => ({
+    ...part,
+    heightMeters: part.heightFeet * 0.3048,
+  }));
+  const heightFeet = Math.max(...parts.map((part) => part.heightFeet));
+  return {
+    id: source.id,
+    name: source.name,
+    campus: source.campus,
+    category: source.campus,
+    description: '建筑轮廓与平均结构高度来自安娜堡市建筑数据。',
+    floors: '此公开数据快照没有提供楼层数。',
+    facts: [],
+    sources: [CITY_SOURCE],
+    parts,
+    footprint: parts[0].footprint,
+    heightMeters: Math.max(...parts.map((part) => part.heightMeters)),
+    heightLabel: `市数据平均结构高度 ${heightFeet.toFixed(1)} 英尺（单位按项目记录推定）`,
+    color: source.campus === 'North Campus' ? '#aebdb9' : '#bdb9ab',
+    featured: false,
+  };
+};
+
+export const CAMPUS_BUILDINGS = campusBuildingsSource.buildings.map(campusModel);
+export const ALL_BUILDINGS = [...BUILDINGS, ...CAMPUS_BUILDINGS];
+
+const campusPoints = ALL_BUILDINGS.flatMap((building) => building.parts.flatMap(({ footprint }) => footprint));
+const minX = Math.min(...campusPoints.map(([x]) => x));
+const maxX = Math.max(...campusPoints.map(([x]) => x));
+const minZ = Math.min(...campusPoints.map(([, z]) => z));
+const maxZ = Math.max(...campusPoints.map(([, z]) => z));
+export const CAMPUS_EXTENT = {
+  centerX: (minX + maxX) / 2,
+  centerZ: (minZ + maxZ) / 2,
+  width: maxX - minX,
+  depth: maxZ - minZ,
+};

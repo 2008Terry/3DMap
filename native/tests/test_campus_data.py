@@ -41,3 +41,16 @@ def test_malformed_building_json_reports_its_path(tmp_path):
 
     with pytest.raises(ValueError, match="campusBuildings.json"):
         module.load_buildings(tmp_path)
+
+
+def test_spatial_pick_resolves_a_building_from_the_hit_position():
+    module = load_module()
+    buildings, _ = module.load_buildings(ROOT)
+    building = next(item for item in buildings if not item.featured)
+    from shapely.geometry import Polygon
+
+    point = Polygon(building.parts[0]["footprint"]).representative_point()
+    picked = module.pick_building((point.x, building.height_m / 2, point.y))
+
+    assert picked is not None
+    assert picked.id == building.id

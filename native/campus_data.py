@@ -7,8 +7,13 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from PySide6.QtCore import QObject, Slot
+from shapely.geometry import Point, Polygon
+from shapely.strtree import STRtree
+
 FEET_TO_METERS = 0.3048
 FEATURED_BURTON_HEIGHT_FEET = 192.0
+_ACTIVE_INDEX: "_FootprintIndex | None" = None
 
 
 @dataclass
@@ -45,6 +50,40 @@ class CampusExtent:
     depth: float
 
 
+class _FootprintIndex:
+    def __init__(self, buildings: list[Building]):
+        self._records: list[tuple[Building, dict[str, Any], Polygon]] = []
+        for building in buildings:
+            for part in building.parts:
+                polygon = Polygon(part["footprint"])
+                if polygon.is_valid and not polygon.is_empty:
+                    self._records.append((building, part, polygon))
+        self._tree = STRtree([record[2] for record in self._records])
+
+    def pick(self, hit_position: tuple[float, float, float]) -> Building | None:
+        x, y, z = hit_position
+        point = Point(x, z)
+        matches: list[Building] = []
+        for result in self._tree.query(point):
+            building, part, polygon = self._records[int(result)]
+            if polygon.covers(point) and -0.05 <= y <= part["height_m"] + 0.05:
+                matches.append(building)
+        return max(matches, key=lambda item: item.height_m, default=None)
+
+
+class CampusPicker(QObject):
+    @Slot(float, float, float, result=str)
+    def selectAt(self, x: float, y: float, z: float) -> str:
+        building = pick_building((x, y, z))
+        return building.id if building else ""
+
+
+def pick_building(hit_position: tuple[float, float, float]) -> Building | None:
+    if _ACTIVE_INDEX is None:
+        return None
+    return _ACTIVE_INDEX.pick(hit_position)
+
+
 def _read_json(path: Path) -> Any:
     try:
         with path.open("r", encoding="utf-8") as source:
@@ -74,6 +113,7 @@ def _source_part(part: dict[str, Any], *, featured: bool = False) -> dict[str, A
 
 
 def load_buildings(repo_root: Path) -> tuple[list[Building], CampusExtent]:
+    global _ACTIVE_INDEX
     repo_root = Path(repo_root)
     city_data = _read_json(repo_root / "src" / "campusBuildings.json")
     featured_footprints = _read_json(repo_root / "src" / "campusBuildingFootprints.json")
@@ -156,4 +196,5 @@ def load_buildings(repo_root: Path) -> tuple[list[Building], CampusExtent]:
         width=max_x - min_x,
         depth=max_z - min_z,
     )
+    _ACTIVE_INDEX = _FootprintIndex(buildings)
     return buildings, extent

@@ -62,6 +62,7 @@
 - Create: native/mesh_builder.py
 - Create: native/geometry_provider.py
 - Create: native/MapScene.qml
+- Create: native/tests/test_mesh_builder.py
 - Modify: native/main.py
 - Modify: native/campus_data.py
 - Modify: native/Main.qml
@@ -71,7 +72,7 @@
 - mesh_builder.build_featured_mesh(building: Building) -> MeshBuffers
 - campus_data.pick_building(hit_position: tuple[float, float, float]) -> Building | None
 - geometry_provider.geometry_from_buffers(buffers: MeshBuffers) -> QQuick3DGeometry
-- `MeshBuffers` is a dataclass containing packed position floats, packed normal floats, triangle indices, and a 3D bounding box; vertices are emitted in Qt Quick 3D coordinates from local x/z footprints and height in meters.
+- `MeshBuffers` is a dataclass containing packed position floats, packed normal floats, packed RGBA color floats, triangle indices, and a 3D bounding box; vertices are emitted in Qt Quick 3D coordinates from local x/z footprints and height in meters.
 - `pick_building` queries the STRtree by hit x/z, filters candidates to polygons covering that point and hit y within the building's base-to-top bounds, then returns the highest matching building or `None`.
 
 - [ ] Extrude each footprint ring to its source-derived height; triangulate concave tops with Shapely constrained Delaunay triangulation and emit indexed vertex buffers.

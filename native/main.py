@@ -7,7 +7,9 @@ from PySide6.QtCore import QUrl
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from campus_data import load_buildings
+from campus_data import CampusPicker, load_buildings
+from geometry_provider import geometry_from_buffers
+from mesh_builder import build_campus_mesh, build_featured_mesh
 
 
 def main() -> int:
@@ -21,9 +23,25 @@ def main() -> int:
         QMessageBox.critical(None, "Campus data could not be loaded", str(error))
         return 1
 
+    generic_buildings = [building for building in buildings if not building.featured]
+    central_geometry = geometry_from_buffers(build_campus_mesh([
+        building for building in generic_buildings if building.campus == "Central Campus"
+    ]))
+    north_geometry = geometry_from_buffers(build_campus_mesh([
+        building for building in generic_buildings if building.campus == "North Campus"
+    ]))
+    featured_geometries = [
+        geometry_from_buffers(build_featured_mesh(building))
+        for building in buildings if building.featured
+    ]
+
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty("campusBuildings", [building.to_qml() for building in buildings])
-    engine.rootContext().setContextProperty("campusExtent", {
+    engine.rootContext().setContextProperty("geometryCentral", central_geometry)
+    engine.rootContext().setContextProperty("geometryNorth", north_geometry)
+    engine.rootContext().setContextProperty("geometryFeatured", featured_geometries)
+    engine.rootContext().setContextProperty("campusDataPicker", CampusPicker())
+    engine.rootContext().setContextProperty("campusBounds", {
         "centerX": extent.center_x,
         "centerZ": extent.center_z,
         "width": extent.width,

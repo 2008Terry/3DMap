@@ -7,7 +7,6 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import QObject, Slot
 from shapely.geometry import Point, Polygon
 from shapely.strtree import STRtree
 
@@ -69,13 +68,6 @@ class _FootprintIndex:
             if polygon.covers(point) and -0.05 <= y <= part["height_m"] + 0.05:
                 matches.append(building)
         return max(matches, key=lambda item: item.height_m, default=None)
-
-
-class CampusPicker(QObject):
-    @Slot(float, float, float, result=str)
-    def selectAt(self, x: float, y: float, z: float) -> str:
-        building = pick_building((x, y, z))
-        return building.id if building else ""
 
 
 def pick_building(hit_position: tuple[float, float, float]) -> Building | None:

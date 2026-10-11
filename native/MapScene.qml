@@ -9,7 +9,8 @@ Item {
     property var centralGeometry
     property var northGeometry
     property var featuredGeometries
-    property var campusPicker
+    property var mapController
+    property var selectionOverlay
     signal buildingPicked(string buildingId)
 
     View3D {
@@ -103,6 +104,19 @@ Item {
                     }
                 }
             }
+
+            Model {
+                geometry: root.selectionOverlay ? root.selectionOverlay.geometry : null
+                visible: !!root.selectionOverlay && root.selectionOverlay.geometry !== null
+                materials: PrincipledMaterial {
+                    baseColor: "#ffffff"
+                    vertexColorsEnabled: true
+                    opacity: 0.42
+                    alphaMode: PrincipledMaterial.Blend
+                    roughness: 0.7
+                    cullMode: PrincipledMaterial.NoCulling
+                }
+            }
         }
 
         OrbitCameraController {
@@ -120,9 +134,30 @@ Item {
                 if (!hit.objectHit)
                     return
                 const point = hit.scenePosition
-                const id = root.campusPicker.selectAt(point.x, point.y, point.z)
+                const id = root.mapController.select_at(point.x, point.y, point.z)
                 if (id.length > 0)
                     root.buildingPicked(id)
+            }
+        }
+
+        Connections {
+            target: root.mapController
+            function onResetCameraRequested() {
+                cameraOrigin.position = Qt.vector3d(root.campusExtent.centerX, 0, root.campusExtent.centerZ)
+                mapCamera.position = Qt.vector3d(0,
+                    Math.max(root.campusExtent.width, root.campusExtent.depth) * 0.78,
+                    Math.max(root.campusExtent.width, root.campusExtent.depth) * 0.82)
+                mapCamera.eulerRotation = Qt.vector3d(-42, 0, 0)
+            }
+            function onPanRequested(deltaX, deltaZ) {
+                cameraOrigin.position = Qt.vector3d(cameraOrigin.position.x + deltaX,
+                    cameraOrigin.position.y, cameraOrigin.position.z + deltaZ)
+            }
+            function onZoomRequested(factor) {
+                const distance = Math.max(300, Math.min(11000, mapCamera.position.z * factor))
+                const ratio = distance / mapCamera.position.z
+                mapCamera.position = Qt.vector3d(mapCamera.position.x,
+                    mapCamera.position.y * ratio, distance)
             }
         }
     }

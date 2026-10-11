@@ -85,9 +85,13 @@
 
 **Files:**
 - Create: native/BuildingDetails.qml
+- Create: native/map_controller.py
+- Create: native/tests/test_map_controller.py
 - Modify: native/Main.qml
 - Modify: native/MapScene.qml
 - Modify: native/main.py
+- Modify: native/mesh_builder.py
+- Modify: native/geometry_provider.py
 
 **Interfaces:**
 - MapController.search(query: str) -> list[BuildingSummary]
@@ -106,7 +110,6 @@
 
 **Files:**
 - Create: native/gesture_worker.py
-- Create: native/map_controller.py
 - Create: native/assets/gesture_recognizer.task
 - Modify: native/Main.qml
 - Modify: native/main.py

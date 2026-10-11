@@ -7,9 +7,10 @@ from PySide6.QtCore import QUrl
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from campus_data import CampusPicker, load_buildings
-from geometry_provider import geometry_from_buffers
-from mesh_builder import build_campus_mesh, build_featured_mesh
+from campus_data import load_buildings
+from geometry_provider import SelectionOverlay, geometry_from_buffers
+from mesh_builder import build_campus_mesh, build_featured_mesh, build_selection_mesh
+from map_controller import MapController
 
 
 def main() -> int:
@@ -34,13 +35,24 @@ def main() -> int:
         geometry_from_buffers(build_featured_mesh(building))
         for building in buildings if building.featured
     ]
+    map_controller = MapController(buildings, extent)
+    selection_overlay = SelectionOverlay()
+    buildings_by_id = {building.id: building for building in buildings}
+
+    def update_selection(building_id: str) -> None:
+        building = buildings_by_id.get(building_id)
+        geometry = geometry_from_buffers(build_selection_mesh(building)) if building else None
+        selection_overlay.setGeometry(geometry)
+
+    map_controller.selectionChanged.connect(update_selection)
 
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty("campusBuildings", [building.to_qml() for building in buildings])
     engine.rootContext().setContextProperty("geometryCentral", central_geometry)
     engine.rootContext().setContextProperty("geometryNorth", north_geometry)
     engine.rootContext().setContextProperty("geometryFeatured", featured_geometries)
-    engine.rootContext().setContextProperty("campusDataPicker", CampusPicker())
+    engine.rootContext().setContextProperty("mapControllerObject", map_controller)
+    engine.rootContext().setContextProperty("selectionOverlayState", selection_overlay)
     engine.rootContext().setContextProperty("campusBounds", {
         "centerX": extent.center_x,
         "centerZ": extent.center_z,

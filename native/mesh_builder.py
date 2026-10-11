@@ -187,3 +187,35 @@ def build_campus_mesh(buildings: Sequence[Building]) -> MeshBuffers:
 
 def build_featured_mesh(building: Building) -> MeshBuffers:
     return _build_mesh([building], featured_details=True)
+
+
+def build_selection_mesh(building: Building) -> MeshBuffers:
+    builder = _MeshBuilder()
+    highlight = (0.14, 0.58, 0.95, 0.82)
+    for part in building.parts:
+        polygon = Polygon(part["footprint"])
+        top_y = float(part["height_m"]) + 0.16
+        bottom_y = float(part["height_m"]) + 0.08
+        if polygon.is_empty or not polygon.is_valid or polygon.area <= 0:
+            continue
+        for triangle in constrained_delaunay_triangles(polygon).geoms:
+            points = list(triangle.exterior.coords)[:3]
+            top = [(x, top_y, z) for x, z in points]
+            bottom = [(x, bottom_y, z) for x, z in points]
+            builder.triangle((top[0], top[2], top[1]), (0.0, 1.0, 0.0), highlight)
+            builder.triangle((bottom[0], bottom[1], bottom[2]), (0.0, -1.0, 0.0), highlight)
+        coordinates = list(polygon.exterior.coords)
+        for start, end in zip(coordinates, coordinates[1:]):
+            dx, dz = end[0] - start[0], end[1] - start[1]
+            length = (dx * dx + dz * dz) ** 0.5 or 1.0
+            nx, nz = dz / length, -dx / length
+            midpoint = ((start[0] + end[0]) / 2, (start[1] + end[1]) / 2)
+            if nx * (midpoint[0] - polygon.centroid.x) + nz * (midpoint[1] - polygon.centroid.y) < 0:
+                nx, nz = -nx, -nz
+            a = (start[0], bottom_y, start[1])
+            b = (end[0], bottom_y, end[1])
+            c = (end[0], top_y, end[1])
+            d = (start[0], top_y, start[1])
+            builder.triangle((a, b, c), (nx, 0.0, nz), highlight)
+            builder.triangle((a, c, d), (nx, 0.0, nz), highlight)
+    return builder.finish()

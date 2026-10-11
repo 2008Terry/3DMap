@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import struct
 
-from PySide6.QtCore import QByteArray
+from PySide6.QtCore import QByteArray, QObject, Property, Signal, Slot
 from PySide6.QtGui import QVector3D
 from PySide6.QtQuick3D import QQuick3DGeometry
 
@@ -50,3 +50,20 @@ class _CampusGeometry(QQuick3DGeometry):
 
 def geometry_from_buffers(buffers: MeshBuffers) -> QQuick3DGeometry:
     return _CampusGeometry(buffers)
+
+
+class SelectionOverlay(QObject):
+    geometryChanged = Signal()
+
+    def __init__(self):
+        super().__init__()
+        self._geometry = None
+
+    @Property(QObject, notify=geometryChanged)
+    def geometry(self):
+        return self._geometry
+
+    @Slot(QObject)
+    def setGeometry(self, geometry):
+        self._geometry = geometry
+        self.geometryChanged.emit()

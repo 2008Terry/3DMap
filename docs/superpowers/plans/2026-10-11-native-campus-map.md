@@ -36,14 +36,16 @@
 - Create: native/main.py
 - Create: native/Main.qml
 - Create: native/campus_data.py
+- Create: native/featured_details.json
 - Create: native/requirements.txt
 - Create: native/setup.ps1
 - Create: native/run.ps1
 - Create: native/README.md
+- Create: native/tests/test_campus_data.py
 
 **Interfaces:**
 - campus_data.load_buildings(repo_root: Path) -> tuple[list[Building], CampusExtent]
-- `Building` is a dataclass with `id`, `facility_id`, `name`, `campus`, `parts`, `height_m`, `featured`, `facts`, and `sources`; each part has `object_id` and one closed local-coordinate footprint ring.
+- `Building` is a dataclass with `id`, `facility_id`, `name`, `campus`, `parts`, `height_m`, `featured`, `facts`, `sources`, `category`, `description`, `floors`, `color`, and `facade_details`; each part has `object_id` and one closed local-coordinate footprint ring.
 - `CampusExtent` is a dataclass with `center_x`, `center_z`, `width`, and `depth`, computed from all loaded rings.
 - Read `src/campusBuildings.json` (`buildings[]`, `parts[].heightFeet`, `parts[].footprint`) and `src/campusBuildingFootprints.json` (featured footprint/source fields); preserve curated facade/detail facts from the existing building data source.
 - main.py loads local data, exposes the controller and data to QML, and reports startup errors in a desktop dialog.

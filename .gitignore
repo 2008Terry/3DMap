@@ -1,3 +1,7 @@
 node_modules/
 dist/
 .superpowers/
+native/.venv/
+native/__pycache__/
+native/tests/__pycache__/
+.pytest_cache/

@@ -51,10 +51,10 @@
 - main.py loads local data, exposes the controller and data to QML, and reports startup errors in a desktop dialog.
 - setup.ps1 creates native/.venv using the local Python 3.12 interpreter and installs native/requirements.txt. run.ps1 launches with that environment.
 
-- [ ] Create the native package entry point and dependency manifest using the local Python/Qt versions.
-- [ ] Implement load_buildings() for the curated and campus-wide JSON files; merge duplicate campus parts by building id and preserve source metadata.
-- [ ] Add a minimal Main.qml and setup/run scripts. Keep the venv inside native/ and exclude it from Git.
-- [ ] Run setup.ps1 and run.ps1; confirm a native window opens and reports 623 buildings loaded. Confirm malformed JSON shows a desktop error.
+- [x] Create the native package entry point and dependency manifest using the local Python/Qt versions.
+- [x] Implement load_buildings() for the curated and campus-wide JSON files; merge duplicate campus parts by building id and preserve source metadata.
+- [x] Add a minimal Main.qml and setup/run scripts. Keep the venv inside native/ and exclude it from Git.
+- [x] Run setup.ps1 and run.ps1; confirm a native window opens and reports 623 buildings loaded. Confirm malformed JSON shows a desktop error.
 
 ### Task 2: Batched campus geometry and indexed selection
 
@@ -75,11 +75,11 @@
 - `MeshBuffers` is a dataclass containing packed position floats, packed normal floats, packed RGBA color floats, triangle indices, and a 3D bounding box; vertices are emitted in Qt Quick 3D coordinates from local x/z footprints and height in meters.
 - `pick_building` queries the STRtree by hit x/z, filters candidates to polygons covering that point and hit y within the building's base-to-top bounds, then returns the highest matching building or `None`.
 
-- [ ] Extrude each footprint ring to its source-derived height; triangulate concave tops with Shapely constrained Delaunay triangulation and emit indexed vertex buffers.
-- [ ] Build one shared-material geometry batch for generic Central buildings and one for generic North buildings; build one batch per featured building including its sourced facade details.
-- [ ] Build an STRtree over footprint parts and resolve Qt Quick 3D hit positions to building ids, including multipart buildings.
-- [ ] In MapScene.qml, add the two campus batches, featured batches, ground, fog, camera, and Qt Quick 3D OrbitCameraController.
-- [ ] Run run.ps1; confirm both campus extents render, featured columns/windows appear, clicking a featured or generic building shows the expected id, and city footprints contain no triangulation gaps.
+- [x] Extrude each footprint ring to its source-derived height; triangulate concave tops with Shapely constrained Delaunay triangulation and emit indexed vertex buffers.
+- [x] Build one shared-material geometry batch for generic Central buildings and one for generic North buildings; build one batch per featured building including its sourced facade details.
+- [x] Build an STRtree over footprint parts and resolve Qt Quick 3D hit positions to building ids, including multipart buildings.
+- [x] In MapScene.qml, add the two campus batches, featured batches, ground, fog, camera, and Qt Quick 3D OrbitCameraController.
+- [x] Run run.ps1; confirm both campus extents render, featured columns/windows appear, clicking a featured or generic building shows the expected id, and city footprints contain no triangulation gaps.
 
 ### Task 3: Native map interface and camera controls
 
@@ -101,10 +101,10 @@
 - MapController.zoom_by(factor: float) -> None
 - `BuildingSummary` contains `id`, `facility_id`, `name`, and `campus`; `BuildingDetailsData` adds `height_m`, `featured`, `facts`, and `sources`.
 
-- [ ] Build a Qt Quick Controls layout with campus title, search input, result list, 3D view, selected-building facts, source names, and recognized-gesture status.
-- [ ] Wire search by building name or Facility ID to all 623 buildings and selecting a result to the same details view as map picking.
-- [ ] Add pan, orbit, zoom, and reset camera controls; keep selected-building highlighting as a small overlay mesh.
-- [ ] Run run.ps1; confirm search returns Central and North results, selection updates details, and the map remains responsive while idle and during camera movement.
+- [x] Build a Qt Quick Controls layout with campus title, search input, result list, 3D view, selected-building facts, source names, and recognized-gesture status.
+- [x] Wire search by building name or Facility ID to all 623 buildings and selecting a result to the same details view as map picking.
+- [x] Add pan, orbit, zoom, and reset camera controls; keep selected-building highlighting as a small overlay mesh.
+- [x] Run run.ps1; confirm search returns Central and North results, selection updates details, and the map remains responsive while idle and during camera movement.
 
 ### Task 4: Offline one-hand gesture control
 
@@ -125,11 +125,11 @@
 - `gesture_changed` emits `(key: str, label: str, confidence: float, landmarks: list[tuple[float, float]])`; `status_changed` emits one readable status string.
 - MapController.handle_gesture(key: str, confidence: float, landmarks: object) -> None
 
-- [ ] Add the local MediaPipe Tasks Python runtime and store the compatible gesture model under native/assets/.
-- [ ] Capture webcam frames in a QThread using OpenCV at 640x480 and no more than 15 inference frames per second; recognize at most one hand.
-- [ ] Map Open_Palm to pan, Thumb_Up to zoom in, Thumb_Down to zoom out, and Victory to reset; preserve the 0.68 confidence threshold and 700 ms discrete-action cooldown.
-- [ ] Display recognized gesture, camera state, and model errors in the native UI without requiring a camera preview.
-- [ ] Run run.ps1; confirm each gesture action, unavailable-camera fallback, and camera release on application close. Search native/ for remote model or CDN URLs and remove any runtime fetch.
+- [x] Add the local MediaPipe Tasks Python runtime and store the compatible gesture model under native/assets/.
+- [x] Capture webcam frames in a QThread using OpenCV at 640x480 and no more than 15 inference frames per second; recognize at most one hand.
+- [x] Map Open_Palm to pan, Thumb_Up to zoom in, Thumb_Down to zoom out, and Victory to reset; preserve the 0.68 confidence threshold and 700 ms discrete-action cooldown.
+- [x] Display recognized gesture, camera state, and model errors in the native UI without requiring a camera preview.
+- [x] Run run.ps1; confirm each gesture action, unavailable-camera fallback, and camera release on application close. Search native/ for remote model or CDN URLs and remove any runtime fetch.
 
 ### Task 5: Local runtime and performance review
 
@@ -143,8 +143,8 @@
 - The standard launch command is .\native\run.ps1.
 - Performance reporting distinguishes measured timings from expected structural reductions.
 
-- [ ] Ensure the local launch path starts the native window without opening a browser or network service.
-- [ ] Inspect the final render batch count; target two generic campus batches plus the eight featured batches, ground, and selection overlay.
-- [ ] Measure map frame time during camera movement and click-response time on this machine; record values only when captured locally.
-- [ ] Verify runtime data and model assets resolve from the repository regardless of the process working directory.
-- [ ] Review the final UI manually, confirm branch is clean after commit, and keep the work local without pushing.
+- [x] Ensure the local launch path starts the native window without opening a browser or network service.
+- [x] Inspect the final render batch count; target two generic campus batches plus the eight featured batches, ground, and selection overlay.
+- [x] Measure map frame time during camera movement and click-response time on this machine; record values only when captured locally.
+- [x] Verify runtime data and model assets resolve from the repository regardless of the process working directory.
+- [x] Review the final UI manually, confirm branch is clean after commit, and keep the work local without pushing.

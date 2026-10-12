@@ -92,3 +92,16 @@ def test_selection_overlay_is_a_thin_surface_above_the_building_roof():
     assert overlay.bounds_min[1] > building.height_m
     assert overlay.bounds_max[1] < building.height_m + 0.5
     assert overlay.indices
+
+
+def test_mesh_reuses_vertices_with_matching_position_normal_and_color():
+    builder = load_mesh_builder()
+    building = Building(
+        id="box", facility_id="test", name="Box", campus="Central Campus",
+        parts=[{"object_id": "part-1", "footprint": [(0, 0), (2, 0), (2, 2), (0, 2), (0, 0)], "height_m": 4.0}],
+        height_m=4.0,
+    )
+
+    mesh = builder.build_campus_mesh([building])
+
+    assert len(mesh.positions) // 3 < len(mesh.indices)

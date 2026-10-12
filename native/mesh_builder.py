@@ -31,14 +31,21 @@ class _MeshBuilder:
         self.normals: list[float] = []
         self.colors: list[float] = []
         self.indices: list[int] = []
+        self._vertex_indices: dict[tuple, int] = {}
 
     def triangle(self, points, normal, color):
-        first = len(self.positions) // 3
+        triangle_indices = []
         for point in points:
-            self.positions.extend(point)
-            self.normals.extend(normal)
-            self.colors.extend(color)
-        self.indices.extend((first, first + 1, first + 2))
+            key = (tuple(point), tuple(normal), tuple(color))
+            index = self._vertex_indices.get(key)
+            if index is None:
+                index = len(self.positions) // 3
+                self._vertex_indices[key] = index
+                self.positions.extend(point)
+                self.normals.extend(normal)
+                self.colors.extend(color)
+            triangle_indices.append(index)
+        self.indices.extend(triangle_indices)
 
     def finish(self) -> MeshBuffers:
         vertices = [self.positions[offset:offset + 3] for offset in range(0, len(self.positions), 3)]

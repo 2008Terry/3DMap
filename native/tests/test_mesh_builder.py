@@ -105,3 +105,24 @@ def test_mesh_reuses_vertices_with_matching_position_normal_and_color():
     mesh = builder.build_campus_mesh([building])
 
     assert len(mesh.positions) // 3 < len(mesh.indices)
+
+
+def test_mesh_keeps_vertices_separate_when_normal_or_color_differs():
+    builder = load_mesh_builder()
+    mesh = builder._MeshBuilder()
+    a, b, c, d = (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1)
+    normal = (0, 1, 0)
+    red, blue = (1, 0, 0, 1), (0, 0, 1, 1)
+    mesh.triangle((a, b, c), normal, red)
+    mesh.triangle((a, c, d), normal, red)
+    mesh.triangle((a, b, d), (1, 0, 0), red)
+    mesh.triangle((a, c, d), normal, blue)
+
+    buffers = mesh.finish()
+    vertex_count = len(buffers.positions) // 3
+
+    assert len(buffers.positions) == vertex_count * 3
+    assert len(buffers.normals) == vertex_count * 3
+    assert len(buffers.colors) == vertex_count * 4
+    assert buffers.indices == (0, 1, 2, 0, 2, 3, 4, 5, 6, 7, 8, 9)
+    assert max(buffers.indices) < vertex_count

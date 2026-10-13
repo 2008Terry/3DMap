@@ -109,6 +109,14 @@ class MapController(QObject):
         self._feedback = {"label": "手势已停止", "progress": 0.0, "points": []}
         self.gestureFeedbackChanged.emit()
 
+    def _interrupt_observation(self):
+        self._stop_motion()
+        self._hand.reset()
+        self._neutral_since = self._last_point = self._last_cursor = None
+        self._feedback = {"label": "观测中断 · 已停止", "progress": 0.0, "points": []}
+        self.set_gesture_status("观测中断 · 等待新手部观测")
+        self.gestureFeedbackChanged.emit()
+
     @Slot(bool)
     def set_gestures_enabled(self, enabled):
         self._enabled = bool(enabled)
@@ -233,10 +241,7 @@ class MapController(QObject):
         if self._frame is None:
             return
         if now - self._last_frame_at > 0.25:
-            self._stop_motion()
-            self._hand.reset()
-            self._feedback = {"label": "观测中断 · 已停止", "progress": 0.0, "points": []}
-            self.gestureFeedbackChanged.emit()
+            self._interrupt_observation()
             return
         if not self._enabled or not self._window_active or self._manual_blocked(now):
             self._stop_motion()
@@ -359,9 +364,15 @@ class MapController(QObject):
 
     @Slot(str, float, "QVariant")
     def handle_gesture(self, key: str, confidence: float, landmarks: Any,
-                       world_landmarks=None, image_aspect=0.75) -> None:
+                       world_landmarks=None, image_aspect=0.75, observed_at=None) -> None:
         now = time.monotonic()
-        self._last_frame_at = now
+        observed_at = now if observed_at is None else observed_at
+        if observed_at <= self._last_frame_at:
+            return
+        if now - observed_at > 0.25:
+            self._interrupt_observation()
+            return
+        self._last_frame_at = observed_at
         inspector = self._inspector
         inspecting = bool(inspector and inspector.active)
         inside = inspecting and inspector.mode == "inside"
@@ -379,7 +390,7 @@ class MapController(QObject):
         if self._blocked_last and not blocked:
             self._hand.reset()
         self._blocked_last = blocked
-        frame = self._hand.update(key, confidence, landmarks, now, world_landmarks, image_aspect)
+        frame = self._hand.update(key, confidence, landmarks, observed_at, world_landmarks, image_aspect)
         points = [{"x": 1.0 - float(p[0]), "y": float(p[1])} for p in landmarks] if len(landmarks) == 21 else []
         self._feedback = {"label": LABELS.get(frame.key, "未识别姿态") if frame else "放松手部 / 等待识别",
                           "progress": frame.progress if frame else 0.0,
@@ -389,8 +400,8 @@ class MapController(QObject):
             self._last_point = None
         if frame is None and not landmarks:
             if self._neutral_since is None:
-                self._neutral_since = now
-            if now - self._neutral_since >= 0.22:
+                self._neutral_since = observed_at
+            if observed_at - self._neutral_since >= 0.22:
                 self._action_latch = ""
         else:
             self._neutral_since = None
@@ -426,12 +437,12 @@ class MapController(QObject):
         if frame.key != "Pointing_Up":
             self.pointingChanged.emit(0, 0, False)
         if frame.key == "Pointing_Up":
-            self._last_cursor = (*frame.cursor, now)
+            self._last_cursor = (*frame.cursor, observed_at)
             def project(v, center):
                 reach = min(self._comfort / 2, center - 0.02 if v < center else 0.98 - center)
                 return max(0.0, min(1.0, 0.5 + (v - center) / (2 * reach)))
             x, y = (project(v, center) for v, center in zip(frame.cursor, self._point_center))
-            self._last_point = (x, y, now)
+            self._last_point = (x, y, observed_at)
             self._motion_position = None
             self._motion_key = frame.key
             self.pointingChanged.emit(x, y, True)
@@ -520,9 +531,11 @@ class MapController(QObject):
         """Receive the worker's actual Qt signature on the controller's GUI thread."""
         if label == "已停止":
             self.stop_gesture_input()
+        elif label == "没有新手部观测":
+            self._interrupt_observation()
         else:
             if isinstance(landmarks, dict):
                 self.handle_gesture(key, confidence, landmarks["landmarks"],
-                                    landmarks["worldLandmarks"], landmarks["imageAspect"])
+                                    landmarks["worldLandmarks"], landmarks["imageAspect"], landmarks["observedAt"])
             else:
                 self.handle_gesture(key, confidence, landmarks)

@@ -85,8 +85,12 @@ current selection and viewing mode.
 Losing window
 activation or opening the reference-plan dialog stops gesture movement;
 manual input holds are cleared on window deactivation. Walking still uses the existing
-collision check. Gesture navigation stops after 250 ms without fresh delivered
-observations, and rejected poses stop motion immediately.
+collision check. Gesture navigation stops when the latest observation reaches
+250 ms of age from camera-read completion, on the next GUI tick/delivery; rejected poses stop motion
+immediately. Smoothing and pose holds use observation timestamps, not GUI
+delivery times; duplicate/out-of-order results are ignored. A stream timeout
+clears the cached pointer and stops movement without treating the interruption
+as a physical hand release or rearming a held confirmation.
 
 The model weights are unchanged. MediaPipe runs single-hand LIVE_STREAM
 tracking with a 640x480 camera target at 30 Hz, dropping frames when inference
@@ -101,8 +105,9 @@ If the driver returns a different resolution, frames are reduced to fit within
 the skeleton preview use the actual image aspect ratio.
 
 The displayed Hz measures inference-result updates, not rendering FPS.
-The displayed milliseconds are a smoothed submission-to-callback duration;
-they exclude camera-driver capture delay, GUI delivery, and rendering.
+The displayed milliseconds are a smoothed camera-read-completion-to-callback
+duration, including image preprocessing and recognition. They exclude
+camera-driver capture delay, GUI delivery, and rendering.
 The 30 Hz target is not a measured throughput claim.
 
 The first update was checked for Python syntax and opened in the native app

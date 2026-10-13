@@ -36,7 +36,7 @@ class GestureWorker(QThread):
         self._lock = threading.Lock()
         self._latest = None
         self._camera_index = 0
-        self._last_delivery = 0.0
+        self._last_observation = 0.0
         self._result_count = 0
         self._inference_ms = 0.0
         self._metrics = {}
@@ -67,12 +67,12 @@ class GestureWorker(QThread):
             count, latency = self._result_count, self._inference_ms
         if not self.isRunning() or self._stop_event.is_set():
             latest = None
-            self._last_delivery = 0.0
+            self._last_observation = 0.0
         if latest is not None and now - latest[0] < 0.25:
-            self._last_delivery = now
+            self._last_observation = latest[0]
             self.gesture_changed.emit(*latest[1:])
-        elif self._last_delivery and now - self._last_delivery > 0.25:
-            self._last_delivery = 0.0
+        elif self._last_observation and now - self._last_observation > 0.25:
+            self._last_observation = 0.0
             self.gesture_changed.emit("", "没有新手部观测", 0.0, [])
         if now - self._metric_at >= 0.5:
             self._metrics = {"fps": round((count - self._metric_count) / (now - self._metric_at), 1),
@@ -105,7 +105,7 @@ class GestureWorker(QThread):
             self.requestInterruption()
             self.wait(5000)
         self.status_changed.emit("Gesture camera stopped")
-        self._last_delivery = 0.0
+        self._last_observation = 0.0
         with self._lock:
             self._latest = None
         self.gesture_changed.emit("", "已停止", 0.0, [])
@@ -147,7 +147,7 @@ class GestureWorker(QThread):
                 captured_at = timestamp_ms / 1000.0
                 latency = (time.monotonic() - captured_at) * 1000
                 observation = {"landmarks": landmarks, "worldLandmarks": world_landmarks,
-                               "imageAspect": _image.height / _image.width}
+                               "imageAspect": _image.height / _image.width, "observedAt": captured_at}
                 with self._lock:
                     self._latest = (captured_at, key, label, confidence, observation)
                     self._result_count += 1
@@ -192,6 +192,7 @@ class GestureWorker(QThread):
                 if not ok:
                     self.status_changed.emit("Camera frame unavailable; mouse controls remain available")
                     break
+                timestamp_ms = max(last_timestamp_ms + 1, int(time.monotonic() * 1000))
                 # Bound inference cost without distorting cameras that ignore 640x480.
                 height, width = frame.shape[:2]
                 scale = min(1.0, 640 / width, 480 / height)
@@ -200,7 +201,6 @@ class GestureWorker(QThread):
                                        interpolation=cv2.INTER_AREA)
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-                timestamp_ms = max(last_timestamp_ms + 1, int(time.monotonic() * 1000))
                 recognizer.recognize_async(image, timestamp_ms)
                 last_timestamp_ms = timestamp_ms
         except Exception as error:

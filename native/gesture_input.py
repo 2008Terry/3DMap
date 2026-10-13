@@ -66,6 +66,7 @@ class HandInterpreter:
         self._filters = [OneEuro() for _ in range(4)]
         self._spread_filter = OneEuro(min_cutoff=2.0, beta=1.0)
         self._last_position = None
+        self._world_geometry = None
 
     @staticmethod
     def _joint_angle(points, mcp, pip, tip):
@@ -80,20 +81,34 @@ class HandInterpreter:
     def _extended(cls, points, mcp, pip, tip):
         return cls._joint_angle(points, mcp, pip, tip) > 155 and dist(points[tip], points[0]) > dist(points[pip], points[0]) * 1.08
 
-    def update(self, key, confidence, landmarks, now):
+    def update(self, key, confidence, landmarks, now, world_landmarks=None, image_aspect=0.75):
         if len(landmarks) != 21 or any(len(p) < 2 or not all(isfinite(float(v)) for v in p) for p in landmarks):
             self.reset()
             return None
         if now - self._last_at > 0.25:
             self.reset()
         self._last_at = now
-        # MediaPipe z uses the x scale. Correct y for our fixed 640x480 capture.
-        points = [(float(p[0]), float(p[1]) * 0.75, float(p[2]) if len(p) > 2 else 0.0)
-                  for p in landmarks]
-        palm_width = dist(points[5], points[17])
-        if palm_width < 0.035 or palm_width > 0.65:
+        # MediaPipe image z uses the x scale; y uses the actual image height.
+        image_points = [(float(p[0]), float(p[1]) * image_aspect, float(p[2]) if len(p) > 2 else 0.0)
+                        for p in landmarks]
+        image_palm_width = dist(image_points[5], image_points[17])
+        if image_palm_width < 0.035 or image_palm_width > 0.65:
             self.reset()
             return None
+        points, palm_width = image_points, image_palm_width
+        using_world = False
+        if (world_landmarks and len(world_landmarks) == 21 and
+                all(len(p) == 3 and all(isfinite(float(v)) for v in p) for p in world_landmarks)):
+            world_width = dist(world_landmarks[5], world_landmarks[17])
+            if world_width > 1e-4:
+                # The model already supplies these estimates; no extra inference pass.
+                points = [tuple(float(v) for v in p) for p in world_landmarks]
+                palm_width = world_width
+                using_world = True
+        if self._world_geometry is not None and self._world_geometry != using_world:
+            self.reset()
+            self._last_at = now
+        self._world_geometry = using_world
         extended = [self._extended(points, *joints) for joints in
                     ((5, 6, 8), (9, 10, 12), (13, 14, 16), (17, 18, 20))]
         pinch_ratio = dist(points[4], points[8]) / palm_width
@@ -110,13 +125,16 @@ class HandInterpreter:
         elif extended == [True, True, False, False] and (key == "None" or confidence < 0.6):
             key, geometric = "Victory", True
         elif not any(extended):
-            dx, dy = points[2][0] - points[4][0], points[4][1] - points[2][1]
-            outside_palm = (points[4][0] < min(points[5][0], points[17][0]) - palm_width * 0.12 or
-                            points[4][0] > max(points[5][0], points[17][0]) + palm_width * 0.12)
+            # Direction is in mirrored screen coordinates, regardless of handedness.
+            dx = image_points[2][0] - image_points[4][0]
+            dy = image_points[4][1] - image_points[2][1]
+            outside_palm = (image_points[4][0] < min(image_points[5][0], image_points[17][0]) - image_palm_width * 0.12 or
+                            image_points[4][0] > max(image_points[5][0], image_points[17][0]) + image_palm_width * 0.12)
             if (outside_palm and self._joint_angle(points, 2, 3, 4) > 145 and
-                    abs(dx) > palm_width * 0.4 and abs(dx) > abs(dy) * 1.3):
+                    abs(dx) > image_palm_width * 0.4 and abs(dx) > abs(dy) * 1.3):
                 key, geometric = "Thumb_Left" if dx < 0 else "Thumb_Right", True
-        if not geometric and (confidence < 0.6 or key not in LABELS):
+        threshold = 0.45 if key == self._candidate and now - self._since >= 0.12 else 0.6
+        if not geometric and (confidence < threshold or key not in LABELS):
             self._candidate = ""
             return None
 

@@ -54,6 +54,14 @@ stability before control; discrete actions need the longer holds above and
 release before repeating. Pinch uses palm-normalized close/open hysteresis.
 These are design defaults, not independently validated accuracy thresholds.
 
+The interpreter now uses the recognizer's existing 3D world-landmark estimates
+for finger angles, pinch distance and finger spread. Screen coordinates still
+control pointing, dragging and directional thumb gestures. If valid world
+landmarks are unavailable, image geometry is used; changing geometry sources
+requires a fresh stable pose. These monocular estimates are not measured hand
+depth or calibrated 3D positions. A model pose needs confidence 0.60 to start;
+an established pose can persist at 0.45, stopping below that threshold.
+
 Keyboard, while the map has focus: hold WASD/arrows to walk/turn indoors or
 orbit outdoors; hold +/- to zoom; E enters; M cycles modes; PageUp/PageDown
 changes floors; Esc returns; R resets; Space pauses/resumes gesture control.
@@ -76,6 +84,9 @@ UI operation. DirectShow falls back to MSMF. The camera buffer-size request
 depends on the driver and is not a guarantee that the driver has no buffering.
 Pinch, three fingers and side thumb use landmark geometry, not new trained
 classes or fabricated model confidence scores.
+If the driver returns a different resolution, frames are reduced to fit within
+640x480 while preserving their aspect ratio, with no upscaling. Geometry and
+the skeleton preview use the actual image aspect ratio.
 
 The displayed Hz measures inference-result updates, not rendering FPS.
 The displayed milliseconds are a smoothed submission-to-callback duration;

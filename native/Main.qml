@@ -334,19 +334,24 @@ ApplicationWindow {
                                     }
                                     const edges = [[0,1,2,3,4],[0,5,6,7,8],[5,9,10,11,12],
                                                    [9,13,14,15,16],[13,17,18,19,20],[17,0]]
+                                    const aspect = mapControllerObject.gesture_feedback.imageAspect || 0.75
+                                    const imageWidth = Math.min(width, height / aspect)
+                                    const imageHeight = imageWidth * aspect
+                                    const offsetX = (width - imageWidth) / 2
+                                    const offsetY = (height - imageHeight) / 2
                                     ctx.strokeStyle = "#77b9b8"; ctx.lineWidth = 2
                                     for (let e of edges) {
                                         ctx.beginPath()
                                         for (let j = 0; j < e.length; j++) {
                                             const p = points[e[j]]
-                                            if (!j) ctx.moveTo(p.x * width, p.y * height)
-                                            else ctx.lineTo(p.x * width, p.y * height)
+                                            if (!j) ctx.moveTo(offsetX + p.x * imageWidth, offsetY + p.y * imageHeight)
+                                            else ctx.lineTo(offsetX + p.x * imageWidth, offsetY + p.y * imageHeight)
                                         }
                                         ctx.stroke()
                                     }
                                     ctx.fillStyle = "#ffcd77"
                                     for (let p of points) {
-                                        ctx.beginPath(); ctx.arc(p.x * width, p.y * height, 2.6, 0, Math.PI*2); ctx.fill()
+                                        ctx.beginPath(); ctx.arc(offsetX + p.x * imageWidth, offsetY + p.y * imageHeight, 2.6, 0, Math.PI*2); ctx.fill()
                                     }
                                 }
                             }

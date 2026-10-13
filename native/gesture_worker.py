@@ -134,16 +134,22 @@ class GestureWorker(QThread):
                 if self._stop_event.is_set():
                     return
                 key, label, confidence, landmarks = "", "未识别姿态", 0.0, []
+                world_landmarks = []
                 if result.hand_landmarks:
                     landmarks = [(float(p.x), float(p.y), float(p.z)) for p in result.hand_landmarks[0]]
+                    if result.hand_world_landmarks:
+                        world_landmarks = [(float(p.x), float(p.y), float(p.z))
+                                           for p in result.hand_world_landmarks[0]]
                     if result.gestures and result.gestures[0]:
                         category = result.gestures[0][0]
                         key, confidence = category.category_name, float(category.score)
                         label = GESTURE_LABELS.get(key, key)
                 captured_at = timestamp_ms / 1000.0
                 latency = (time.monotonic() - captured_at) * 1000
+                observation = {"landmarks": landmarks, "worldLandmarks": world_landmarks,
+                               "imageAspect": _image.height / _image.width}
                 with self._lock:
-                    self._latest = (captured_at, key, label, confidence, landmarks)
+                    self._latest = (captured_at, key, label, confidence, observation)
                     self._result_count += 1
                     self._inference_ms += 0.2 * (latency - self._inference_ms)
 
@@ -186,9 +192,12 @@ class GestureWorker(QThread):
                 if not ok:
                     self.status_changed.emit("Camera frame unavailable; mouse controls remain available")
                     break
-                # Use the actual frame dimensions assumed by the geometry rules.
-                if frame.shape[:2] != (480, 640):
-                    frame = cv2.resize(frame, (640, 480))
+                # Bound inference cost without distorting cameras that ignore 640x480.
+                height, width = frame.shape[:2]
+                scale = min(1.0, 640 / width, 480 / height)
+                if scale < 1.0:
+                    frame = cv2.resize(frame, (max(1, round(width * scale)), max(1, round(height * scale))),
+                                       interpolation=cv2.INTER_AREA)
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
                 timestamp_ms = max(last_timestamp_ms + 1, int(time.monotonic() * 1000))

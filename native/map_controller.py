@@ -327,7 +327,8 @@ class MapController(QObject):
         self.zoomRequested.emit(factor)
 
     @Slot(str, float, "QVariant")
-    def handle_gesture(self, key: str, confidence: float, landmarks: Any) -> None:
+    def handle_gesture(self, key: str, confidence: float, landmarks: Any,
+                       world_landmarks=None, image_aspect=0.75) -> None:
         now = time.monotonic()
         self._last_frame_at = now
         inspector = self._inspector
@@ -345,12 +346,12 @@ class MapController(QObject):
         if self._blocked_last and not blocked:
             self._hand.reset()
         self._blocked_last = blocked
-        frame = self._hand.update(key, confidence, landmarks, now)
+        frame = self._hand.update(key, confidence, landmarks, now, world_landmarks, image_aspect)
         points = [{"x": 1.0 - float(p[0]), "y": float(p[1])} for p in landmarks] if len(landmarks) == 21 else []
         self._feedback = {"label": LABELS.get(frame.key, "未识别姿态") if frame else "放松手部 / 等待识别",
                           "progress": frame.progress if frame else 0.0,
                           "source": "关键点几何" if frame and frame.geometric else "本地模型",
-                          "points": points}
+                          "points": points, "imageAspect": image_aspect}
         if self._last_point and now - self._last_point[2] > 0.8:
             self._last_point = None
         if frame is None and not landmarks:
@@ -487,4 +488,8 @@ class MapController(QObject):
         if label == "已停止":
             self.stop_gesture_input()
         else:
-            self.handle_gesture(key, confidence, landmarks)
+            if isinstance(landmarks, dict):
+                self.handle_gesture(key, confidence, landmarks["landmarks"],
+                                    landmarks["worldLandmarks"], landmarks["imageAspect"])
+            else:
+                self.handle_gesture(key, confidence, landmarks)

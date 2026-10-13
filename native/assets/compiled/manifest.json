@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "inputs": {
+    "src/campusBuildings.json": "5f4a0cd3c96e58f8c9552d16fa6692e4ff7f298783985f43aa82c35d7922b696",
+    "src/campusBuildingFootprints.json": "9c05cbc759b2e38e0ca3d34646df8346ab0bbcc2ae0edf55859d1d09400bb9f5",
+    "native/featured_details.json": "fc2e82fcb906ff1136a4be6bf354b77868f21dc4eb0cbb8530e935bf9144d608",
+    "native/assets/campus_environment.json": "d50195bf137e4d6829faeb67b13303b07caa073482b100e75e05a8209543c7f9",
+    "native/campus_data.py": "d8ab1bec9c2e26aea96234f051096c1556f0ccaa375fb3259b97a33d7cfe45fb",
+    "native/mesh_builder.py": "78993c1b88eaf7d376e12f2dabd19d9e1ff3c751e5ee05a8e2e98ce5a4de200a",
+    "native/facade_mesh.py": "e44d031344a78a3ffb8ad3b6b07a1bf22cef46d2bd104370c91d9580d9063308",
+    "native/environment_mesh.py": "2874764d61a1ef4c771b49e8b57c092d23287f6d6eaf10b8fbcf21edb77050a1"
+  },
+  "meshes": {
+    "central": [
+      "central-0.meshbin"
+    ],
+    "north": [
+      "north-0.meshbin"
+    ],
+    "featured": [
+      "featured-0.meshbin",
+      "featured-1.meshbin",
+      "featured-2.meshbin",
+      "featured-3.meshbin",
+      "featured-4.meshbin",
+      "featured-5.meshbin",
+      "featured-6.meshbin",
+      "featured-7.meshbin"
+    ],
+    "facades": [
+      "facades-0.meshbin"
+    ],
+    "environment": [
+      "environment-0.meshbin",
+      "environment-1.meshbin",
+      "environment-2.meshbin",
+      "environment-3.meshbin"
+    ]
+  }
+}

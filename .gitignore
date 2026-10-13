@@ -5,3 +5,5 @@ native/.venv/
 native/__pycache__/
 native/tests/__pycache__/
 .pytest_cache/
+native/.pytest_tmp/
+native/.pytest_check/

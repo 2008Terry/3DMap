@@ -1,0 +1,98 @@
+[
+  {
+    "key": "shapiro-photo-0",
+    "building": "shapiro",
+    "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+    "image_url": "https://lib.umich.edu/_astro/shapiro-4-june2019_edited_2m13Nq.webp",
+    "asset": "assets/references/shapiro-photo-0.webp",
+    "alt": "exterior of the shapiro library from the diag entrance"
+  },
+  {
+    "key": "shapiro-photo-1",
+    "building": "shapiro",
+    "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+    "image_url": "https://lib.umich.edu/_astro/Shapiro-Askwith-Info-Sep2022-1185x790_edited_Z1pIAHl.webp",
+    "asset": "assets/references/shapiro-photo-1.webp",
+    "alt": ""
+  },
+  {
+    "key": "shapiro-photo-2",
+    "building": "shapiro",
+    "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+    "image_url": "https://lib.umich.edu/_astro/shapiro-berts4-apr2019_edited_2niucr.webp",
+    "asset": "assets/references/shapiro-photo-2.webp",
+    "alt": ""
+  },
+  {
+    "key": "shapiro-photo-3",
+    "building": "shapiro",
+    "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+    "image_url": "https://lib.umich.edu/_astro/clark%20commons%20open_r8xQ1.webp",
+    "asset": "assets/references/shapiro-photo-3.webp",
+    "alt": ""
+  },
+  {
+    "key": "shapiro-photo-4",
+    "building": "shapiro",
+    "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+    "image_url": "https://lib.umich.edu/_astro/Shapiro-CVGA-2-Sep2022-1185x790_edited_1FvtPP.webp",
+    "asset": "assets/references/shapiro-photo-4.webp",
+    "alt": ""
+  },
+  {
+    "key": "shapiro-photo-5",
+    "building": "shapiro",
+    "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+    "image_url": "https://lib.umich.edu/_astro/pie-space4_ZPoI72.webp",
+    "asset": "assets/references/shapiro-photo-5.webp",
+    "alt": ""
+  },
+  {
+    "key": "shapiro-photo-6",
+    "building": "shapiro",
+    "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+    "image_url": "https://lib.umich.edu/_astro/Shapiro-DesignLabWorkshop1-Apr2019%20(1)_qtBIv.webp",
+    "asset": "assets/references/shapiro-photo-6.webp",
+    "alt": ""
+  },
+  {
+    "key": "duderstadt-photo-0",
+    "building": "duderstadt",
+    "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+    "image_url": "https://lib.umich.edu/_astro/duderstadt2-june2019_edited_Z2pYQOn.webp",
+    "asset": "assets/references/duderstadt-photo-0.webp",
+    "alt": "exterior of the duderstadt center where the art, architecture, and engineering library is located"
+  },
+  {
+    "key": "duderstadt-photo-1",
+    "building": "duderstadt",
+    "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+    "image_url": "https://lib.umich.edu/_astro/aael-infodesk3-sept2019_RhYvh.webp",
+    "asset": "assets/references/duderstadt-photo-1.webp",
+    "alt": ""
+  },
+  {
+    "key": "duderstadt-photo-2",
+    "building": "duderstadt",
+    "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+    "image_url": "https://lib.umich.edu/_astro/AAEL_SpecColl%20(1)_edited_Zh0xAb.webp",
+    "asset": "assets/references/duderstadt-photo-2.webp",
+    "alt": ""
+  },
+  {
+    "key": "duderstadt-photo-3",
+    "building": "duderstadt",
+    "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+    "image_url": "https://lib.umich.edu/_astro/AAEL-BookArtsStudio1-Sept2019_Z2jsBnc.webp",
+    "asset": "assets/references/duderstadt-photo-3.webp",
+    "alt": ""
+  },
+  {
+    "key": "duderstadt-photo-4",
+    "building": "duderstadt",
+    "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+    "image_url": "https://lib.umich.edu/_astro/aael-mujos1-sept2019_edited_Z8tA44.webp",
+    "asset": "assets/references/duderstadt-photo-4.webp",
+    "alt": ""
+  }
+]

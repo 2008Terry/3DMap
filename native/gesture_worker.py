@@ -16,6 +16,8 @@ GESTURE_LABELS = {
     "Thumb_Up": "拇指向上",
     "Thumb_Down": "拇指向下",
     "Victory": "胜利手势",
+    "Pointing_Up": "食指指向",
+    "Closed_Fist": "握拳",
 }
 
 

@@ -1,0 +1,1064 @@
+{
+  "schema_version": 1,
+  "accessed": "2026-10-12",
+  "buildings": {
+    "shapiro-undergraduate-library": {
+      "id": "shapiro-undergraduate-library",
+      "name": "Shapiro Library",
+      "facility_ids": [
+        "BLD-034816"
+      ],
+      "evidence_level": "official floor maps with approximate 3D registration",
+      "mapping_status": "schematic walls, circulation, stairs and furniture",
+      "floors": [
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/basement/",
+          "pdf_url": "https://lib.umich.edu/cms-files/f4640ec5932f2ffbfded11709c16e3fa/Shapiro_Basement.pdf",
+          "plan_asset": "assets/references/shapiro-basement.png",
+          "plan_pdf": "assets/references/shapiro-basement.pdf",
+          "label": "Basement",
+          "name": "Basement",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Student Parent and Caregiver Study Room",
+              "kind": "study"
+            },
+            {
+              "name": "Compact Shelving",
+              "kind": "stacks"
+            },
+            {
+              "name": "CAEN Laboratory",
+              "kind": "study"
+            },
+            {
+              "name": "Reflection Room",
+              "kind": "study"
+            }
+          ]
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/floor-1/",
+          "pdf_url": "https://lib.umich.edu/cms-files/990f6ebfc4566242597cf865b3438e5f/Shapiro_Floor1.pdf",
+          "plan_asset": "assets/references/shapiro-floor-1.png",
+          "plan_pdf": "assets/references/shapiro-floor-1.pdf",
+          "label": "1",
+          "name": "Floor 1",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Bert's Study Lounge",
+              "kind": "lounge",
+              "rect": [
+                0.02,
+                0.15,
+                0.24,
+                0.38
+              ]
+            },
+            {
+              "name": "Bert's Cafe",
+              "kind": "cafe",
+              "rect": [
+                0.49,
+                0.1,
+                0.92,
+                0.26
+              ]
+            },
+            {
+              "name": "Media Production Rooms 1136-1138",
+              "kind": "studio",
+              "rect": [
+                0.02,
+                0.58,
+                0.15,
+                0.68
+              ]
+            },
+            {
+              "name": "Design Lab Workshop 1128",
+              "kind": "lab",
+              "rect": [
+                0.02,
+                0.7,
+                0.15,
+                0.82
+              ]
+            },
+            {
+              "name": "Video Production Room 1074",
+              "kind": "studio",
+              "rect": [
+                0.83,
+                0.78,
+                0.98,
+                0.86
+              ]
+            },
+            {
+              "name": "Design Lab PIE Space",
+              "kind": "lab",
+              "rect": [
+                0.52,
+                0.89,
+                0.81,
+                0.99
+              ]
+            },
+            {
+              "name": "Computing / Printing Study Space",
+              "kind": "study",
+              "rect": [
+                0.2,
+                0.6,
+                0.73,
+                0.82
+              ]
+            }
+          ]
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/floor-2/",
+          "pdf_url": "https://lib.umich.edu/cms-files/4db0eaf1b98ee14ea4333ad33b88452c/Shapiro_Floor2.pdf",
+          "plan_asset": "assets/references/shapiro-floor-2.png",
+          "plan_pdf": "assets/references/shapiro-floor-2.pdf",
+          "label": "2",
+          "name": "Floor 2",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Askwith Media Library",
+              "kind": "study"
+            },
+            {
+              "name": "Knox Adaptive Technology Center",
+              "kind": "study"
+            },
+            {
+              "name": "Group Study Rooms 2122-2144",
+              "kind": "study"
+            },
+            {
+              "name": "Sweetland Peer Writing Center",
+              "kind": "study"
+            },
+            {
+              "name": "Book Stacks P-Z",
+              "kind": "stacks"
+            },
+            {
+              "name": "Computing and Printing",
+              "kind": "study"
+            }
+          ]
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/floor-3/",
+          "pdf_url": "https://lib.umich.edu/cms-files/a921267c951708311f090f932d6a74ef/Shapiro_Floor3.pdf",
+          "plan_asset": "assets/references/shapiro-floor-3.png",
+          "plan_pdf": "assets/references/shapiro-floor-3.pdf",
+          "label": "3",
+          "name": "Floor 3",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Conference Rooms 3178 and 3180 (nonpublic)",
+              "kind": "study"
+            },
+            {
+              "name": "Digital Scholarship (nonpublic)",
+              "kind": "study"
+            },
+            {
+              "name": "Study Room 3042",
+              "kind": "study"
+            },
+            {
+              "name": "Study Room 3046",
+              "kind": "study"
+            },
+            {
+              "name": "Shapiro Reading Room",
+              "kind": "study"
+            },
+            {
+              "name": "Shapiro Gallery",
+              "kind": "study"
+            },
+            {
+              "name": "Wellbeing Room",
+              "kind": "study"
+            }
+          ]
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/floor-4/",
+          "pdf_url": "https://lib.umich.edu/cms-files/1202d8a464e21d36bf0afdaef8710e9f/Shapiro_Floor4.pdf",
+          "plan_asset": "assets/references/shapiro-floor-4.png",
+          "plan_pdf": "assets/references/shapiro-floor-4.pdf",
+          "label": "4",
+          "name": "Floor 4",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Turkish American Friendship Room (nonpublic)",
+              "kind": "study"
+            },
+            {
+              "name": "Computer and Video Game Archive",
+              "kind": "study"
+            },
+            {
+              "name": "Shapiro 4059",
+              "kind": "study"
+            },
+            {
+              "name": "Science Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            },
+            {
+              "name": "Michigan Publishing (nonpublic)",
+              "kind": "study"
+            }
+          ]
+        }
+      ],
+      "photos": [
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+          "image_url": "https://lib.umich.edu/_astro/shapiro-4-june2019_edited_2m13Nq.webp",
+          "alt": "exterior of the shapiro library from the diag entrance",
+          "asset": "assets/references/shapiro-photo-0.webp"
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+          "image_url": "https://lib.umich.edu/_astro/Shapiro-Askwith-Info-Sep2022-1185x790_edited_Z1pIAHl.webp",
+          "alt": ""
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+          "image_url": "https://lib.umich.edu/_astro/shapiro-berts4-apr2019_edited_2niucr.webp",
+          "alt": ""
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+          "image_url": "https://lib.umich.edu/_astro/clark%20commons%20open_r8xQ1.webp",
+          "alt": "",
+          "asset": "assets/references/shapiro-photo-3.webp"
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+          "image_url": "https://lib.umich.edu/_astro/Shapiro-CVGA-2-Sep2022-1185x790_edited_1FvtPP.webp",
+          "alt": ""
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+          "image_url": "https://lib.umich.edu/_astro/pie-space4_ZPoI72.webp",
+          "alt": ""
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/shapiro-library/",
+          "image_url": "https://lib.umich.edu/_astro/Shapiro-DesignLabWorkshop1-Apr2019%20(1)_qtBIv.webp",
+          "alt": ""
+        }
+      ],
+      "sources": [
+        {
+          "label": "University of Michigan Library floor plans",
+          "url": "https://lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/basement/"
+        },
+        {
+          "label": "U-M Library CC-BY copyright policy",
+          "url": "https://lib.umich.edu/about-us/policies/copyright-policy/"
+        }
+      ]
+    },
+    "city-BLD-034963": {
+      "id": "city-BLD-034963",
+      "name": "Duderstadt Center",
+      "facility_ids": [
+        "BLD-034963",
+        "BLD-037733"
+      ],
+      "evidence_level": "official floor maps with approximate 3D registration",
+      "mapping_status": "schematic walls, circulation, stairs and furniture",
+      "floors": [
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/art-architecture-and-engineering-library-floors/basement/",
+          "pdf_url": "https://lib.umich.edu/cms-files/08ceb370af3d8d89ad1eae9a41f0a9c7/AAEL_Basement.pdf",
+          "plan_asset": "assets/references/duderstadt-basement.png",
+          "plan_pdf": "assets/references/duderstadt-basement.pdf",
+          "label": "Basement",
+          "name": "Basement",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Fabrication Studio",
+              "kind": "study"
+            },
+            {
+              "name": "Multipurpose Space",
+              "kind": "study"
+            },
+            {
+              "name": "Computing Site",
+              "kind": "study"
+            },
+            {
+              "name": "Carillon Practice Room",
+              "kind": "study"
+            },
+            {
+              "name": "AAEL Special Collections",
+              "kind": "study"
+            }
+          ]
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/art-architecture-and-engineering-library-floors/floor-1/",
+          "pdf_url": "https://lib.umich.edu/cms-files/5aa3a8853ced85506783f15820fcc1af/AAEL_Floor1.pdf",
+          "plan_asset": "assets/references/duderstadt-floor-1.png",
+          "plan_pdf": "assets/references/duderstadt-floor-1.pdf",
+          "label": "1",
+          "name": "Floor 1",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Mujo Cafe",
+              "kind": "cafe",
+              "rect": [
+                0.34,
+                0.04,
+                0.46,
+                0.16
+              ]
+            },
+            {
+              "name": "Duderstadt Center Information Desk",
+              "kind": "desk",
+              "rect": [
+                0.38,
+                0.27,
+                0.44,
+                0.33
+              ]
+            },
+            {
+              "name": "Study Space",
+              "kind": "study",
+              "rect": [
+                0.51,
+                0.4,
+                0.64,
+                0.57
+              ]
+            },
+            {
+              "name": "Duderstadt Center Space",
+              "kind": "study",
+              "rect": [
+                0.5,
+                0.1,
+                0.77,
+                0.33
+              ]
+            }
+          ]
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/art-architecture-and-engineering-library-floors/floor-2/",
+          "pdf_url": "https://lib.umich.edu/cms-files/d8a1186d63e67357f1c9e420e983f0fb/AAEL_Floor2.pdf",
+          "plan_asset": "assets/references/duderstadt-floor-2.png",
+          "plan_pdf": "assets/references/duderstadt-floor-2.pdf",
+          "label": "2",
+          "name": "Floor 2",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Materials Collection",
+              "kind": "study"
+            },
+            {
+              "name": "Book Arts Studio",
+              "kind": "study"
+            },
+            {
+              "name": "VizHubs",
+              "kind": "study"
+            },
+            {
+              "name": "East Collaboration Rooms",
+              "kind": "study"
+            },
+            {
+              "name": "Southeast Collaboration Rooms",
+              "kind": "study"
+            },
+            {
+              "name": "Computing Site",
+              "kind": "study"
+            },
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            }
+          ]
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/art-architecture-and-engineering-library-floors/floor-3/",
+          "pdf_url": "https://lib.umich.edu/cms-files/eb2225ef4ee80284f6b9ba24c82c0812/AAEL_Floor3.pdf",
+          "plan_asset": "assets/references/duderstadt-floor-3.png",
+          "plan_pdf": "assets/references/duderstadt-floor-3.pdf",
+          "label": "3",
+          "name": "Floor 3",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Computing Site",
+              "kind": "study"
+            },
+            {
+              "name": "Study Spaces",
+              "kind": "study"
+            },
+            {
+              "name": "Book Stacks A-N and N-NA",
+              "kind": "stacks"
+            },
+            {
+              "name": "Non-library Duderstadt Center Spaces",
+              "kind": "study"
+            }
+          ]
+        }
+      ],
+      "photos": [
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+          "image_url": "https://lib.umich.edu/_astro/duderstadt2-june2019_edited_Z2pYQOn.webp",
+          "alt": "exterior of the duderstadt center where the art, architecture, and engineering library is located",
+          "asset": "assets/references/duderstadt-photo-0.webp"
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+          "image_url": "https://lib.umich.edu/_astro/aael-infodesk3-sept2019_RhYvh.webp",
+          "alt": ""
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+          "image_url": "https://lib.umich.edu/_astro/AAEL_SpecColl%20(1)_edited_Zh0xAb.webp",
+          "alt": ""
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+          "image_url": "https://lib.umich.edu/_astro/AAEL-BookArtsStudio1-Sept2019_Z2jsBnc.webp",
+          "alt": ""
+        },
+        {
+          "source_url": "https://lib.umich.edu/locations-and-hours/art-architecture-and-engineering-library/",
+          "image_url": "https://lib.umich.edu/_astro/aael-mujos1-sept2019_edited_Z8tA44.webp",
+          "alt": ""
+        }
+      ],
+      "sources": [
+        {
+          "label": "University of Michigan Library floor plans",
+          "url": "https://lib.umich.edu/visit-and-study/floor-plans/art-architecture-and-engineering-library-floors/basement/"
+        },
+        {
+          "label": "U-M Library CC-BY copyright policy",
+          "url": "https://lib.umich.edu/about-us/policies/copyright-policy/"
+        }
+      ]
+    },
+    "hatcher-graduate-library": {
+      "id": "hatcher-graduate-library",
+      "name": "Hatcher Library",
+      "facility_ids": [
+        "BLD-034813"
+      ],
+      "evidence_level": "official floor maps with approximate 3D registration",
+      "mapping_status": "schematic walls, circulation, stairs and furniture",
+      "floors": [
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/basement/",
+          "pdf_url": "https://lib.umich.edu/cms-files/eb3354b83a1393dfc0702c0f807b4edf/HatcherN_Basement.pdf",
+          "plan_asset": "assets/references/hatcher-north-basement.png",
+          "plan_pdf": "assets/references/hatcher-north-basement.pdf",
+          "label": "Basement",
+          "name": "Basement",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/basement-0/",
+          "pdf_url": "https://lib.umich.edu/cms-files/1a773ecafc63ef3eaf7e567a804d63d7/HatcherNA_Basement.pdf",
+          "plan_asset": "assets/references/hatcher-north-basement-0.png",
+          "plan_pdf": "assets/references/hatcher-north-basement-0.pdf",
+          "label": "Basement A",
+          "name": "Basement A",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-1/",
+          "pdf_url": "https://lib.umich.edu/cms-files/cec69efca723d20760a88a08db77ea9f/HatcherN_Floor1.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-1.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-1.pdf",
+          "label": "1",
+          "name": "Floor 1",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Hatcher Gallery Exhibit Room",
+              "kind": "study"
+            },
+            {
+              "name": "Hatcher Gallery Event Space",
+              "kind": "study"
+            },
+            {
+              "name": "Humanities Collaboratory",
+              "kind": "study"
+            },
+            {
+              "name": "Gallery Lab",
+              "kind": "study"
+            },
+            {
+              "name": "International Studies Reading Room",
+              "kind": "study"
+            },
+            {
+              "name": "Book Stacks AC-AZ and PN",
+              "kind": "stacks"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-1a/",
+          "pdf_url": "https://lib.umich.edu/cms-files/64e3a266b3a5ba28c4274f9c99c70658/HatcherN_Floor1A.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-1a.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-1a.pdf",
+          "label": "1A",
+          "name": "Floor 1A",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-2/",
+          "pdf_url": "https://lib.umich.edu/cms-files/c22600ed53a0b832e1bc91d2c2c7e78e/HatcherN_Floor2.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-2.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-2.pdf",
+          "label": "2",
+          "name": "Floor 2",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Reference Reading Room",
+              "kind": "study"
+            },
+            {
+              "name": "Hatcher 206",
+              "kind": "study"
+            },
+            {
+              "name": "Study Space 212a",
+              "kind": "study"
+            },
+            {
+              "name": "Serials and Microforms",
+              "kind": "study"
+            },
+            {
+              "name": "Computing and Printing",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-2a/",
+          "pdf_url": "https://lib.umich.edu/cms-files/51db8419af87c6fd37c2469d2704fc99/HatcherNA_Floor2.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-2a.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-2a.pdf",
+          "label": "2A",
+          "name": "Floor 2A",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-3/",
+          "pdf_url": "https://lib.umich.edu/cms-files/cba1af268b9a527c0f16625c4d5d67cb/HatcherN_Floor3.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-3.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-3.pdf",
+          "label": "3",
+          "name": "Floor 3",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-3a/",
+          "pdf_url": "https://lib.umich.edu/cms-files/e1bb4d3f4daec6051d6351915204d62d/HatcherN_Floor3A.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-3a.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-3a.pdf",
+          "label": "3A",
+          "name": "Floor 3A",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-4/",
+          "pdf_url": "https://lib.umich.edu/cms-files/6431cfa8d5b8a4f5caf2f3064d4cb423/HatcherN_Floor4.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-4.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-4.pdf",
+          "label": "4",
+          "name": "Floor 4",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/floor-4a/",
+          "pdf_url": "https://lib.umich.edu/cms-files/c728a9833b99f9566817dec99f2775e8/HatcherNA_Floor4.pdf",
+          "plan_asset": "assets/references/hatcher-north-floor-4a.png",
+          "plan_pdf": "assets/references/hatcher-north-floor-4a.pdf",
+          "label": "4A",
+          "name": "Floor 4A",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "North"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-1/",
+          "pdf_url": "https://lib.umich.edu/cms-files/93133a1a5e0b4740944491a6eaa9303f/HatcherS_Floor1.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-1.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-1.pdf",
+          "label": "1",
+          "name": "Floor 1",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Information Services Desk",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-2/",
+          "pdf_url": "https://lib.umich.edu/cms-files/b444a4a13e35cb7b04042106c76790dd/HatcherS_Floor2.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-2.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-2.pdf",
+          "label": "2",
+          "name": "Floor 2",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Clark Library",
+              "kind": "study"
+            },
+            {
+              "name": "Atlas Cases",
+              "kind": "study"
+            },
+            {
+              "name": "Map Cases",
+              "kind": "study"
+            },
+            {
+              "name": "Clark Library Presentation Space",
+              "kind": "study"
+            },
+            {
+              "name": "Computing Site",
+              "kind": "study"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-3/",
+          "pdf_url": "https://lib.umich.edu/cms-files/e622727203daf5d65088ff240c5c10bf/HatcherS_Floor3.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-3.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-3.pdf",
+          "label": "3",
+          "name": "Floor 3",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-4/",
+          "pdf_url": "https://lib.umich.edu/cms-files/5f2901bde7fa06cb2d2bf45d721518f0/HatcherS_Floor4_0.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-4.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-4.pdf",
+          "label": "4",
+          "name": "Floor 4",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-5/",
+          "pdf_url": "https://lib.umich.edu/cms-files/a0f188e7300387bde9e1f4c86fd4f880/HatcherS_Floor5_0.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-5.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-5.pdf",
+          "label": "5",
+          "name": "Floor 5",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Book Stacks",
+              "kind": "stacks"
+            },
+            {
+              "name": "Study Space",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-6/",
+          "pdf_url": "https://lib.umich.edu/cms-files/99cd844310b92be408328e785bf34728/HatcherS_Floor6.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-6.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-6.pdf",
+          "label": "6",
+          "name": "Floor 6",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Special Collections Research Center",
+              "kind": "study"
+            },
+            {
+              "name": "Reading Room",
+              "kind": "study"
+            },
+            {
+              "name": "Classroom Space",
+              "kind": "study"
+            },
+            {
+              "name": "Study Carrels",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-7/",
+          "pdf_url": "https://lib.umich.edu/cms-files/66fb12bd6578e46030da15b61b933973/HatcherS_Floor7.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-7.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-7.pdf",
+          "label": "7",
+          "name": "Floor 7",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Staff Space (nonpublic)",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        },
+        {
+          "source_url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/floor-8/",
+          "pdf_url": "https://lib.umich.edu/cms-files/c378e9c755f1f0bdc2b94630d87a8084/HatcherS_Floor8.pdf",
+          "plan_asset": "assets/references/hatcher-south-floor-8.png",
+          "plan_pdf": "assets/references/hatcher-south-floor-8.pdf",
+          "label": "8",
+          "name": "Floor 8",
+          "mapping": "approximate source zones; walls and furniture inferred",
+          "spaces": [
+            {
+              "name": "Conference Room 806 (nonpublic)",
+              "kind": "study"
+            },
+            {
+              "name": "Papyrology (nonpublic)",
+              "kind": "study"
+            },
+            {
+              "name": "Library Administration (nonpublic)",
+              "kind": "study"
+            }
+          ],
+          "wing": "South"
+        }
+      ],
+      "photos": [],
+      "sources": [
+        {
+          "label": "University of Michigan Library floor plans",
+          "url": "https://lib.umich.edu/visit-and-study/floor-plans/hatcher-library-north-floors/basement/"
+        },
+        {
+          "label": "U-M Library CC-BY copyright policy",
+          "url": "https://lib.umich.edu/about-us/policies/copyright-policy/"
+        }
+      ]
+    },
+    "city-BLD-035111": {
+      "name": "Michigan Union",
+      "facility_ids": [
+        "BLD-035111",
+        "BLD-036687"
+      ],
+      "evidence_level": "official floor labels and selected named spaces; schematic 3D",
+      "sources": [
+        {
+          "label": "Michigan Union floor plans",
+          "url": "https://uunions.umich.edu/union/"
+        },
+        {
+          "label": "Michigan Union tour",
+          "url": "https://uunions.umich.edu/michigan-union-walking-tour/"
+        }
+      ],
+      "floors": [
+        {
+          "label": "G",
+          "name": "Ground Floor",
+          "spaces": [
+            {
+              "name": "MUTO G002",
+              "kind": "office"
+            }
+          ],
+          "source_url": "https://uunions.umich.edu/union/"
+        },
+        {
+          "label": "1",
+          "name": "First Floor",
+          "spaces": [
+            {
+              "name": "Campus Information Center",
+              "kind": "desk"
+            }
+          ],
+          "source_url": "https://uunions.umich.edu/union/"
+        },
+        {
+          "label": "2",
+          "name": "Second Floor",
+          "spaces": [
+            {
+              "name": "IdeaHub",
+              "kind": "study"
+            }
+          ],
+          "source_url": "https://uunions.umich.edu/union/"
+        },
+        {
+          "label": "3",
+          "name": "Third Floor",
+          "spaces": [],
+          "source_url": "https://uunions.umich.edu/union/"
+        },
+        {
+          "label": "4",
+          "name": "Fourth Floor",
+          "spaces": [
+            {
+              "name": "Reflection Room 4302",
+              "kind": "lounge"
+            }
+          ],
+          "source_url": "https://uunions.umich.edu/union/"
+        }
+      ]
+    },
+    "city-BLD-034968": {
+      "name": "Beyster Building",
+      "facility_ids": [
+        "BLD-034968"
+      ],
+      "evidence_level": "official first-floor room labels; other levels inferred",
+      "sources": [
+        {
+          "label": "CSE Beyster floor map",
+          "url": "https://cse.engin.umich.edu/wp-content/uploads/sites/3/2019/03/beyster_map.pdf"
+        },
+        {
+          "label": "CSE meeting and event facilities",
+          "url": "https://cse.engin.umich.edu/about/our-facilities/scheduling-for-meetings-and-events/"
+        }
+      ],
+      "floors": [
+        {
+          "label": "1",
+          "name": "First Floor",
+          "source_url": "https://cse.engin.umich.edu/wp-content/uploads/sites/3/2019/03/beyster_map.pdf",
+          "spaces": [
+            {
+              "name": "Tishman Hall 1665",
+              "kind": "lounge"
+            },
+            {
+              "name": "Classroom 1690",
+              "kind": "classroom"
+            },
+            {
+              "name": "Classroom 1670",
+              "kind": "classroom"
+            },
+            {
+              "name": "Student Orgs 1648-1648D",
+              "kind": "office"
+            },
+            {
+              "name": "CAEN Lab East 1620",
+              "kind": "lab"
+            },
+            {
+              "name": "CAEN Lab West 1695",
+              "kind": "lab"
+            },
+            {
+              "name": "Learning Center 1637-1637B",
+              "kind": "study"
+            },
+            {
+              "name": "Student Projects 1625",
+              "kind": "lab"
+            }
+          ]
+        },
+        {
+          "label": "2",
+          "name": "示意 2 层（未核实）",
+          "basis": "inferred",
+          "spaces": []
+        },
+        {
+          "label": "3",
+          "name": "示意 3 层（未核实）",
+          "basis": "inferred",
+          "spaces": []
+        },
+        {
+          "label": "4",
+          "name": "示意 4 层（未核实）",
+          "basis": "inferred",
+          "spaces": []
+        }
+      ]
+    }
+  },
+  "asset_license": {
+    "attribution": "University of Michigan Library",
+    "license": "CC-BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "policy": "https://lib.umich.edu/about-us/policies/copyright-policy/",
+    "modifications": "PDFs unchanged; PNG floor plans rasterized for local reference viewer"
+  }
+}

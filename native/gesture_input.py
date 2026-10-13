@@ -10,8 +10,10 @@ LABELS = {
     "Pointing_Up": "食指指向", "Open_Palm": "张开手掌", "Pinch": "捏合",
     "Victory": "双指旋转", "Thumb_Up": "拇指向上", "Thumb_Down": "拇指向下",
     "Closed_Fist": "握拳", "Three_Fingers": "三指", "Thumb_Left": "拇指向左",
+    "Thumb_Right": "拇指向右", "ILoveYou": "控制开关",
 }
-HOLD_SECONDS = {"Closed_Fist": 0.55, "Three_Fingers": 0.65, "Thumb_Left": 0.6}
+HOLD_SECONDS = {"Closed_Fist": 0.55, "Three_Fingers": 0.65, "Thumb_Left": 0.6,
+                "Thumb_Right": 0.6, "ILoveYou": 0.85}
 
 
 class OneEuro:
@@ -46,6 +48,7 @@ class HandFrame:
     position: tuple[float, float]
     cursor: tuple[float, float]
     geometric: bool
+    spread: float
 
     @property
     def progress(self):
@@ -61,17 +64,21 @@ class HandInterpreter:
         self._since = self._last_at = 0.0
         self._pinching = False
         self._filters = [OneEuro() for _ in range(4)]
+        self._spread_filter = OneEuro(min_cutoff=2.0, beta=1.0)
         self._last_position = None
 
     @staticmethod
-    def _extended(points, mcp, pip, tip):
+    def _joint_angle(points, mcp, pip, tip):
         a = tuple(points[mcp][i] - points[pip][i] for i in range(3))
         b = tuple(points[tip][i] - points[pip][i] for i in range(3))
         denominator = dist(a, (0, 0, 0)) * dist(b, (0, 0, 0))
         if denominator < 1e-8:
-            return False
-        angle = degrees(acos(max(-1.0, min(1.0, sum(x*y for x, y in zip(a, b)) / denominator))))
-        return angle > 155 and dist(points[tip], points[0]) > dist(points[pip], points[0]) * 1.08
+            return 0.0
+        return degrees(acos(max(-1.0, min(1.0, sum(x*y for x, y in zip(a, b)) / denominator))))
+
+    @classmethod
+    def _extended(cls, points, mcp, pip, tip):
+        return cls._joint_angle(points, mcp, pip, tip) > 155 and dist(points[tip], points[0]) > dist(points[pip], points[0]) * 1.08
 
     def update(self, key, confidence, landmarks, now):
         if len(landmarks) != 21 or any(len(p) < 2 or not all(isfinite(float(v)) for v in p) for p in landmarks):
@@ -91,18 +98,24 @@ class HandInterpreter:
                     ((5, 6, 8), (9, 10, 12), (13, 14, 16), (17, 18, 20))]
         pinch_ratio = dist(points[4], points[8]) / palm_width
         # Separate close/open thresholds; a folded fist must not become a pinch.
-        pinch_shape = (dist(points[8], points[5]) > palm_width * 0.6 and
-                       dist(points[4], points[2]) > palm_width * 0.35)
+        pinch_shape = (self._joint_angle(points, 5, 6, 8) > (90 if self._pinching else 100) and
+                       dist(points[8], points[5]) > palm_width * (0.55 if self._pinching else 0.6) and
+                       dist(points[4], points[2]) > palm_width * (0.3 if self._pinching else 0.35))
         self._pinching = pinch_shape and pinch_ratio < (0.42 if self._pinching else 0.27)
         geometric = False
         if self._pinching:
             key, geometric = "Pinch", True
         elif extended == [True, True, True, False]:
             key, geometric = "Three_Fingers", True
+        elif extended == [True, True, False, False] and (key == "None" or confidence < 0.6):
+            key, geometric = "Victory", True
         elif not any(extended):
             dx, dy = points[2][0] - points[4][0], points[4][1] - points[2][1]
-            if dx < -palm_width * 0.4 and abs(dx) > abs(dy) * 1.3:
-                key, geometric = "Thumb_Left", True
+            outside_palm = (points[4][0] < min(points[5][0], points[17][0]) - palm_width * 0.12 or
+                            points[4][0] > max(points[5][0], points[17][0]) + palm_width * 0.12)
+            if (outside_palm and self._joint_angle(points, 2, 3, 4) > 145 and
+                    abs(dx) > palm_width * 0.4 and abs(dx) > abs(dy) * 1.3):
+                key, geometric = "Thumb_Left" if dx < 0 else "Thumb_Right", True
         if not geometric and (confidence < 0.6 or key not in LABELS):
             self._candidate = ""
             return None
@@ -113,9 +126,11 @@ class HandInterpreter:
             # A replacement hand / tracking jump requires a fresh clutch.
             self._candidate = ""
             self._filters = [OneEuro() for _ in range(4)]
+            self._spread_filter = OneEuro(min_cutoff=2.0, beta=1.0)
         self._last_position = position
         filtered = [f.update(value, now) for f, value in zip(self._filters, (*position, *cursor))]
         if key != self._candidate:
             self._candidate, self._since = key, now
         held = now - self._since
-        return HandFrame(key, held, held >= 0.12, tuple(filtered[:2]), tuple(filtered[2:]), geometric)
+        spread = self._spread_filter.update(dist(points[8], points[12]) / palm_width, now)
+        return HandFrame(key, held, held >= 0.12, tuple(filtered[:2]), tuple(filtered[2:]), geometric, spread)

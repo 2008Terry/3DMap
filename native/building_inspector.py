@@ -64,6 +64,10 @@ class BuildingInspector(QObject):
     def active(self):
         return self._active
 
+    @Property(str, notify=geometryChanged)
+    def inspection_key(self):
+        return self._built_id
+
     @Property(str, notify=changed)
     def mode(self):
         return self._mode
@@ -252,8 +256,10 @@ class BuildingInspector(QObject):
 
     @Slot(float)
     def set_cut(self, value):
-        self._cut = max(0.02, min(0.98, float(value)))
-        self.changed.emit()
+        value = max(0.02, min(0.98, float(value)))
+        if value != self._cut:
+            self._cut = value
+            self.changed.emit()
 
     @Slot(str)
     def set_cut_axis(self, axis):
@@ -263,13 +269,17 @@ class BuildingInspector(QObject):
 
     @Slot(float)
     def set_spread(self, value):
-        self._spread = max(0, min(24, float(value)))
-        self.changed.emit()
+        value = max(0, min(24, float(value)))
+        if value != self._spread:
+            self._spread = value
+            self.changed.emit()
 
     @Slot(float)
     def set_shell_opacity(self, value):
-        self._opacity = max(0.03, min(0.5, float(value)))
-        self.changed.emit()
+        value = max(0.03, min(0.5, float(value)))
+        if value != self._opacity:
+            self._opacity = value
+            self.changed.emit()
 
     @Slot(bool)
     def set_furniture(self, visible):

@@ -25,6 +25,8 @@ Item {
     property var heldKeys: ({})
     property var campusViewState: null
     property bool wasInspecting: false
+    property string inspectionViewKey: ""
+    property string walkViewKey: ""
     readonly property int drawCalls: view.renderStats.drawCallCount
     readonly property int fps: view.renderStats.fps
     readonly property string graphicsApi: view.renderStats.graphicsApiName
@@ -37,6 +39,33 @@ Item {
         const size = Math.max(campusExtent.width, campusExtent.depth)
         mapCamera.position = Qt.vector3d(0, size * 0.78, size * 0.82)
         mapCamera.eulerRotation = Qt.vector3d(-42, 0, 0)
+    }
+    function resetWalkView() {
+        const floor = root.inspector.current_floor
+        walkCamera.position = Qt.vector3d(floor.startX, floor.elevation + 1.65, floor.startZ)
+        walkCamera.eulerRotation = Qt.vector3d(0, floor.startYaw, 0)
+        walkCamera.fieldOfView = 67
+        root.walkViewKey = root.inspector.inspection_key + ":" + root.inspector.selected_floor
+    }
+    function syncInspectionHeight() {
+        if (!root.inspector.active || !root.wasInspecting ||
+            root.inspectionViewKey !== root.inspector.inspection_key || root.inspector.mode === "inside") return
+        const b = root.inspector.bounds
+        const height = root.inspector.mode === "floor" ? root.inspector.current_floor.elevation :
+            b.height / 2 + (root.inspector.mode === "explode" ?
+            root.inspector.spread * Math.max(0, root.inspector.floors.length - 1) / 2 : 0)
+        cameraOrigin.y = height
+    }
+    function resetInspectionView() {
+        if (root.inspector.mode === "inside") { root.resetWalkView(); return }
+        const b = root.inspector.bounds
+        const distance = Math.max(35, b.width, b.depth, b.height) *
+            (root.inspector.mode === "explode" ? 2.1 : 1.6)
+        cameraOrigin.position = Qt.vector3d(0, 0, 0)
+        cameraOrigin.eulerRotation = Qt.vector3d(0, 0, 0)
+        mapCamera.position = Qt.vector3d(0, distance * 0.85, distance)
+        mapCamera.eulerRotation = Qt.vector3d(-38, 0, 0)
+        root.syncInspectionHeight()
     }
     function walk(distance) {
         if (!inspector.active || inspector.mode !== "inside")
@@ -169,9 +198,15 @@ Item {
         Node {
             Node {
                 id: cameraOrigin
+                objectName: "cameraOrigin"
                 position: Qt.vector3d(root.campusExtent.centerX, 0, root.campusExtent.centerZ)
+                Behavior on y {
+                    enabled: root.inspector.active && root.inspector.mode !== "inside"
+                    NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+                }
                 PerspectiveCamera {
                     id: mapCamera
+                    objectName: "mapCamera"
                     position: Qt.vector3d(0, Math.max(root.campusExtent.width, root.campusExtent.depth) * 0.78,
                                            Math.max(root.campusExtent.width, root.campusExtent.depth) * 0.82)
                     eulerRotation.x: -42
@@ -280,7 +315,10 @@ Item {
         }
         Connections {
             target: root.mapController
-            function onResetCameraRequested() { root.resetCampus() }
+            function onResetCameraRequested() {
+                if (root.inspector.active) root.resetInspectionView()
+                else root.resetCampus()
+            }
             function onPanRequested(dx, dz) {
                 root.panScreen(dx, dz)
             }
@@ -330,6 +368,7 @@ Item {
         }
         Connections {
             target: root.inspector
+            function onChanged() { root.syncInspectionHeight() }
             function onViewRequested() {
                 root.heldKeys = ({})
                 if (!root.inspector.active) {
@@ -340,28 +379,26 @@ Item {
                         mapCamera.eulerRotation = root.campusViewState.pitch
                     } else root.resetCampus()
                     root.wasInspecting = false
+                    root.inspectionViewKey = ""
+                    root.walkViewKey = ""
                     return
                 }
+                const newBuilding = !root.wasInspecting || root.inspectionViewKey !== root.inspector.inspection_key
                 if (!root.wasInspecting) {
                     root.campusViewState = {origin: cameraOrigin.position,
                         rotation: cameraOrigin.eulerRotation, camera: mapCamera.position,
                         pitch: mapCamera.eulerRotation}
                     root.wasInspecting = true
                 }
-                const b = root.inspector.bounds
-                cameraOrigin.position = Qt.vector3d(0, 0, 0)
-                cameraOrigin.eulerRotation = Qt.vector3d(0, 0, 0)
-                if (root.inspector.mode === "inside") {
-                    const floor = root.inspector.current_floor
-                    walkCamera.position = Qt.vector3d(floor.startX, floor.elevation + 1.65, floor.startZ)
-                    walkCamera.eulerRotation = Qt.vector3d(0, floor.startYaw, 0)
-                    walkCamera.fieldOfView = 67
-                } else {
-                    const distance = Math.max(35, b.width, b.depth, b.height) *
-                                     (root.inspector.mode === "explode" ? 2.1 : 1.6)
-                    mapCamera.position = Qt.vector3d(0, distance * 0.85, distance)
-                    mapCamera.eulerRotation = Qt.vector3d(-38, 0, 0)
+                if (newBuilding) {
+                    root.inspectionViewKey = root.inspector.inspection_key
+                    root.walkViewKey = ""
+                    root.resetInspectionView()
                 }
+                if (root.inspector.mode === "inside") {
+                    if (root.walkViewKey !== root.inspector.inspection_key + ":" + root.inspector.selected_floor)
+                        root.resetWalkView()
+                } else root.syncInspectionHeight()
             }
         }
     }

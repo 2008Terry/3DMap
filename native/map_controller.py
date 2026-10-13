@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from math import exp, hypot
+from math import exp, hypot, log
 from typing import Any
 
 from PySide6.QtCore import QEvent, QObject, Property, QTimer, Signal, Slot
@@ -45,6 +45,7 @@ class MapController(QObject):
         self._frame = None
         self._last_frame_at = self._last_tick = time.monotonic()
         self._motion_position = None
+        self._motion_spread = None
         self._motion_key = ""
         self._action_latch = ""
         self._last_floor_at = 0.0
@@ -89,6 +90,7 @@ class MapController(QObject):
     def _stop_motion(self):
         self._frame = None
         self._motion_position = None
+        self._motion_spread = None
         self._motion_key = ""
         self.pointingChanged.emit(0, 0, False)
 
@@ -112,7 +114,7 @@ class MapController(QObject):
         self.gestureControlsChanged.emit()
         self._feedback = {"label": "等待重新稳定" if enabled else "手势已暂停", "progress": 0.0, "points": []}
         self.gestureFeedbackChanged.emit()
-        self.set_gesture_status("等待重新稳定手势" if enabled else "手势已暂停 · 空格或按钮恢复")
+        self.set_gesture_status("等待重新稳定手势" if enabled else "手势已暂停 · 控制开关手势、空格或按钮恢复")
 
     @Slot(bool)
     def set_window_active(self, active):
@@ -201,7 +203,8 @@ class MapController(QObject):
         if self._frame is None:
             return
         if now - self._last_frame_at > 0.25:
-            self._release_hand()
+            self._stop_motion()
+            self._hand.reset()
             self._feedback = {"label": "观测中断 · 已停止", "progress": 0.0, "points": []}
             self.gestureFeedbackChanged.emit()
             return
@@ -313,10 +316,7 @@ class MapController(QObject):
 
     @Slot()
     def reset_camera(self) -> None:
-        if self._inspector and self._inspector.active:
-            self._inspector.viewRequested.emit()
-        else:
-            self.resetCameraRequested.emit()
+        self.resetCameraRequested.emit()
 
     @Slot(float, float)
     def pan_by(self, delta_x: float, delta_y: float) -> None:
@@ -337,6 +337,7 @@ class MapController(QObject):
         if context != self._context:
             self._context = context
             self._motion_position = None
+            self._motion_spread = None
             self._motion_key = ""
             self._last_point = None
             self._last_floor_at = now
@@ -350,6 +351,27 @@ class MapController(QObject):
                           "progress": frame.progress if frame else 0.0,
                           "source": "关键点几何" if frame and frame.geometric else "本地模型",
                           "points": points}
+        if self._last_point and now - self._last_point[2] > 0.8:
+            self._last_point = None
+        if frame is None and not landmarks:
+            if self._neutral_since is None:
+                self._neutral_since = now
+            if now - self._neutral_since >= 0.22:
+                self._action_latch = ""
+        else:
+            self._neutral_since = None
+            if frame and frame.ready and self._action_latch and frame.key != self._action_latch:
+                self._action_latch = ""
+        if frame and frame.key == "ILoveYou" and self._window_active and now >= self._manual_until:
+            self._stop_motion()
+            if frame.held >= HOLD_SECONDS[frame.key] and self._action_latch != frame.key:
+                self.set_gestures_enabled(not self._enabled)
+                self._action_latch = frame.key
+            else:
+                self.set_gesture_status("松开后重新操作" if self._action_latch == frame.key else
+                                        "拇指 + 食指 + 小指 · 保持以暂停/恢复")
+                self.gestureFeedbackChanged.emit()
+            return
         if blocked:
             self._stop_motion()
             label = ("控制已暂停" if not self._enabled else "窗口未激活" if not self._window_active else "键鼠优先")
@@ -361,20 +383,12 @@ class MapController(QObject):
         self._frame = frame
         if frame is None:
             self._stop_motion()
-            if self._neutral_since is None:
-                self._neutral_since = now
-            if now - self._neutral_since >= 0.22:
-                self._action_latch = ""
-                self._last_point = None
             self.set_gesture_status("放松即停止 · 指向、捏合或张开手掌开始")
             return
-        self._neutral_since = None
         if not frame.ready:
             self._stop_motion()
             self.set_gesture_status("正在稳定 · " + LABELS[frame.key])
             return
-        if self._action_latch and frame.key != self._action_latch:
-            self._action_latch = ""
         if frame.key != "Pointing_Up":
             self.pointingChanged.emit(0, 0, False)
         if frame.key == "Pointing_Up":
@@ -386,18 +400,18 @@ class MapController(QObject):
             self._last_point = (x, y, now)
             self._motion_position = None
             self._motion_key = frame.key
-            if inspecting and inspector.mode == "section":
-                inspector.set_cut(x)
-                self.set_gesture_status("食指移动 · 扫描切面")
-            else:
-                self.pointingChanged.emit(x, y, True)
-                self.set_gesture_status("指向后捏合确认" + (" · 或停留选择" if self._dwell_enabled else ""))
+            self.pointingChanged.emit(x, y, True)
+            self.set_gesture_status("指向后捏合确认" + (" · 或停留选择" if self._dwell_enabled else ""))
         elif frame.key in ("Open_Palm", "Pinch", "Victory"):
             if self._motion_key != frame.key:
-                if frame.key == "Pinch" and self._last_point and now - self._last_point[2] < 0.8:
+                if (frame.key == "Pinch" and self._action_latch != "Pinch" and
+                        self._last_point and now - self._last_point[2] < 0.8):
                     self.selectRequested.emit(self._last_point[0], self._last_point[1])
+                    self._action_latch = "Pinch"
                 self._motion_position = None
+                self._motion_spread = None
                 self._motion_key = frame.key
+            dx = dy = 0.0
             if self._motion_position is not None:
                 dx = max(-0.04, min(0.04, frame.position[0] - self._motion_position[0]))
                 dy = max(-0.04, min(0.04, frame.position[1] - self._motion_position[1]))
@@ -407,18 +421,43 @@ class MapController(QObject):
                     self.lookRequested.emit(dx * 160, dy * 110)
                 elif frame.key == "Victory":
                     self.orbitRequested.emit(-dx * 220, -dy * 140)
+                elif frame.key == "Pinch" and inspecting and inspector.mode == "section":
+                    delta = dx if inspector.cut_axis == "x" else -dy if inspector.cut_axis == "y" else dy
+                    inspector.set_cut(inspector.cut + delta * 1.8)
+                elif frame.key == "Pinch" and inspecting and inspector.mode == "explode":
+                    inspector.set_spread(inspector.spread - dy * 60)
+                elif frame.key == "Pinch" and inspecting and inspector.mode == "xray":
+                    inspector.set_shell_opacity(inspector.shell_opacity + dy * 0.8)
                 else:
                     self.pan_by(-dx * self._navigation_span, -dy * self._navigation_span)
+            if frame.key == "Victory" and not inside:
+                if self._motion_spread is not None and min(frame.spread, self._motion_spread) > 0.1:
+                    change = log(frame.spread / self._motion_spread)
+                    if abs(change) >= 0.05:
+                        self.zoom_by(max(0.94, min(1.06, exp(-change * 0.7 * self._sensitivity))))
+                        self._motion_spread = frame.spread
+                else:
+                    self._motion_spread = frame.spread
             if self._motion_position is None or dx or dy:
                 self._motion_position = frame.position
-            self.set_gesture_status("环顾 · 松手停止" if inside else
-                                    "双指旋转 · 松手停止" if frame.key == "Victory" else
-                                    "捏合拖动地图" if frame.key == "Pinch" else "手掌拖动地图")
+            if inside:
+                status = "环顾 · 松手停止"
+            elif frame.key == "Victory":
+                status = "双指移动旋转 · 张合双指缩放"
+            elif frame.key == "Pinch" and inspecting and inspector.mode == "section":
+                status = f"捏合拖动 · {inspector.cut_axis.upper()} 切面 {inspector.cut:.0%}"
+            elif frame.key == "Pinch" and inspecting and inspector.mode == "explode":
+                status = f"捏合上下 · 楼层展开 {inspector.spread:.1f} m"
+            elif frame.key == "Pinch" and inspecting and inspector.mode == "xray":
+                status = f"捏合上下 · 外壳透视 {1 - inspector.shell_opacity:.0%}"
+            else:
+                status = "捏合拖动地图" if frame.key == "Pinch" else "手掌拖动地图"
+            self.set_gesture_status(status)
         elif frame.key in HOLD_SECONDS:
             self._motion_position = None
             self._motion_key = frame.key
-            if frame.key == "Closed_Fist" and not self._selected_id:
-                self.set_gesture_status("先指向选择建筑，再握拳进入")
+            if frame.key in ("Closed_Fist", "Thumb_Right") and not self._selected_id:
+                self.set_gesture_status("先指向选择建筑，再握拳或拇指向右进入")
                 return
             if frame.key == "Three_Fingers" and not inspecting:
                 self.set_gesture_status("打开建筑后，三指切换结构视图")
@@ -428,7 +467,7 @@ class MapController(QObject):
                 return
             if frame.held >= HOLD_SECONDS[frame.key] and self._action_latch != frame.key:
                 self._action_latch = frame.key
-                if frame.key == "Closed_Fist":
+                if frame.key in ("Closed_Fist", "Thumb_Right"):
                     self.enter_structure()
                 elif frame.key == "Three_Fingers":
                     self.cycle_structure_mode()

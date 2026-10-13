@@ -377,14 +377,20 @@ ApplicationWindow {
                             width: parent.width
                             text: inspectorObject.mode === "inside"
                                   ? "手掌/双指环顾 · 拇指持续走动 · Esc 返回"
-                                  : "食指指向 + 捏合确认 · 手掌/捏合拖动 · 双指旋转"
+                                  : inspectorObject.mode === "section" && inspectorObject.active
+                                  ? "食指选房间 · 捏合拖动切面 · 双指旋转/张合缩放"
+                                  : inspectorObject.mode === "explode" && inspectorObject.active
+                                  ? "食指选房间 · 捏合上下调层距 · 双指旋转/张合缩放"
+                                  : inspectorObject.mode === "xray" && inspectorObject.active
+                                  ? "食指选房间 · 捏合上下调透视 · 双指旋转/张合缩放"
+                                  : "食指指向 + 捏合确认 · 手掌/捏合拖动 · 双指旋转/张合缩放"
                             color: "#9eafad"
                             font.pixelSize: 10
                             wrapMode: Text.WordWrap
                         }
                         Label {
                             width: parent.width
-                            text: "握拳停留：进入 · 三指停留：切换视图\n拇指向左停留：返回 · 拇指上下：缩放/换层\n空格：暂停 · E：进入 · M：视图 · R：复位\nWASD/方向键持续操作 · PgUp/PgDn 换层"
+                            text: "握拳/拇指向右停留：进入 · 三指：切换视图\n拇指向左停留：返回 · 拇指上下：缩放/换层\n拇指+食指+小指停留：暂停/恢复控制\n空格：暂停 · E：进入 · M：视图 · R：复位\nWASD/方向键持续操作 · PgUp/PgDn 换层"
                             color: "#bbccc9"; font.pixelSize: 11; wrapMode: Text.WordWrap
                         }
                         CheckBox {

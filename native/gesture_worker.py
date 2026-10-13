@@ -15,10 +15,10 @@ GESTURE_LABELS = {
     "Open_Palm": "张开手掌",
     "Thumb_Up": "拇指向上",
     "Thumb_Down": "拇指向下",
-    "Victory": "胜利手势",
+    "Victory": "双指旋转",
     "Pointing_Up": "食指指向",
     "Closed_Fist": "握拳",
-    "ILoveYou": "手势未绑定",
+    "ILoveYou": "控制开关",
 }
 
 

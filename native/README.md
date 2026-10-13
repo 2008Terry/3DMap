@@ -27,14 +27,24 @@ when the sidebar is scrolled or a building is open.
 
 | Input | Campus / structure | Inside |
 | --- | --- | --- |
-| Index finger | Point, then pinch to confirm; optional 850 ms dwell; slide the section cut in section mode | Select schematic space |
-| Thumb/index pinch | Confirm the recent pointer (up to 800 ms old), then drag to pan | Look around |
+| Index finger | Point, then pinch to confirm; optional 850 ms dwell; select rooms in all structure modes | Select schematic space |
+| Thumb/index pinch | Confirm the recent pointer (up to 800 ms old); drag to pan, or adjust the cut, floor spread or shell opacity in the matching mode | Look around |
 | Open palm and move | Pan at a scale based on current camera distance | Look around |
-| V / two fingers and move | Orbit the map or building | Look around |
+| V / two fingers and move | Orbit the map or building; open/close the two fingers to zoom in/out | Look around |
 | Thumb up/down, held | Continuous zoom; floor changes every 800 ms in structure mode | Continuous forward/backward movement, default 2 m/s |
 | Fist, held 550 ms | Open selected building, then release/reissue to enter | Return to dollhouse |
+| Thumb toward screen-right, held 600 ms | Open selected building, then release/reissue to enter | Return to dollhouse |
 | Index/middle/ring fingers, held 650 ms | Cycle dollhouse, section, x-ray, exploded and floor modes | Switch to dollhouse |
 | Thumb toward screen-left, held 600 ms | Return from structure to the saved campus view | Return to dollhouse |
+| Thumb/index/little fingers extended, held 850 ms | Pause/resume gesture control, including while control is paused | Same |
+
+In section mode, pinch-drag horizontally for X, vertically for Y/Z. In exploded
+mode, drag upward to increase floor spacing. In x-ray mode, drag upward to make
+the shell more transparent. The open palm continues to pan in these modes.
+Changing structure modes in the same building preserves orbit and zoom;
+switching buildings/wings resets the view. R explicitly resets the current view.
+An interrupted observation stops movement but does not rearm a held confirmation;
+use a different stable pose or briefly remove the hand before repeating it.
 
 **V no longer resets the view.** Use R or **重置视角** to reset, and Esc or
 the side thumb to go back. Open palm, pinch and V are clutched: establish a pose,
@@ -72,12 +82,14 @@ The displayed milliseconds are a smoothed submission-to-callback duration;
 they exclude camera-driver capture delay, GUI delivery, and rendering.
 The 30 Hz target is not a measured throughput claim.
 
-This change was checked for Python syntax and opened in the native app without
-startup errors. No test suite was added or run for this request, and no real-hand
-recognition, error-rate, latency comparison or fatigue study was conducted.
-The previous gesture unit test still encodes the old immediate-trigger mapping;
-the 2026-10-12 test count below is historical and does not validate these new
-controls. See [design and HCI sources](../docs/research/2026-10-13-gesture-design.md)
+The first update was checked for Python syntax and opened in the native app
+without startup errors. A subsequent run of the existing suite had 16 passes
+and two failures in tests that still expect the old immediate-trigger gesture
+mapping. After the user's instruction to prioritize implementation, no further
+tests were run for the additions above. No real-hand recognition, error-rate,
+latency comparison or fatigue study was conducted. The 2026-10-12 test count
+below is historical and does not validate these new controls.
+See [design and HCI sources](../docs/research/2026-10-13-gesture-design.md)
 and [native UI screenshot](../docs/research/previews/gesture-controls.png).
 
 ## Campus and indoor exploration (2026-10-12)
@@ -101,8 +113,9 @@ interiors clipped to their real external footprint.
 
 1. Search a building or point to it, then click **打开建筑结构** or make a fist.
 2. Choose **剖开**, **切片**, **透视**, **拆层**, **单层**, or **进入**.
-3. For sections, select X/Y/Z and move the cut slider; an index finger controls
-   the cut while the section mode is active. Spread and shell opacity have sliders.
+3. For sections, select X/Y/Z and move the cut slider or pinch-drag the cut.
+   Pinch-drag also adjusts exploded floor spacing and x-ray shell opacity;
+   the sliders remain available. The index finger always points/selects.
 4. Use floor buttons or thumb gestures to switch levels. Hatcher has a wing selector.
 5. Inside, use W/S to move, A/D to turn, right drag to look, and wheel to move.
    Palm motion looks around; thumb gestures move forward/backward. Walls,

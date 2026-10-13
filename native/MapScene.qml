@@ -27,6 +27,7 @@ Item {
     property bool wasInspecting: false
     property string inspectionViewKey: ""
     property string walkViewKey: ""
+    property string selectionMessage: ""
     readonly property int drawCalls: view.renderStats.drawCallCount
     readonly property int fps: view.renderStats.fps
     readonly property string graphicsApi: view.renderStats.graphicsApiName
@@ -120,6 +121,8 @@ Item {
         for (let i = 0; i < hits.length; i++) {
             const point = hits[i].scenePosition
             if (inspector.active) {
+                const model = hits[i].objectHit
+                if (!model || typeof model.inspectionFloor !== "number") continue
                 const mode = inspector.mode
                 const b = inspector.bounds
                 if (mode === "section" &&
@@ -129,15 +132,26 @@ Item {
                     continue
                 if (mode === "dollhouse" && point.x > 0 && point.z > 0)
                     continue
-                inspector.pick_room(point.x, point.y, point.z)
-                return
+                if (inspector.select_room(model.inspectionFloor, point.x, point.z).length > 0)
+                    return true
+                continue
             }
             const id = mapController.select_at(point.x, point.y, point.z)
             if (id.length > 0) {
                 root.buildingPicked(id)
-                return
+                return true
             }
         }
+        return false
+    }
+
+    function confirmAtScreen(px, py) {
+        const selected = root.selectAtScreen(px, py)
+        root.selectionMessage = selected ?
+            (root.inspector.active ? root.inspector.current_floor.label + " 层 · " + root.inspector.room_name :
+             "已选中 · " + root.mapController.selected_details.name) :
+            "未选中目标 · 移到建筑或房间上再确认"
+        selectionFeedbackTimer.restart()
     }
 
     Keys.onPressed: function(event) {
@@ -344,7 +358,7 @@ Item {
             function onOrbitRequested(dx, dy) { root.orbit(dx, dy) }
             function onSelectRequested(x, y) {
                 dwell.stop()
-                root.selectAtScreen(x * root.width, y * root.height)
+                root.confirmAtScreen(x * root.width, y * root.height)
                 root.pointerSelected = true
             }
             function onPointingChanged(x, y, valid) {
@@ -371,6 +385,8 @@ Item {
             function onChanged() { root.syncInspectionHeight() }
             function onViewRequested() {
                 root.heldKeys = ({})
+                root.selectionMessage = ""
+                selectionFeedbackTimer.stop()
                 if (!root.inspector.active) {
                     if (root.wasInspecting && root.campusViewState) {
                         cameraOrigin.position = root.campusViewState.origin
@@ -428,7 +444,7 @@ Item {
         }
         onReleased: function(mouse) {
             if (mouse.button === Qt.LeftButton && Math.hypot(mouse.x - pressX, mouse.y - pressY) < 8)
-                root.selectAtScreen(mouse.x, mouse.y)
+                root.confirmAtScreen(mouse.x, mouse.y)
         }
         onDoubleClicked: function(mouse) {
             if (mouse.button === Qt.LeftButton) root.mapController.enter_structure()
@@ -481,10 +497,15 @@ Item {
         id: dwell
         interval: 850
         onTriggered: if (pointer.visible) {
-            root.selectAtScreen(pointer.x + 13, pointer.y + 13)
+            root.confirmAtScreen(pointer.x + 13, pointer.y + 13)
             root.pointerSelected = true
             root.pointerProgress = 1
         }
+    }
+    Timer {
+        id: selectionFeedbackTimer
+        interval: 1800
+        onTriggered: root.selectionMessage = ""
     }
     Timer {
         interval: 32; repeat: true; running: dwell.running
@@ -492,13 +513,14 @@ Item {
     }
     Rectangle {
         anchors.left: parent.left; anchors.bottom: parent.bottom; anchors.margins: 14
-        width: Math.min(root.width - 28, 430); height: 64; radius: 8
+        width: Math.min(root.width - 28, 430); height: root.selectionMessage ? 84 : 64; radius: 8
         color: "#dc182c37"
         Text {
             anchors.fill: parent; anchors.margins: 10
             color: "#fff4d8"; font.pixelSize: 12; elide: Text.ElideRight
             text: (!root.mapController.gestures_enabled ? "手势暂停 · 空格恢复 · 键鼠可用" :
-                   root.mapController.gesture_feedback.label) + "\n" + root.mapController.gesture_status
+                   root.mapController.gesture_feedback.label) + "\n" + root.mapController.gesture_status +
+                  (root.selectionMessage ? "\n" + root.selectionMessage : "")
         }
         Rectangle {
             anchors.left: parent.left; anchors.bottom: parent.bottom; height: 3; radius: 2

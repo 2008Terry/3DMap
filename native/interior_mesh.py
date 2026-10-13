@@ -68,6 +68,12 @@ def _finish(builder):
     return builder.finish() if builder.indices else None
 
 
+def build_room_highlight(polygon):
+    builder = _MeshBuilder()
+    prism(builder, polygon, 0.14, 0.015, (1.0, 0.76, 0.18, 1.0))
+    return _finish(builder)
+
+
 @dataclass
 class Interior:
     footprint: object

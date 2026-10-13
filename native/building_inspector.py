@@ -11,10 +11,10 @@ from shapely.geometry import LineString, Point
 
 if __package__:
     from .geometry_provider import geometry_from_buffers
-    from .interior_mesh import build_interior
+    from .interior_mesh import build_interior, build_room_highlight
 else:
     from geometry_provider import geometry_from_buffers
-    from interior_mesh import build_interior
+    from interior_mesh import build_interior, build_room_highlight
 
 
 class BuildingInspector(QObject):
@@ -44,6 +44,8 @@ class BuildingInspector(QObject):
         self._shell = None
         self._facade = None
         self._room = ""
+        self._selected_room = None
+        self._room_geometry = None
         self._built_id = ""
         self._wing = ""
 
@@ -99,6 +101,10 @@ class BuildingInspector(QObject):
     @Property(str, notify=changed)
     def room_name(self):
         return self._room
+
+    @Property(QObject, notify=changed)
+    def room_geometry(self):
+        return self._room_geometry
 
     @Property(str, notify=changed)
     def name(self):
@@ -201,6 +207,8 @@ class BuildingInspector(QObject):
             self._built_id = build_key
             self._floor = next((i for i, f in enumerate(layout.floors) if f["label"] == "1"), 0)
             self._room = ""
+            self._selected_room = None
+            self._room_geometry = None
             self.geometryChanged.emit()
         self._active = True
         self._mode = "dollhouse"
@@ -244,8 +252,13 @@ class BuildingInspector(QObject):
     def set_floor(self, index):
         if not self._layout:
             return
-        self._floor = max(0, min(len(self._layout.floors) - 1, index))
+        index = max(0, min(len(self._layout.floors) - 1, index))
+        if index == self._floor:
+            return
+        self._floor = index
         self._room = ""
+        self._selected_room = None
+        self._room_geometry = None
         self.changed.emit()
         if self._mode in ("floor", "inside"):
             self.viewRequested.emit()
@@ -292,9 +305,22 @@ class BuildingInspector(QObject):
             return ""
         index = self._floor if self._mode in ("floor", "inside") else max(
             0, min(len(self._layout.floors) - 1, int((y + 0.1) / (3.6 + (self._spread if self._mode == "explode" else 0)))))
+        return self.select_room(index, x, z)
+
+    @Slot(int, float, float, result=str)
+    def select_room(self, index, x, z):
+        if not self._layout or not 0 <= index < len(self._layout.floors):
+            return ""
         floor = self._layout.floors[index]
+        if not self._layout.footprint.covers(Point(x, z)):
+            return ""
+        room = next((room for room in floor["rooms"] if room["polygon"].covers(Point(x, z))), None)
+        if self._floor == index and self._selected_room is room and self._room:
+            return self._room
         self._floor = index
-        self._room = next((room["name"] for room in floor["rooms"] if room["polygon"].covers(Point(x, z))), "示意公共通道")
+        self._selected_room = room
+        self._room = room["name"] if room else "示意公共通道"
+        self._room_geometry = geometry_from_buffers(build_room_highlight(room["polygon"])) if room else None
         self.changed.emit()
         return self._room
 

@@ -76,6 +76,12 @@ its begin event to its end event. After release, a 600 ms handover delay and a
 new stable hand pose precede camera control. Keyboard auto-repeat releases do
 not end the held-key state; text composition also renews manual priority.
 Changing the building wing or floor establishes a new hand-drag baseline.
+Room picking reads the hit model's floor index, so slab undersides and exploded
+levels do not rely on height rounding. A selected schematic room has a yellow
+floor overlay, with the same cuts and floor spread as the structure. Pinch,
+dwell and mouse selection show the selected building/room or a missed-target
+message for 1.8 seconds. Repeating a floor change at the top/bottom keeps the
+current selection and viewing mode.
 Losing window
 activation or opening the reference-plan dialog stops gesture movement;
 manual input holds are cleared on window deactivation. Walking still uses the existing

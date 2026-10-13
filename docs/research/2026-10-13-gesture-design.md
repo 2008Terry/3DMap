@@ -81,6 +81,14 @@ Python 文件通过语法解析；更新后的原生窗口成功加载，无启�
 
 拖动上下文增加楼翼和楼层标识。换楼翼／楼层后，手的位置和双指张合基准重新建立，避免沿用上一视图的增量。按用户指示，此轮仍未运行测试或开启摄像头。
 
+### 选取反馈
+
+楼内原来由命中高度除以楼层间距推算楼层。楼板底面低于本层基准，可能落入下一层。选取路径现在直接读取命中楼板／墙／家具模型上的楼层编号，再判断命中位置是否属于室内示意轮廓。拆层间距不参与推算。
+
+选中房间增加黄色区域高亮，使用现有示意房间多边形生成一小块网格；沿用切片／剖开裁切和拆层位置，自身不参与选取。同一房间重复确认复用高亮几何。高亮表明当前示意空间的选择，不能证明真实房间边界或官方图配准。
+
+捏合、停留和鼠标点击共享选取入口，显示约 1.8 秒的选中名称／楼层或未命中提示；换视图清除旧提示。到达最高／最低楼层后重复换层保留房间和视图。此轮只做代码检查与实现，未运行测试，以上行为仍待实际操作验证。
+
 ## 调研依据
 
 - [MediaPipe Python Gesture Recognizer](https://developers.google.com/edge/mediapipe/solutions/vision/gesture_recognizer/python)：VIDEO/LIVE_STREAM 利用跟踪；实时模式异步输出，忙时忽略新输入。
@@ -91,3 +99,4 @@ Python 文件通过语法解析；更新后的原生窗口成功加载，无启�
 - [Apple 手势设计准则](https://developer.apple.com/design/human-interface-guidelines/gestures)：连续操作的及时反馈、符合预期、替代输入，避免要求固定身体姿势。
 - [Qt PinchHandler](https://doc.qt.io/qt-6/qml-qtquick-pinchhandler.html)：触摸与触控板捏合输入；本项目 Qt 6.8 API 以安装环境为准。
 - [Qt 6.8 鼠标事件](https://doc.qt.io/qt-6.8/qmouseevent.html)、[原生手势事件](https://doc.qt.io/qt-6.8/qnativegestureevent.html)、[按键事件](https://doc.qt.io/qt-6.8/qkeyevent.html)：核对按下状态、手势起止与自动重复事件，用于应用内输入仲裁。
+- [Qt PickResult](https://doc.qt.io/qt-6/qml-pickresult.html)：通过命中模型与场景位置选择示意房间。

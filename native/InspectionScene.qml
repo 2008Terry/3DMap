@@ -38,6 +38,7 @@ Node {
             y: modelData.elevation + (root.mode === "explode" ? index * root.inspector.spread : 0)
             visible: (root.mode !== "floor" && root.mode !== "inside") || index === root.inspector.selected_floor
             Model {
+                readonly property int inspectionFloor: level.index
                 geometry: level.modelData.slab
                 pickable: true
                 materials: CutMaterial {
@@ -47,6 +48,7 @@ Node {
                 }
             }
             Model {
+                readonly property int inspectionFloor: level.index
                 geometry: level.modelData.walls
                 pickable: true
                 materials: CutMaterial {
@@ -62,6 +64,7 @@ Node {
                 materials: CutMaterial { }
             }
             Model {
+                readonly property int inspectionFloor: level.index
                 geometry: level.modelData.furniture
                 visible: root.inspector.show_furniture
                 pickable: true
@@ -70,6 +73,18 @@ Node {
                     sectionPosition: root.positionOnAxis
                 }
             }
+        }
+    }
+    Model {
+        geometry: root.inspector.room_geometry
+        visible: geometry !== null
+        y: (root.inspector.current_floor.elevation || 0) +
+           (root.mode === "explode" ? root.inspector.selected_floor * root.inspector.spread : 0)
+        pickable: false
+        materials: CutMaterial {
+            sectionAxis: root.axis
+            sectionPosition: root.positionOnAxis
+            materialAlpha: 0.7
         }
     }
     Model {

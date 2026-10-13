@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>本地校园地图 · 手势优化报告</title>
+<style>
+:root{color-scheme:light;--ink:#20343f;--muted:#64757d;--line:#dde4e4;--gold:#b48226}
+*{box-sizing:border-box}body{margin:0;background:#f0f3f1;color:var(--ink);font:16px/1.85 "Segoe UI","Microsoft YaHei",sans-serif}header{background:#142c3a;color:#f5f6ed;padding:34px max(24px,calc((100vw - 1060px)/2));border-bottom:4px solid #dbb662}header p{color:#c4d1d6;margin:4px 0}h1{margin:0;font-size:30px;line-height:1.5}main{max-width:1060px;margin:28px auto;padding:32px;background:#fff;border:1px solid var(--line)}h2{font-size:23px;margin:34px 0 14px;padding-top:18px;border-top:1px solid var(--line)}h3{font-size:18px}p{margin:12px 0}a{color:#226776;text-underline-offset:3px;overflow-wrap:anywhere}a:focus-visible{outline:3px solid var(--gold)}code{font:14px Consolas,monospace;background:#edf2f2;padding:2px 5px}.notice{padding:16px 20px;background:#fff8e9;border-left:3px solid var(--gold)}.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.7}th,td{padding:12px 14px;vertical-align:top;border-bottom:1px solid var(--line);text-align:left}th{background:#edf2f2}td:first-child{min-width:130px;font-weight:600}td:last-child{min-width:140px}.muted{color:var(--muted);font-size:14px}li{margin:7px 0}footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media(max-width:700px){main{margin:0;padding:22px 18px;border:0}h1{font-size:25px}header{padding:24px 18px}table{font-size:13px}th,td{padding:9px}}
+@media print{body{background:#fff;font-size:10pt}main{margin:0;padding:0;border:0;max-width:none}header{background:#fff;color:var(--ink);padding:0 0 12px}header p{color:var(--muted)}h2{break-after:avoid}tr{break-inside:avoid}thead{display:table-header-group}.scroll{overflow:visible}table{font-size:9pt}}
+</style>
+</head>
+<body>
+<header><h1>本地校园地图 · 手势优化报告</h1><p>2026-10-13 · Windows 原生应用 · 普通摄像头 · 单手</p></header>
+<main>
+<p>代码审阅基线：<code>60f8575</code> · 分支：<code>codex/campus-interiors-environment</code>。这是本次实现记录，未替代校园建模报告中的历史测量。</p>
+<div class="notice"><strong>功能已接入，体验尚未验收。</strong><br>按你的“先不管测试，先做”要求，后续未运行测试或开启摄像头。没有实际准确率、误触率、总延迟、不同光照适应性或疲劳度的数据；不能认定“无缝、舒服”的完整目标已经达到。</div>
+
+<h2>01 · 对应你的要求</h2>
+<div class="scroll"><table><thead><tr><th>要求</th><th>当前实现与代码依据</th><th>证据边界</th></tr></thead><tbody>
+<tr><td>更多手势</td><td>11 种姿态：7 种模型类别，4 种关键点几何补充。<a href="../../native/gesture_input.py">解释层</a>及<a href="../../native/map_controller.py">地图控制层</a>都有映射。</td><td>代码已接入；真人辨识未实测。</td></tr>
+<tr><td>轻量、本地、实时识别</td><td><a href="../../native/gesture_worker.py">识别线程</a>复用本地 MediaPipe Tasks 模型，单手跟踪、异步回调、只保留最新结果。模型文件约 8.37 MB；依赖固定为 MediaPipe 0.10.21。</td><td>运行架构已实现；吞吐量和延迟改善未比较。</td></tr>
+<tr><td>模型与识别优化</td><td>复用三维关键点；按掌宽归一化；保持图像比例；置信度迟滞、姿态保持、捏合闭合／释放双阈值、自适应平滑。</td><td>模型权重未换代或训练；阈值是设计默认值。</td></tr>
+<tr><td>更符合直觉的地图操作</td><td>指向后确认、抓住拖动、双指张合缩放、左右拇指进入／返回；结构视图中捏合直接调参数。</td><td>操作设计已实现；直觉性与学习成本待评价。</td></tr>
+<tr><td>更多输入、顺畅交接</td><td><a href="../../native/MapScene.qml">原生场景</a>接入连续按键、鼠标拖动／滚轮、触摸／触控板捏合；人工输入按住期间优先，释放后重新接回手势。</td><td>输入路径已接入；物理触控板等未实测。</td></tr>
+<tr><td>舒适、减少误触</td><td>舒适操作区、灵敏度、指向中心校准、可选停留确认、暂停／恢复；失焦与过期观测停动作，保持一次确认锁定。</td><td>设置已提供；没有疲劳度或误触率证据。</td></tr>
+<tr><td>HCI 调研</td><td>参考手势偏好、及时反馈、替代输入与 One Euro 滤波研究；<a href="2026-10-13-gesture-design.md">方案文档</a>标明研究与本项目默认设计的区别。</td><td>有调研依据；研究不能替代本项目用户试用。</td></tr>
+<tr><td>本地运行、提交推送</td><td>原生应用已重新启动；实现基线已推送到当前分支，本地与远端跟踪引用一致，工作区审阅时干净。</td><td>启动时摄像头关闭；不证明完整手势链路效果。</td></tr>
+</tbody></table></div>
+
+<h2>02 · 当前怎么操作</h2>
+<p>先点击原生窗口中的“启动手势”。可在“手势设置”调整操作范围、灵敏度和指向中心；设置目前只保留本次会话。</p>
+<div class="scroll"><table><thead><tr><th>姿态</th><th>动作</th></tr></thead><tbody>
+<tr><td>食指</td><td>指向建筑／房间；可用 850 ms 停留确认。</td></tr>
+<tr><td>拇指＋食指捏合</td><td>确认最近的指向；拖动平移。切片模式调切面、拆层模式调层距、透视模式调透明程度；室内环顾。</td></tr>
+<tr><td>张开手掌</td><td>移动手掌平移地图，室内环顾；放松即停止。</td></tr>
+<tr><td>双指 V</td><td>移动旋转、张合缩放；室内移动环顾。</td></tr>
+<tr><td>拇指向上／向下</td><td>校园持续缩放；结构视图换层；室内持续前进／后退。</td></tr>
+<tr><td>握拳 · 保持 550 ms</td><td>打开选中建筑；松开再做一次进入内部；室内时返回剖开。</td></tr>
+<tr><td>三指 · 保持 650 ms</td><td>食指、中指、无名指伸展，循环剖开、切片、透视、拆层、单层。</td></tr>
+<tr><td>拇指向屏幕左 · 600 ms</td><td>逐级返回，回校园时保留之前的校园视角。</td></tr>
+<tr><td>拇指向屏幕右 · 600 ms</td><td>与握拳一样打开／进入；室内时返回剖开。</td></tr>
+<tr><td>拇指＋食指＋小指 · 850 ms</td><td>暂停／恢复控制；摄像头与识别继续。停止摄像头另用按钮。</td></tr>
+</tbody></table></div>
+<p>键鼠：WASD／方向键持续操作，+/− 缩放，E 进入，M 切换视图，PgUp／PgDn 换层，Esc 返回，R 重置，空格暂停。鼠标左拖旋转，右／中拖或 Ctrl＋左拖平移，室内右拖环顾；滚轮室外缩放、室内移动。</p>
+<p>选中示意房间后显示黄色区域高亮与名称。未选中目标也有提示。切换同一栋楼的结构视图保留观察角度与缩放；换楼／楼翼重建视角。</p>
+
+<h2>03 · 实时性与实际边界</h2>
+<ul><li>目标采集 30 Hz，图像不超过 640×480，保留原比例；目标值不是测量结果。</li><li>按图像读出时间计算滤波、保持和超时。帧龄超过 250 ms 后在下次界面处理时停止动作；中断不会当作手已经松开来重复确认。</li><li>面板 Hz 是模型结果更新频率。处理毫秒包含图像预处理与识别，不包含相机驱动延迟、界面交付和渲染。</li><li>摄像头停止在后台关闭，界面不等待；应用退出时等待资源释放。关闭耗时尚未实测。</li><li>三维手部坐标是单目估计，室内房间也是示意结构；两者都不应当作实测几何。</li></ul>
+<p class="muted">此前运行现有检查得到 16 项通过、2 项失败，失败用例仍期望旧即时映射。这个结果早于后续修改，不能验证当前版本；用户要求暂缓测试后没有修改或重跑测试。</p>
+
+<h2>04 · 后续需要的证据</h2>
+<p>完整目标仍需在本机真实摄像头条件下确认：每种手势的成功与误触、从动作到画面的总延迟、不同光照／背景下的稳定性，以及连续操作的学习成本和疲劳。当前没有这些证据，继续改变识别阈值也无法证明体验改善。</p>
+
+<h2>05 · 研究与本地入口</h2>
+<p><a href="https://developers.google.com/edge/mediapipe/solutions/vision/gesture_recognizer/python">MediaPipe 官方指南</a> · <a href="https://gery.casiez.net/1euro/">One Euro Filter</a> · <a href="https://www.microsoft.com/en-us/research/publication/understanding-mid-air-hand-gestures-a-study-of-human-preferences-in-usage-of-gesture-types-for-hci/">手势偏好研究</a> · <a href="https://developer.apple.com/design/human-interface-guidelines/gestures">Apple 手势设计</a></p>
+<p><a href="../../native/README.md">完整运行说明</a> · <a href="2026-10-13-gesture-design.md">实现与研究记录</a> · <a href="2026-10-13-campus-map-report.html">校园地图报告</a></p>
+<p>本地启动：从仓库根目录运行 <code>.\native\run.ps1</code>。应用不启动网页服务，不自动开启摄像头，运行时不联网。</p>
+<footer>离线报告，无脚本或远程资源加载。研究链接需要联网；代码和项目附件链接需要保留仓库目录。本报告不是设备性能验收结论。</footer>
+</main>
+</body>
+</html>

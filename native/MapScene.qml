@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick3D
-import QtQuick3D.Helpers
+import QtQuick.Controls
 
 Item {
     id: root
@@ -15,16 +15,24 @@ Item {
     property var mapController
     property var selectionOverlay
     property var inspector
+    property var gestureWorker
     property bool showStats: false
     property bool pointerSelected: false
     property real pointerAnchorX: 0
     property real pointerAnchorY: 0
+    property real pointerProgress: 0
+    property double dwellStarted: 0
+    property var heldKeys: ({})
+    property var campusViewState: null
+    property bool wasInspecting: false
     readonly property int drawCalls: view.renderStats.drawCallCount
     readonly property int fps: view.renderStats.fps
     readonly property string graphicsApi: view.renderStats.graphicsApiName
     signal buildingPicked(string buildingId)
+    signal gestureSettingsRequested()
 
     function resetCampus() {
+        cameraOrigin.eulerRotation = Qt.vector3d(0, 0, 0)
         cameraOrigin.position = Qt.vector3d(campusExtent.centerX, 0, campusExtent.centerZ)
         const size = Math.max(campusExtent.width, campusExtent.depth)
         mapCamera.position = Qt.vector3d(0, size * 0.78, size * 0.82)
@@ -41,8 +49,42 @@ Item {
     }
     function look(dx, dy) {
         walkCamera.eulerRotation = Qt.vector3d(
-            Math.max(-70, Math.min(70, walkCamera.eulerRotation.x + dy)),
-            walkCamera.eulerRotation.y + dx, 0)
+            Math.max(-70, Math.min(70, walkCamera.eulerRotation.x - dy)),
+            walkCamera.eulerRotation.y - dx, 0)
+    }
+    function orbit(dx, dy) {
+        cameraOrigin.eulerRotation = Qt.vector3d(
+            Math.max(-25, Math.min(30, cameraOrigin.eulerRotation.x + dy)),
+            cameraOrigin.eulerRotation.y + dx, 0)
+    }
+    function panScreen(dx, dy) {
+        const yaw = cameraOrigin.eulerRotation.y * Math.PI / 180
+        cameraOrigin.position = cameraOrigin.position.plus(Qt.vector3d(
+            dx * Math.cos(yaw) + dy * Math.sin(yaw), 0,
+            -dx * Math.sin(yaw) + dy * Math.cos(yaw)))
+    }
+    function keyboardStep(dt) {
+        root.mapController.manual_input()
+        const forward = (heldKeys[Qt.Key_W] || heldKeys[Qt.Key_Up] ? 1 : 0) -
+                        (heldKeys[Qt.Key_S] || heldKeys[Qt.Key_Down] ? 1 : 0)
+        const turn = (heldKeys[Qt.Key_D] || heldKeys[Qt.Key_Right] ? 1 : 0) -
+                     (heldKeys[Qt.Key_A] || heldKeys[Qt.Key_Left] ? 1 : 0)
+        if (inspector.active && inspector.mode === "inside") {
+            root.walk(forward * dt * 2)
+            root.look(turn * dt * 80, 0)
+        } else {
+            root.orbit(turn * dt * 80, -forward * dt * 45)
+        }
+        const zoom = (heldKeys[Qt.Key_Plus] || heldKeys[Qt.Key_Equal] ? 1 : 0) -
+                     (heldKeys[Qt.Key_Minus] ? 1 : 0)
+        if (zoom) root.mapController.zoom_by(Math.exp(-zoom * dt * 0.65))
+    }
+    onActiveFocusChanged: if (!activeFocus) heldKeys = ({})
+    Connections {
+        target: root.mapController
+        function onGestureControlsChanged() {
+            if (!root.mapController.dwell_enabled) { dwell.stop(); root.pointerProgress = 0 }
+        }
     }
     function selectAtScreen(px, py) {
         const hits = view.pickAll(px, py)
@@ -70,17 +112,38 @@ Item {
     }
 
     Keys.onPressed: function(event) {
+        if (event.isAutoRepeat) { event.accepted = true; return }
         if (event.key === Qt.Key_F3) {
             root.showStats = !root.showStats
             event.accepted = true
-        } else if (inspector.active && inspector.mode === "inside") {
-            if (event.key === Qt.Key_W || event.key === Qt.Key_Up) root.walk(1.2)
-            else if (event.key === Qt.Key_S || event.key === Qt.Key_Down) root.walk(-1.2)
-            else if (event.key === Qt.Key_A || event.key === Qt.Key_Left) root.look(-7, 0)
-            else if (event.key === Qt.Key_D || event.key === Qt.Key_Right) root.look(7, 0)
-            else return
+        } else if (event.key === Qt.Key_Space) {
+            root.mapController.set_gestures_enabled(!root.mapController.gestures_enabled)
+            event.accepted = true
+        } else if ([Qt.Key_Escape, Qt.Key_R, Qt.Key_E, Qt.Key_M,
+                    Qt.Key_PageUp, Qt.Key_PageDown].indexOf(event.key) >= 0) {
+            root.mapController.manual_input()
+            if (event.key === Qt.Key_Escape) root.mapController.go_back()
+            else if (event.key === Qt.Key_R) root.mapController.reset_camera()
+            else if (event.key === Qt.Key_E) root.mapController.enter_structure()
+            else if (event.key === Qt.Key_M) root.mapController.cycle_structure_mode()
+            else if (inspector.active) inspector.change_floor(event.key === Qt.Key_PageUp ? 1 : -1)
+            event.accepted = true
+        } else if ([Qt.Key_W, Qt.Key_A, Qt.Key_S, Qt.Key_D, Qt.Key_Up, Qt.Key_Down,
+                    Qt.Key_Left, Qt.Key_Right, Qt.Key_Plus, Qt.Key_Equal, Qt.Key_Minus].indexOf(event.key) >= 0) {
+            heldKeys = Object.assign({}, heldKeys, { [event.key]: true })
             event.accepted = true
         }
+    }
+    Keys.onReleased: function(event) {
+        if (!event.isAutoRepeat) {
+            const next = Object.assign({}, heldKeys)
+            delete next[event.key]
+            heldKeys = next
+        }
+    }
+    FrameAnimation {
+        running: root.activeFocus && Object.keys(root.heldKeys).length > 0
+        onTriggered: root.keyboardStep(Math.min(0.05, frameTime))
     }
 
     View3D {
@@ -115,6 +178,7 @@ Item {
                     clipNear: 0.1
                     clipFar: 12000
                     fieldOfView: 48
+                    onZChanged: root.mapController.set_navigation_span(Math.max(8, z) * 1.2)
                 }
             }
             PerspectiveCamera {
@@ -214,29 +278,17 @@ Item {
                 visible: root.inspector.active
             }
         }
-        OrbitCameraController {
-            origin: cameraOrigin
-            camera: mapCamera
-            enabled: !root.inspector.active || root.inspector.mode !== "inside"
-            panEnabled: true
-            xSpeed: 0.18
-            ySpeed: 0.18
-        }
-        TapHandler {
-            acceptedButtons: Qt.LeftButton
-            onTapped: function(eventPoint) {
-                root.forceActiveFocus()
-                root.selectAtScreen(eventPoint.position.x, eventPoint.position.y)
-            }
-        }
         Connections {
             target: root.mapController
             function onResetCameraRequested() { root.resetCampus() }
             function onPanRequested(dx, dz) {
-                cameraOrigin.position = Qt.vector3d(cameraOrigin.position.x + dx,
-                    cameraOrigin.position.y, cameraOrigin.position.z + dz)
+                root.panScreen(dx, dz)
             }
             function onZoomRequested(factor) {
+                if (root.inspector.active && root.inspector.mode === "inside") {
+                    walkCamera.fieldOfView = Math.max(30, Math.min(90, walkCamera.fieldOfView * factor))
+                    return
+                }
                 const distance = Math.max(root.inspector.active ? 8 : 300,
                                           Math.min(11000, mapCamera.position.z * factor))
                 const ratio = distance / mapCamera.position.z
@@ -244,36 +296,66 @@ Item {
                     mapCamera.position.y * ratio, distance)
             }
             function onFocusRequested(x, z, distance) {
+                cameraOrigin.eulerRotation = Qt.vector3d(0, 0, 0)
                 cameraOrigin.position = Qt.vector3d(x, 0, z)
                 mapCamera.position = Qt.vector3d(0, distance * 0.8, distance)
                 mapCamera.eulerRotation = Qt.vector3d(-42, 0, 0)
             }
             function onLookRequested(dx, dy) { root.look(dx, dy) }
             function onWalkRequested(distance) { root.walk(distance) }
+            function onOrbitRequested(dx, dy) { root.orbit(dx, dy) }
+            function onSelectRequested(x, y) {
+                dwell.stop()
+                root.selectAtScreen(x * root.width, y * root.height)
+                root.pointerSelected = true
+            }
             function onPointingChanged(x, y, valid) {
                 if (!valid) {
-                    pointer.visible = false; root.pointerSelected = false; dwell.stop(); return
+                    pointer.visible = false; root.pointerSelected = false; dwell.stop()
+                    root.pointerProgress = 0; return
                 }
                 const px = x * root.width, py = y * root.height
                 const moved = !pointer.visible || Math.hypot(px - root.pointerAnchorX, py - root.pointerAnchorY) > 24
                 pointer.x = px - 13; pointer.y = py - 13; pointer.visible = true
                 if (moved) {
                     root.pointerAnchorX = px; root.pointerAnchorY = py
-                    root.pointerSelected = false; dwell.restart()
+                    root.pointerSelected = false; root.pointerProgress = 0
+                    root.dwellStarted = Date.now()
+                    if (root.mapController.dwell_enabled) dwell.restart()
                 }
-                else if (!root.pointerSelected && !dwell.running) dwell.restart()
+                else if (!root.pointerSelected && !dwell.running && root.mapController.dwell_enabled) {
+                    root.dwellStarted = Date.now(); dwell.restart()
+                }
             }
         }
         Connections {
             target: root.inspector
             function onViewRequested() {
-                if (!root.inspector.active) { root.resetCampus(); return }
+                root.heldKeys = ({})
+                if (!root.inspector.active) {
+                    if (root.wasInspecting && root.campusViewState) {
+                        cameraOrigin.position = root.campusViewState.origin
+                        cameraOrigin.eulerRotation = root.campusViewState.rotation
+                        mapCamera.position = root.campusViewState.camera
+                        mapCamera.eulerRotation = root.campusViewState.pitch
+                    } else root.resetCampus()
+                    root.wasInspecting = false
+                    return
+                }
+                if (!root.wasInspecting) {
+                    root.campusViewState = {origin: cameraOrigin.position,
+                        rotation: cameraOrigin.eulerRotation, camera: mapCamera.position,
+                        pitch: mapCamera.eulerRotation}
+                    root.wasInspecting = true
+                }
                 const b = root.inspector.bounds
                 cameraOrigin.position = Qt.vector3d(0, 0, 0)
+                cameraOrigin.eulerRotation = Qt.vector3d(0, 0, 0)
                 if (root.inspector.mode === "inside") {
                     const floor = root.inspector.current_floor
                     walkCamera.position = Qt.vector3d(floor.startX, floor.elevation + 1.65, floor.startZ)
                     walkCamera.eulerRotation = Qt.vector3d(0, floor.startYaw, 0)
+                    walkCamera.fieldOfView = 67
                 } else {
                     const distance = Math.max(35, b.width, b.depth, b.height) *
                                      (root.inspector.mode === "explode" ? 2.1 : 1.6)
@@ -286,24 +368,77 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        enabled: root.inspector.active && root.inspector.mode === "inside"
-        acceptedButtons: Qt.RightButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         hoverEnabled: false
         property real lastX: 0
         property real lastY: 0
-        onPressed: function(mouse) { lastX = mouse.x; lastY = mouse.y; root.forceActiveFocus() }
+        property real pressX: 0
+        property real pressY: 0
+        onPressed: function(mouse) {
+            lastX = pressX = mouse.x; lastY = pressY = mouse.y
+            root.forceActiveFocus(); root.mapController.manual_input()
+        }
         onPositionChanged: function(mouse) {
             if (!pressed) return
-            root.look((mouse.x - lastX) * 0.2, (mouse.y - lastY) * 0.2)
+            root.mapController.manual_input()
+            const dx = mouse.x - lastX, dy = mouse.y - lastY
+            if (root.inspector.active && root.inspector.mode === "inside") {
+                if (mouse.buttons & Qt.RightButton) root.look(dx * 0.2, dy * 0.2)
+            } else if ((mouse.buttons & (Qt.RightButton | Qt.MiddleButton)) || (mouse.modifiers & Qt.ControlModifier)) {
+                root.panScreen(-dx / root.width * mapCamera.z, -dy / root.height * mapCamera.z)
+            } else root.orbit(-dx * 0.18, -dy * 0.18)
             lastX = mouse.x; lastY = mouse.y
         }
-        onWheel: function(wheel) { root.walk(wheel.angleDelta.y > 0 ? 1.2 : -1.2) }
+        onReleased: function(mouse) {
+            if (mouse.button === Qt.LeftButton && Math.hypot(mouse.x - pressX, mouse.y - pressY) < 8)
+                root.selectAtScreen(mouse.x, mouse.y)
+        }
+        onDoubleClicked: function(mouse) {
+            if (mouse.button === Qt.LeftButton) root.mapController.enter_structure()
+        }
+        onWheel: function(wheel) {
+            root.forceActiveFocus(); root.mapController.manual_input()
+            const delta = wheel.pixelDelta.y || wheel.angleDelta.y
+            if (root.inspector.active && root.inspector.mode === "inside")
+                root.walk(Math.max(-0.8, Math.min(0.8, delta * 0.004)))
+            else root.mapController.zoom_by(Math.exp(-Math.max(-240, Math.min(240, delta)) * 0.0015))
+        }
+    }
+    PinchHandler {
+        target: null
+        onActiveChanged: if (active) { root.forceActiveFocus(); root.mapController.manual_input() }
+        onScaleChanged: function(delta) {
+            root.mapController.manual_input()
+            root.mapController.zoom_by(1 / delta)
+        }
+        onRotationChanged: function(delta) {
+            root.mapController.manual_input()
+            if (root.inspector.active && root.inspector.mode === "inside") root.look(-delta, 0)
+            else root.orbit(-delta, 0)
+        }
+        onTranslationChanged: function(delta) {
+            root.mapController.manual_input()
+            if (root.inspector.active && root.inspector.mode === "inside") root.look(delta.x * 0.2, delta.y * 0.2)
+            else root.panScreen(-delta.x / root.width * mapCamera.z, -delta.y / root.height * mapCamera.z)
+        }
     }
     Rectangle {
         id: pointer
         visible: false
         width: 26; height: 26; radius: 13
         color: "#00000000"; border.width: 3; border.color: "#ffcc4c"
+        Canvas {
+            id: pointerRing
+            anchors.fill: parent
+            onPaint: {
+                const c = getContext("2d")
+                c.clearRect(0, 0, width, height)
+                c.strokeStyle = "#faffec"; c.lineWidth = 3
+                c.beginPath(); c.arc(13, 13, 10, -Math.PI / 2,
+                    -Math.PI / 2 + root.pointerProgress * Math.PI * 2); c.stroke()
+            }
+            Connections { target: root; function onPointerProgressChanged() { pointerRing.requestPaint() } }
+        }
     }
     Timer {
         id: dwell
@@ -311,7 +446,46 @@ Item {
         onTriggered: if (pointer.visible) {
             root.selectAtScreen(pointer.x + 13, pointer.y + 13)
             root.pointerSelected = true
+            root.pointerProgress = 1
         }
+    }
+    Timer {
+        interval: 32; repeat: true; running: dwell.running
+        onTriggered: root.pointerProgress = Math.min(1, (Date.now() - root.dwellStarted) / dwell.interval)
+    }
+    Rectangle {
+        anchors.left: parent.left; anchors.bottom: parent.bottom; anchors.margins: 14
+        width: Math.min(root.width - 28, 430); height: 64; radius: 8
+        color: "#dc182c37"
+        Text {
+            anchors.fill: parent; anchors.margins: 10
+            color: "#fff4d8"; font.pixelSize: 12; elide: Text.ElideRight
+            text: (!root.mapController.gestures_enabled ? "手势暂停 · 空格恢复 · 键鼠可用" :
+                   root.mapController.gesture_feedback.label) + "\n" + root.mapController.gesture_status
+        }
+        Rectangle {
+            anchors.left: parent.left; anchors.bottom: parent.bottom; height: 3; radius: 2
+            width: parent.width * (root.mapController.gesture_feedback.progress || 0)
+            color: "#ffce78"
+        }
+    }
+    Row {
+        anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 14; spacing: 8
+        Button {
+            text: root.gestureWorker.running ? "停止摄像头" : "启动手势"
+            onClicked: {
+                root.gestureWorker.running ? root.gestureWorker.stop() : root.gestureWorker.start()
+                root.forceActiveFocus()
+            }
+        }
+        Button {
+            text: root.mapController.gestures_enabled ? "暂停控制" : "恢复控制"
+            onClicked: {
+                root.mapController.set_gestures_enabled(!root.mapController.gestures_enabled)
+                root.forceActiveFocus()
+            }
+        }
+        Button { text: "手势设置"; onClicked: root.gestureSettingsRequested() }
     }
     Rectangle {
         visible: root.showStats

@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtWidgets import QApplication, QMessageBox
@@ -58,6 +58,7 @@ def main() -> int:
         facade_geometry = geometry_from_buffers(facade_mesh) if facade_mesh.indices else None
     inspector = BuildingInspector(buildings, repo_root)
     map_controller = MapController(buildings, extent, inspector, environment)
+    app.installEventFilter(map_controller)
     gesture_worker = GestureWorker(repo_root / "native" / "assets" / "gesture_recognizer.task")
     selection_overlay = SelectionOverlay()
     buildings_by_id = {building.id: building for building in buildings}
@@ -70,6 +71,11 @@ def main() -> int:
     map_controller.selectionChanged.connect(update_selection)
     gesture_worker.status_changed.connect(map_controller.set_gesture_status)
     gesture_worker.gesture_changed.connect(map_controller.handle_recognition)
+    gesture_worker.finished.connect(map_controller.stop_gesture_input)
+    gesture_poll = QTimer(app)
+    gesture_poll.setInterval(16)
+    gesture_poll.timeout.connect(gesture_worker.poll_latest)
+    gesture_poll.start()
     app.aboutToQuit.connect(gesture_worker.stop)
 
     engine = QQmlApplicationEngine()

@@ -30,6 +30,10 @@ ApplicationWindow {
         {key: "floor", name: "单层"},
         {key: "inside", name: "进入"}
     ]
+    onActiveChanged: {
+        mapControllerObject.set_window_active(active && !planDialog.visible)
+        if (!active) mapScene.heldKeys = ({})
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -42,6 +46,7 @@ ApplicationWindow {
             color: "#182630"
             border.color: "#344a55"
             Flickable {
+                id: sidebarScroll
                 anchors.fill: parent
                 anchors.margins: 17
                 clip: true
@@ -181,13 +186,13 @@ ApplicationWindow {
                         }
                         Row {
                             spacing: 6
-                            Button { text: "上一层"; onClicked: inspectorObject.change_floor(-1) }
+                            Button { text: "上一层"; onClicked: inspectorObject.change_floor(1) }
                             Label {
                                 text: inspectorObject.current_floor.label || ""
                                 color: "#f3f3ed"
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-                            Button { text: "下一层"; onClicked: inspectorObject.change_floor(1) }
+                            Button { text: "下一层"; onClicked: inspectorObject.change_floor(-1) }
                         }
                         Label {
                             width: parent.width
@@ -283,34 +288,127 @@ ApplicationWindow {
                         Button { text: "+"; onClicked: mapControllerObject.zoom_by(0.82) }
                         Button { text: "重置视角"; onClicked: mapControllerObject.reset_camera() }
                     }
-                    Row {
-                        spacing: 6
-                        Button {
-                            text: "启动手势"
+                    Column {
+                        id: gestureSettings
+                        width: parent.width
+                        spacing: 9
+                        ComboBox {
+                            width: parent.width
+                            model: ["摄像头 1", "摄像头 2", "摄像头 3", "摄像头 4", "摄像头 5", "摄像头 6"]
                             enabled: !gestureWorkerObject.running
-                            onClicked: gestureWorkerObject.start()
+                            currentIndex: gestureWorkerObject.camera_index
+                            onActivated: gestureWorkerObject.set_camera_index(currentIndex)
                         }
-                        Button {
-                            text: "停止"
-                            enabled: gestureWorkerObject.running
-                            onClicked: gestureWorkerObject.stop()
+                        Row {
+                            spacing: 6
+                            Button {
+                                text: "启动手势"
+                                enabled: !gestureWorkerObject.running
+                                onClicked: gestureWorkerObject.start()
+                            }
+                            Button {
+                                text: "停止"
+                                enabled: gestureWorkerObject.running
+                                onClicked: gestureWorkerObject.stop()
+                            }
+                            Button {
+                                text: mapControllerObject.gestures_enabled ? "暂停控制" : "恢复控制"
+                                onClicked: mapControllerObject.set_gestures_enabled(!mapControllerObject.gestures_enabled)
+                            }
                         }
-                    }
-                    Label {
-                        width: parent.width
-                        text: mapControllerObject.gesture_status
-                        color: "#a4c0c5"
-                        font.pixelSize: 11
-                        wrapMode: Text.WordWrap
-                    }
-                    Label {
-                        width: parent.width
-                        text: inspectorObject.mode === "inside"
-                              ? "W/S 移动 · A/D 转向 · 右键拖动环顾 · 拇指前后移动"
-                              : "拖动旋转 · 滚轮缩放 · 食指停留选择 · 握拳进入"
-                        color: "#9eafad"
-                        font.pixelSize: 10
-                        wrapMode: Text.WordWrap
+                        Rectangle {
+                            width: parent.width; height: 146; radius: 9
+                            color: "#10212b"; border.color: "#36515a"
+                            Canvas {
+                                id: handPreview
+                                anchors.fill: parent; anchors.margins: 12
+                                property var points: mapControllerObject.gesture_feedback.points || []
+                                onPointsChanged: requestPaint()
+                                onPaint: {
+                                    const ctx = getContext("2d")
+                                    ctx.clearRect(0, 0, width, height)
+                                    if (points.length !== 21) {
+                                        ctx.fillStyle = "#b0c4c9"; ctx.font = "12px sans-serif"
+                                        ctx.fillText("手放在镜头前 · 普通摄像头 · 单手", 6, height / 2)
+                                        return
+                                    }
+                                    const edges = [[0,1,2,3,4],[0,5,6,7,8],[5,9,10,11,12],
+                                                   [9,13,14,15,16],[13,17,18,19,20],[17,0]]
+                                    ctx.strokeStyle = "#77b9b8"; ctx.lineWidth = 2
+                                    for (let e of edges) {
+                                        ctx.beginPath()
+                                        for (let j = 0; j < e.length; j++) {
+                                            const p = points[e[j]]
+                                            if (!j) ctx.moveTo(p.x * width, p.y * height)
+                                            else ctx.lineTo(p.x * width, p.y * height)
+                                        }
+                                        ctx.stroke()
+                                    }
+                                    ctx.fillStyle = "#ffcd77"
+                                    for (let p of points) {
+                                        ctx.beginPath(); ctx.arc(p.x * width, p.y * height, 2.6, 0, Math.PI*2); ctx.fill()
+                                    }
+                                }
+                            }
+                        }
+                        Label {
+                            width: parent.width
+                            text: mapControllerObject.gesture_feedback.label || "等待手势"
+                            color: "#ffce78"; font.pixelSize: 13
+                        }
+                        ProgressBar {
+                            width: parent.width
+                            value: mapControllerObject.gesture_feedback.progress || 0
+                        }
+                        Label {
+                            width: parent.width
+                            text: "识别更新 " + (gestureWorkerObject.metrics.fps || 0) + " Hz · 处理约 " +
+                                  (gestureWorkerObject.metrics.latencyMs || 0) + " ms"
+                            color: "#9fb8bf"; font.pixelSize: 10
+                        }
+                        Label {
+                            width: parent.width
+                            text: mapControllerObject.gesture_status
+                            color: "#a4c0c5"
+                            font.pixelSize: 11
+                            wrapMode: Text.WordWrap
+                        }
+                        Label {
+                            width: parent.width
+                            text: inspectorObject.mode === "inside"
+                                  ? "手掌/双指环顾 · 拇指持续走动 · Esc 返回"
+                                  : "食指指向 + 捏合确认 · 手掌/捏合拖动 · 双指旋转"
+                            color: "#9eafad"
+                            font.pixelSize: 10
+                            wrapMode: Text.WordWrap
+                        }
+                        Label {
+                            width: parent.width
+                            text: "握拳停留：进入 · 三指停留：切换视图\n拇指向左停留：返回 · 拇指上下：缩放/换层\n空格：暂停 · E：进入 · M：视图 · R：复位\nWASD/方向键持续操作 · PgUp/PgDn 换层"
+                            color: "#bbccc9"; font.pixelSize: 11; wrapMode: Text.WordWrap
+                        }
+                        CheckBox {
+                            text: "食指停留也可选择"
+                            checked: mapControllerObject.dwell_enabled
+                            onToggled: mapControllerObject.set_dwell_enabled(checked)
+                        }
+                        Label { text: "移动灵敏度"; color: "#b2c7ca"; font.pixelSize: 11 }
+                        Slider {
+                            width: parent.width; from: 0.5; to: 1.75
+                            value: mapControllerObject.gesture_sensitivity
+                            onMoved: mapControllerObject.set_gesture_sensitivity(value)
+                        }
+                        Label { text: "指向操作范围（小范围减少伸手）"; color: "#b2c7ca"; font.pixelSize: 11 }
+                        Slider {
+                            width: parent.width; from: 0.55; to: 1
+                            value: mapControllerObject.comfort_range
+                            onMoved: mapControllerObject.set_comfort_range(value)
+                        }
+                        Row {
+                            spacing: 6
+                            Button { text: "此位置设为中心"; onClicked: mapControllerObject.calibrate_pointer() }
+                            Button { text: "恢复中心"; onClicked: mapControllerObject.reset_pointer_center() }
+                        }
                     }
                     Label {
                         width: parent.width
@@ -329,6 +427,7 @@ ApplicationWindow {
             color: "#dbe5e4"
             clip: true
             MapScene {
+                id: mapScene
                 anchors.fill: parent
                 campusExtent: campusBounds
                 centralGeometry: geometryCentral
@@ -339,6 +438,9 @@ ApplicationWindow {
                 mapController: mapControllerObject
                 selectionOverlay: selectionOverlayState
                 inspector: inspectorObject
+                gestureWorker: gestureWorkerObject
+                onGestureSettingsRequested: sidebarScroll.contentY = Math.min(gestureSettings.y,
+                    Math.max(0, sidebarScroll.contentHeight - sidebarScroll.height))
             }
         }
     }
@@ -350,6 +452,7 @@ ApplicationWindow {
         width: Math.min(window.width - 60, 1000)
         height: window.height - 70
         standardButtons: Dialog.Close
+        onVisibleChanged: mapControllerObject.set_window_active(window.active && !visible)
         contentItem: Flickable {
             clip: true
             contentWidth: width * 1.6

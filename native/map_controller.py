@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import time
-from math import hypot
+from math import exp, hypot
 from typing import Any
 
-from PySide6.QtCore import QObject, Property, Signal, Slot
+from PySide6.QtCore import QEvent, QObject, Property, QTimer, Signal, Slot
 
 if __package__:
     from .campus_data import Building, CampusExtent, pick_building
+    from .gesture_input import HandInterpreter, HOLD_SECONDS, LABELS
 else:
     from campus_data import Building, CampusExtent, pick_building
+    from gesture_input import HandInterpreter, HOLD_SECONDS, LABELS
 
 
 class MapController(QObject):
@@ -25,6 +27,10 @@ class MapController(QObject):
     pointingChanged = Signal(float, float, bool)
     lookRequested = Signal(float, float)
     walkRequested = Signal(float)
+    orbitRequested = Signal(float, float)
+    selectRequested = Signal(float, float)
+    gestureControlsChanged = Signal()
+    gestureFeedbackChanged = Signal()
 
     def __init__(self, buildings: list[Building], extent: CampusExtent, inspector=None, environment=None):
         super().__init__()
@@ -33,11 +39,190 @@ class MapController(QObject):
         self._extent = extent
         self._selected_id = ""
         self._gesture_status = "Gesture camera inactive"
-        self._previous_palm: tuple[float, float] | None = None
-        self._last_gesture_key = ""
-        self._last_discrete_action_at = 0.0
         self._inspector = inspector
         self._bus_stops = (environment or {}).get("busStops", [])
+        self._hand = HandInterpreter()
+        self._frame = None
+        self._last_frame_at = self._last_tick = time.monotonic()
+        self._motion_position = None
+        self._motion_key = ""
+        self._action_latch = ""
+        self._last_floor_at = 0.0
+        self._last_point = None
+        self._neutral_since = None
+        self._enabled = self._window_active = True
+        self._manual_until = 0.0
+        self._blocked_last = False
+        self._sensitivity = 1.0
+        self._comfort = 0.8
+        self._point_center = (0.5, 0.5)
+        self._last_cursor = None
+        self._dwell_enabled = True
+        self._navigation_span = max(extent.width, extent.depth)
+        self._feedback = {"label": "等待手势", "progress": 0.0, "points": []}
+        self._context = None
+        self._timer = QTimer(self)
+        self._timer.setInterval(16)
+        self._timer.timeout.connect(self._gesture_tick)
+        self._timer.start()
+
+    @Property(bool, notify=gestureControlsChanged)
+    def gestures_enabled(self):
+        return self._enabled
+
+    @Property(float, notify=gestureControlsChanged)
+    def gesture_sensitivity(self):
+        return self._sensitivity
+
+    @Property(float, notify=gestureControlsChanged)
+    def comfort_range(self):
+        return self._comfort
+
+    @Property(bool, notify=gestureControlsChanged)
+    def dwell_enabled(self):
+        return self._dwell_enabled
+
+    @Property("QVariantMap", notify=gestureFeedbackChanged)
+    def gesture_feedback(self):
+        return self._feedback
+
+    def _stop_motion(self):
+        self._frame = None
+        self._motion_position = None
+        self._motion_key = ""
+        self.pointingChanged.emit(0, 0, False)
+
+    def _release_hand(self):
+        self._stop_motion()
+        self._hand.reset()
+        self._action_latch = ""
+        self._last_point = None
+        self._neutral_since = None
+
+    @Slot()
+    def stop_gesture_input(self):
+        self._release_hand()
+        self._feedback = {"label": "手势已停止", "progress": 0.0, "points": []}
+        self.gestureFeedbackChanged.emit()
+
+    @Slot(bool)
+    def set_gestures_enabled(self, enabled):
+        self._enabled = bool(enabled)
+        self._release_hand()
+        self.gestureControlsChanged.emit()
+        self._feedback = {"label": "等待重新稳定" if enabled else "手势已暂停", "progress": 0.0, "points": []}
+        self.gestureFeedbackChanged.emit()
+        self.set_gesture_status("等待重新稳定手势" if enabled else "手势已暂停 · 空格或按钮恢复")
+
+    @Slot(bool)
+    def set_window_active(self, active):
+        self._window_active = bool(active)
+        self._release_hand()
+
+    @Slot(float)
+    def set_gesture_sensitivity(self, value):
+        self._sensitivity = max(0.5, min(1.75, value))
+        self.gestureControlsChanged.emit()
+
+    @Slot(float)
+    def set_comfort_range(self, value):
+        self._comfort = max(0.55, min(1.0, value))
+        self._release_hand()
+        self.gestureControlsChanged.emit()
+
+    @Slot()
+    def calibrate_pointer(self):
+        if not self._last_cursor or time.monotonic() - self._last_cursor[2] > 3.0:
+            self.set_gesture_status("先舒适地举起食指，再点击设为中心")
+            return
+        self._point_center = tuple(max(0.15, min(0.85, v)) for v in self._last_cursor[:2])
+        self._release_hand()
+        self.set_gesture_status("已设指向中心 · 放松后重新指向")
+
+    @Slot()
+    def reset_pointer_center(self):
+        self._point_center = (0.5, 0.5)
+        self._release_hand()
+
+    @Slot(bool)
+    def set_dwell_enabled(self, enabled):
+        self._dwell_enabled = bool(enabled)
+        self.gestureControlsChanged.emit()
+
+    @Slot(float)
+    def set_navigation_span(self, span):
+        self._navigation_span = max(8.0, min(16000.0, span))
+
+    @Slot()
+    def manual_input(self):
+        self._manual_until = time.monotonic() + 0.6
+        self._release_hand()
+
+    def eventFilter(self, watched, event):
+        if event.type() in (QEvent.Type.MouseButtonPress, QEvent.Type.Wheel,
+                            QEvent.Type.KeyPress, QEvent.Type.TouchBegin, QEvent.Type.TouchUpdate,
+                            QEvent.Type.NativeGesture):
+            self.manual_input()
+        return False
+
+    @Slot()
+    def go_back(self):
+        self._stop_motion()
+        inspector = self._inspector
+        if inspector and inspector.active:
+            if inspector.mode == "inside":
+                inspector.set_mode("dollhouse")
+            else:
+                inspector.close()
+
+    @Slot()
+    def cycle_structure_mode(self):
+        inspector = self._inspector
+        if inspector and inspector.active:
+            modes = ("dollhouse", "section", "xray", "explode", "floor")
+            index = modes.index(inspector.mode) if inspector.mode in modes else -1
+            inspector.set_mode(modes[(index + 1) % len(modes)])
+
+    @Slot()
+    def enter_structure(self):
+        inspector = self._inspector
+        if not inspector or not self._selected_id:
+            self.set_gesture_status("先指向选择建筑，再握拳进入")
+        elif not inspector.active:
+            inspector.open()
+        elif inspector.mode != "inside":
+            inspector.set_mode("inside")
+        else:
+            inspector.set_mode("dollhouse")
+
+    def _gesture_tick(self):
+        now = time.monotonic()
+        dt, self._last_tick = min(0.05, max(0.0, now - self._last_tick)), now
+        if self._frame is None:
+            return
+        if now - self._last_frame_at > 0.25:
+            self._release_hand()
+            self._feedback = {"label": "观测中断 · 已停止", "progress": 0.0, "points": []}
+            self.gestureFeedbackChanged.emit()
+            return
+        if not self._enabled or not self._window_active or now < self._manual_until:
+            self._stop_motion()
+            return
+        frame = self._frame
+        if not frame.ready or frame.key not in ("Thumb_Up", "Thumb_Down"):
+            return
+        inspector = self._inspector
+        direction = 1 if frame.key == "Thumb_Up" else -1
+        if inspector and inspector.active:
+            if inspector.mode == "inside":
+                self.walkRequested.emit(direction * dt * 2.0 * self._sensitivity)
+            elif frame.held >= 0.4 and now - self._last_floor_at >= 0.8:
+                self._last_floor_at = now
+                inspector.change_floor(direction)
+                if inspector.mode != "floor":
+                    inspector.set_mode("floor")
+        else:
+            self.zoom_by(exp(-direction * dt * 0.65 * self._sensitivity))
 
     @Property("QVariantMap", notify=detailsChanged)
     def selected_details(self):
@@ -143,87 +328,124 @@ class MapController(QObject):
 
     @Slot(str, float, "QVariant")
     def handle_gesture(self, key: str, confidence: float, landmarks: Any) -> None:
+        now = time.monotonic()
+        self._last_frame_at = now
         inspector = self._inspector
         inspecting = bool(inspector and inspector.active)
         inside = inspecting and inspector.mode == "inside"
-        if key != "Pointing_Up" or confidence < 0.68:
-            self.pointingChanged.emit(0, 0, False)
-        if confidence < 0.68 or not key:
-            self._previous_palm = None
-            self._last_gesture_key = ""
-            self.set_gesture_status("Waiting for a hand gesture")
+        context = (self._selected_id, inspecting, inspector.mode if inspecting else "campus")
+        if context != self._context:
+            self._context = context
+            self._motion_position = None
+            self._motion_key = ""
+            self._last_point = None
+            self._last_floor_at = now
+        blocked = not self._enabled or not self._window_active or now < self._manual_until
+        if self._blocked_last and not blocked:
+            self._hand.reset()
+        self._blocked_last = blocked
+        frame = self._hand.update(key, confidence, landmarks, now)
+        points = [{"x": 1.0 - float(p[0]), "y": float(p[1])} for p in landmarks] if len(landmarks) == 21 else []
+        self._feedback = {"label": LABELS.get(frame.key, "未识别姿态") if frame else "放松手部 / 等待识别",
+                          "progress": frame.progress if frame else 0.0,
+                          "source": "关键点几何" if frame and frame.geometric else "本地模型",
+                          "points": points}
+        if blocked:
+            self._stop_motion()
+            label = ("控制已暂停" if not self._enabled else "窗口未激活" if not self._window_active else "键鼠优先")
+            self._feedback["label"] += " · " + label
+            self._feedback["progress"] = 0.0
+            self.gestureFeedbackChanged.emit()
             return
-
-        if key == "Pointing_Up" and len(landmarks) > 8:
-            x, y = 1.0 - float(landmarks[8][0]), float(landmarks[8][1])
-            self._previous_palm = None
-            self._last_gesture_key = key
+        self.gestureFeedbackChanged.emit()
+        self._frame = frame
+        if frame is None:
+            self._stop_motion()
+            if self._neutral_since is None:
+                self._neutral_since = now
+            if now - self._neutral_since >= 0.22:
+                self._action_latch = ""
+                self._last_point = None
+            self.set_gesture_status("放松即停止 · 指向、捏合或张开手掌开始")
+            return
+        self._neutral_since = None
+        if not frame.ready:
+            self._stop_motion()
+            self.set_gesture_status("正在稳定 · " + LABELS[frame.key])
+            return
+        if self._action_latch and frame.key != self._action_latch:
+            self._action_latch = ""
+        if frame.key != "Pointing_Up":
+            self.pointingChanged.emit(0, 0, False)
+        if frame.key == "Pointing_Up":
+            self._last_cursor = (*frame.cursor, now)
+            def project(v, center):
+                reach = min(self._comfort / 2, center - 0.02 if v < center else 0.98 - center)
+                return max(0.0, min(1.0, 0.5 + (v - center) / (2 * reach)))
+            x, y = (project(v, center) for v, center in zip(frame.cursor, self._point_center))
+            self._last_point = (x, y, now)
+            self._motion_position = None
+            self._motion_key = frame.key
             if inspecting and inspector.mode == "section":
                 inspector.set_cut(x)
-                self.set_gesture_status("食指移动 · 扫描建筑切面")
+                self.set_gesture_status("食指移动 · 扫描切面")
             else:
                 self.pointingChanged.emit(x, y, True)
-                self.set_gesture_status("食指指向并停留 · 选择建筑或房间")
-            return
-
-        if key == "Open_Palm":
-            if len(landmarks) <= 9:
-                return
-            x, y = landmarks[9]
-            position = (1.0 - float(x), float(y))
-            if self._previous_palm is not None:
-                delta_x = position[0] - self._previous_palm[0]
-                delta_y = position[1] - self._previous_palm[1]
-                delta_x = 0.0 if abs(delta_x) < 0.003 else max(-0.06, min(0.06, delta_x))
-                delta_y = 0.0 if abs(delta_y) < 0.003 else max(-0.06, min(0.06, delta_y))
+                self.set_gesture_status("指向后捏合确认" + (" · 或停留选择" if self._dwell_enabled else ""))
+        elif frame.key in ("Open_Palm", "Pinch", "Victory"):
+            if self._motion_key != frame.key:
+                if frame.key == "Pinch" and self._last_point and now - self._last_point[2] < 0.8:
+                    self.selectRequested.emit(self._last_point[0], self._last_point[1])
+                self._motion_position = None
+                self._motion_key = frame.key
+            if self._motion_position is not None:
+                dx = max(-0.04, min(0.04, frame.position[0] - self._motion_position[0]))
+                dy = max(-0.04, min(0.04, frame.position[1] - self._motion_position[1]))
+                dx = 0.0 if abs(dx) < 0.0007 else dx * self._sensitivity
+                dy = 0.0 if abs(dy) < 0.0007 else dy * self._sensitivity
                 if inside:
-                    self.lookRequested.emit(-delta_x * 150, -delta_y * 100)
+                    self.lookRequested.emit(dx * 160, dy * 110)
+                elif frame.key == "Victory":
+                    self.orbitRequested.emit(-dx * 220, -dy * 140)
                 else:
-                    scale = (max(inspector.bounds["width"], inspector.bounds["depth"]) * 1.6
-                             if inspecting else max(self._extent.width, self._extent.depth) * 1.2)
-                    self.pan_by(-delta_x * scale, delta_y * scale)
-            self._previous_palm = position
-            self._last_gesture_key = key
-            self.set_gesture_status("张开手掌 · 环顾室内" if inside else "Open Palm · move the map")
-            return
-
-        self._previous_palm = None
-        if self._last_gesture_key == key:
-            return
-        self._last_gesture_key = key
-        if key in ("Thumb_Up", "Thumb_Down"):
-            now = time.monotonic()
-            if now - self._last_discrete_action_at < 0.7:
+                    self.pan_by(-dx * self._navigation_span, -dy * self._navigation_span)
+            if self._motion_position is None or dx or dy:
+                self._motion_position = frame.position
+            self.set_gesture_status("环顾 · 松手停止" if inside else
+                                    "双指旋转 · 松手停止" if frame.key == "Victory" else
+                                    "捏合拖动地图" if frame.key == "Pinch" else "手掌拖动地图")
+        elif frame.key in HOLD_SECONDS:
+            self._motion_position = None
+            self._motion_key = frame.key
+            if frame.key == "Closed_Fist" and not self._selected_id:
+                self.set_gesture_status("先指向选择建筑，再握拳进入")
                 return
-            self._last_discrete_action_at = now
-            if inside:
-                self.walkRequested.emit(1.8 if key == "Thumb_Up" else -1.8)
-                self.set_gesture_status("拇指 · 在室内前进/后退")
-            elif inspecting:
-                inspector.change_floor(1 if key == "Thumb_Up" else -1)
-                inspector.set_mode("floor")
-                self.set_gesture_status("拇指 · 切换楼层")
-            else:
-                self.zoom_by(0.82 if key == "Thumb_Up" else 1.22)
-                self.set_gesture_status("Thumb Up · zoom in" if key == "Thumb_Up" else "Thumb Down · zoom out")
-        elif key == "Closed_Fist" and inspector:
-            if not self._selected_id:
-                self.set_gesture_status("先用食指或鼠标选择建筑，再握拳进入")
-            elif not inspecting:
-                inspector.open()
-                self.set_gesture_status("握拳 · 打开建筑结构")
-            else:
-                inspector.set_mode("dollhouse" if inside else "inside")
-                self.set_gesture_status("握拳 · 切换室内视角")
-        elif key == "Victory":
-            if inspecting:
-                inspector.close()
-            self.reset_camera()
-            self.set_gesture_status("Victory · view reset")
+            if frame.key == "Three_Fingers" and not inspecting:
+                self.set_gesture_status("打开建筑后，三指切换结构视图")
+                return
+            if frame.key == "Thumb_Left" and not inspecting:
+                self.set_gesture_status("已经在校园 · R 或按钮复位视角")
+                return
+            if frame.held >= HOLD_SECONDS[frame.key] and self._action_latch != frame.key:
+                self._action_latch = frame.key
+                if frame.key == "Closed_Fist":
+                    self.enter_structure()
+                elif frame.key == "Three_Fingers":
+                    self.cycle_structure_mode()
+                else:
+                    self.go_back()
+            self.set_gesture_status("松开后重新操作" if self._action_latch == frame.key else
+                                    LABELS[frame.key] + " · 保持以确认")
         else:
-            self.set_gesture_status("Recognized: " + key)
+            self._motion_position = None
+            self._motion_key = frame.key
+            self.set_gesture_status("拇指持续前进/后退 · 松手停止" if inside else
+                                    "拇指切换楼层" if inspecting else "拇指持续缩放 · 松手停止")
 
     @Slot(str, str, float, object)
     def handle_recognition(self, key, label, confidence, landmarks):
         """Receive the worker's actual Qt signature on the controller's GUI thread."""
-        self.handle_gesture(key, confidence, landmarks)
+        if label == "已停止":
+            self.stop_gesture_input()
+        else:
+            self.handle_gesture(key, confidence, landmarks)

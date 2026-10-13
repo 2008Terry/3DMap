@@ -14,6 +14,72 @@ The first run creates `native/.venv` and installs the pinned Python requirements
 
 The application reads its data from `src/campusBuildings.json`, `src/campusBuildingFootprints.json`, `native/featured_details.json`, `native/building_references.json`, and `native/assets/campus_environment.json`. Gesture recognition uses the bundled `native/assets/gesture_recognizer.task` model and the local MediaPipe Tasks package; the running app makes no network requests. The camera starts only after selecting **启动手势**. If camera access or model initialization fails, mouse navigation stays available. The app does not start a web server or open a browser.
 
+## Current gesture controls (2026-10-13)
+
+Use **启动手势**, **暂停控制** and **手势设置** in the map's persistent toolbar.
+Settings include a camera index (six choices, without opening devices to scan
+them), sensitivity, a smaller pointing reach, dwell selection, and pointing-center
+calibration. For calibration, hold an index finger comfortably, then click
+**此位置设为中心** within three seconds. **恢复中心** restores the default.
+Settings apply for this session. The skeleton panel shows mirrored landmarks,
+the recognized pose and confirmation progress; the map overlay stays visible
+when the sidebar is scrolled or a building is open.
+
+| Input | Campus / structure | Inside |
+| --- | --- | --- |
+| Index finger | Point, then pinch to confirm; optional 850 ms dwell; slide the section cut in section mode | Select schematic space |
+| Thumb/index pinch | Confirm the recent pointer (up to 800 ms old), then drag to pan | Look around |
+| Open palm and move | Pan at a scale based on current camera distance | Look around |
+| V / two fingers and move | Orbit the map or building | Look around |
+| Thumb up/down, held | Continuous zoom; floor changes every 800 ms in structure mode | Continuous forward/backward movement, default 2 m/s |
+| Fist, held 550 ms | Open selected building, then release/reissue to enter | Return to dollhouse |
+| Index/middle/ring fingers, held 650 ms | Cycle dollhouse, section, x-ray, exploded and floor modes | Switch to dollhouse |
+| Thumb toward screen-left, held 600 ms | Return from structure to the saved campus view | Return to dollhouse |
+
+**V no longer resets the view.** Use R or **重置视角** to reset, and Esc or
+the side thumb to go back. Open palm, pinch and V are clutched: establish a pose,
+move, then relax to stop. One-Euro-style adaptive filtering stabilizes slow
+motion and responds more quickly to fast motion. A candidate needs 120 ms
+stability before control; discrete actions need the longer holds above and
+release before repeating. Pinch uses palm-normalized close/open hysteresis.
+These are design defaults, not independently validated accuracy thresholds.
+
+Keyboard, while the map has focus: hold WASD/arrows to walk/turn indoors or
+orbit outdoors; hold +/- to zoom; E enters; M cycles modes; PageUp/PageDown
+changes floors; Esc returns; R resets; Space pauses/resumes gesture control.
+Mouse: left drag orbits; right/middle drag or Ctrl-left drag pans; right drag
+looks around indoors; wheel zooms or walks. Double-click enters a selected
+building. Qt-supported touchpad/touch pinch, rotation and translation are also
+wired to the same controls. Physical touchpad gestures have not been exercised.
+
+Manual input temporarily takes priority over camera control. Losing window
+activation or opening the reference-plan dialog stops gesture movement;
+keyboard holds are cleared on focus loss. Walking still uses the existing
+collision check. Gesture navigation stops after 250 ms without fresh delivered
+observations, and rejected poses stop motion immediately.
+
+The model weights are unchanged. MediaPipe runs single-hand LIVE_STREAM
+tracking with a 640x480 camera target at 30 Hz, dropping frames when inference
+is busy. Its callback writes one latest-result mailbox; GUI polling discards
+results more than 250 ms old, avoiding queued old actions after an expensive
+UI operation. DirectShow falls back to MSMF. The camera buffer-size request
+depends on the driver and is not a guarantee that the driver has no buffering.
+Pinch, three fingers and side thumb use landmark geometry, not new trained
+classes or fabricated model confidence scores.
+
+The displayed Hz measures inference-result updates, not rendering FPS.
+The displayed milliseconds are a smoothed submission-to-callback duration;
+they exclude camera-driver capture delay, GUI delivery, and rendering.
+The 30 Hz target is not a measured throughput claim.
+
+This change was checked for Python syntax and opened in the native app without
+startup errors. No test suite was added or run for this request, and no real-hand
+recognition, error-rate, latency comparison or fatigue study was conducted.
+The previous gesture unit test still encodes the old immediate-trigger mapping;
+the 2026-10-12 test count below is historical and does not validate these new
+controls. See [design and HCI sources](../docs/research/2026-10-13-gesture-design.md)
+and [native UI screenshot](../docs/research/previews/gesture-controls.png).
+
 ## Campus and indoor exploration (2026-10-12)
 
 The scene has 623 university building records and 2,174 surrounding building
@@ -40,7 +106,8 @@ interiors clipped to their real external footprint.
 4. Use floor buttons or thumb gestures to switch levels. Hatcher has a wing selector.
 5. Inside, use W/S to move, A/D to turn, right drag to look, and wheel to move.
    Palm motion looks around; thumb gestures move forward/backward. Walls,
-   furniture and stairs block walking. Victory returns to campus. F3 shows stats.
+   furniture and stairs block walking. F3 shows stats. The current gesture
+   mapping above replaces the original Victory-to-reset mapping.
 
 Pointing selection has an 850 ms dwell and a movement tolerance. The camera
 worker's four-argument Qt signal is received by a GUI-thread controller slot;

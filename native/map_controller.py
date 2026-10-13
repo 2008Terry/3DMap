@@ -6,7 +6,7 @@ import time
 from math import exp, hypot, log
 from typing import Any
 
-from PySide6.QtCore import QEvent, QObject, Property, QTimer, Signal, Slot
+from PySide6.QtCore import QEvent, QObject, Property, QTimer, Qt, Signal, Slot
 
 if __package__:
     from .campus_data import Building, CampusExtent, pick_building
@@ -53,6 +53,8 @@ class MapController(QObject):
         self._neutral_since = None
         self._enabled = self._window_active = True
         self._manual_until = 0.0
+        self._manual_keys = set()
+        self._manual_mouse = self._manual_touch = self._manual_native = False
         self._blocked_last = False
         self._sensitivity = 1.0
         self._comfort = 0.8
@@ -119,6 +121,9 @@ class MapController(QObject):
     @Slot(bool)
     def set_window_active(self, active):
         self._window_active = bool(active)
+        if not active:
+            self._manual_keys.clear()
+            self._manual_mouse = self._manual_touch = self._manual_native = False
         self._release_hand()
 
     @Slot(float)
@@ -160,10 +165,35 @@ class MapController(QObject):
         self._manual_until = time.monotonic() + 0.6
         self._release_hand()
 
+    def _manual_blocked(self, now):
+        return bool(self._manual_keys or self._manual_mouse or self._manual_touch or
+                    self._manual_native or now < self._manual_until)
+
     def eventFilter(self, watched, event):
-        if event.type() in (QEvent.Type.MouseButtonPress, QEvent.Type.Wheel,
-                            QEvent.Type.KeyPress, QEvent.Type.TouchBegin, QEvent.Type.TouchUpdate,
-                            QEvent.Type.NativeGesture):
+        kind = event.type()
+        if kind in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonDblClick,
+                    QEvent.Type.MouseButtonRelease, QEvent.Type.MouseMove):
+            self._manual_mouse = event.buttons() != Qt.MouseButton.NoButton
+            if self._manual_mouse or kind != QEvent.Type.MouseMove:
+                self.manual_input()
+        elif kind in (QEvent.Type.KeyPress, QEvent.Type.KeyRelease):
+            key = event.nativeScanCode() or event.key()
+            if kind == QEvent.Type.KeyPress:
+                self._manual_keys.add(key)
+            elif not event.isAutoRepeat():
+                self._manual_keys.discard(key)
+            self.manual_input()
+        elif kind in (QEvent.Type.TouchBegin, QEvent.Type.TouchUpdate,
+                      QEvent.Type.TouchEnd, QEvent.Type.TouchCancel):
+            self._manual_touch = kind in (QEvent.Type.TouchBegin, QEvent.Type.TouchUpdate)
+            self.manual_input()
+        elif kind == QEvent.Type.NativeGesture:
+            if event.gestureType() == Qt.NativeGestureType.BeginNativeGesture:
+                self._manual_native = True
+            elif event.gestureType() == Qt.NativeGestureType.EndNativeGesture:
+                self._manual_native = False
+            self.manual_input()
+        elif kind in (QEvent.Type.Wheel, QEvent.Type.InputMethod):
             self.manual_input()
         return False
 
@@ -208,7 +238,7 @@ class MapController(QObject):
             self._feedback = {"label": "观测中断 · 已停止", "progress": 0.0, "points": []}
             self.gestureFeedbackChanged.emit()
             return
-        if not self._enabled or not self._window_active or now < self._manual_until:
+        if not self._enabled or not self._window_active or self._manual_blocked(now):
             self._stop_motion()
             return
         frame = self._frame
@@ -334,7 +364,9 @@ class MapController(QObject):
         inspector = self._inspector
         inspecting = bool(inspector and inspector.active)
         inside = inspecting and inspector.mode == "inside"
-        context = (self._selected_id, inspecting, inspector.mode if inspecting else "campus")
+        context = (self._selected_id, inspecting, inspector.mode if inspecting else "campus",
+                   inspector.inspection_key if inspecting else "",
+                   inspector.selected_floor if inspecting else -1)
         if context != self._context:
             self._context = context
             self._motion_position = None
@@ -342,7 +374,7 @@ class MapController(QObject):
             self._motion_key = ""
             self._last_point = None
             self._last_floor_at = now
-        blocked = not self._enabled or not self._window_active or now < self._manual_until
+        blocked = not self._enabled or not self._window_active or self._manual_blocked(now)
         if self._blocked_last and not blocked:
             self._hand.reset()
         self._blocked_last = blocked
@@ -363,7 +395,7 @@ class MapController(QObject):
             self._neutral_since = None
             if frame and frame.ready and self._action_latch and frame.key != self._action_latch:
                 self._action_latch = ""
-        if frame and frame.key == "ILoveYou" and self._window_active and now >= self._manual_until:
+        if frame and frame.key == "ILoveYou" and self._window_active and not self._manual_blocked(now):
             self._stop_motion()
             if frame.held >= HOLD_SECONDS[frame.key] and self._action_latch != frame.key:
                 self.set_gestures_enabled(not self._enabled)

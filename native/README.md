@@ -70,9 +70,15 @@ looks around indoors; wheel zooms or walks. Double-click enters a selected
 building. Qt-supported touchpad/touch pinch, rotation and translation are also
 wired to the same controls. Physical touchpad gestures have not been exercised.
 
-Manual input temporarily takes priority over camera control. Losing window
+Manual input takes priority while a key, mouse button or touch contact is held,
+including when it is stationary. A native touchpad gesture keeps priority from
+its begin event to its end event. After release, a 600 ms handover delay and a
+new stable hand pose precede camera control. Keyboard auto-repeat releases do
+not end the held-key state; text composition also renews manual priority.
+Changing the building wing or floor establishes a new hand-drag baseline.
+Losing window
 activation or opening the reference-plan dialog stops gesture movement;
-keyboard holds are cleared on focus loss. Walking still uses the existing
+manual input holds are cleared on window deactivation. Walking still uses the existing
 collision check. Gesture navigation stops after 250 ms without fresh delivered
 observations, and rejected poses stop motion immediately.
 

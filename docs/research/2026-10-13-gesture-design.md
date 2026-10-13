@@ -75,6 +75,12 @@ Python 文件通过语法解析；更新后的原生窗口成功加载，无启�
 
 世界坐标是普通单目摄像头模型的估计，不能当作经过标定的真实深度。复用现有模型输出无需新增网络、模型下载或第二次推理。
 
+### 输入交接
+
+代码检查发现原有 600 ms 输入优先窗口可能在鼠标／触摸按住不动时结束。这轮改为跟踪应用内的按键、鼠标按钮、触摸接触和原生触控板手势起止；保持按下时手势持续让出控制，释放后保留 600 ms 交接时间，再要求姿态重新稳定。自动重复产生的按键释放不清除持键状态；输入法组合事件同样续期键鼠优先。窗口失活或打开参考图对话框时清空持键状态，避免丢失释放事件后卡在优先状态。
+
+拖动上下文增加楼翼和楼层标识。换楼翼／楼层后，手的位置和双指张合基准重新建立，避免沿用上一视图的增量。按用户指示，此轮仍未运行测试或开启摄像头。
+
 ## 调研依据
 
 - [MediaPipe Python Gesture Recognizer](https://developers.google.com/edge/mediapipe/solutions/vision/gesture_recognizer/python)：VIDEO/LIVE_STREAM 利用跟踪；实时模式异步输出，忙时忽略新输入。
@@ -84,3 +90,4 @@ Python 文件通过语法解析；更新后的原生窗口成功加载，无启�
 - [Microsoft Research 手势偏好研究](https://www.microsoft.com/en-us/research/publication/understanding-mid-air-hand-gestures-a-study-of-human-preferences-in-usage-of-gesture-types-for-hci/)：指向、直接操作等不同类型随任务有不同偏好；不是本项目姿态映射的用户验证。
 - [Apple 手势设计准则](https://developer.apple.com/design/human-interface-guidelines/gestures)：连续操作的及时反馈、符合预期、替代输入，避免要求固定身体姿势。
 - [Qt PinchHandler](https://doc.qt.io/qt-6/qml-qtquick-pinchhandler.html)：触摸与触控板捏合输入；本项目 Qt 6.8 API 以安装环境为准。
+- [Qt 6.8 鼠标事件](https://doc.qt.io/qt-6.8/qmouseevent.html)、[原生手势事件](https://doc.qt.io/qt-6.8/qnativegestureevent.html)、[按键事件](https://doc.qt.io/qt-6.8/qkeyevent.html)：核对按下状态、手势起止与自动重复事件，用于应用内输入仲裁。

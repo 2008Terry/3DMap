@@ -173,14 +173,16 @@ Item {
             event.accepted = true
         } else if ([Qt.Key_W, Qt.Key_A, Qt.Key_S, Qt.Key_D, Qt.Key_Up, Qt.Key_Down,
                     Qt.Key_Left, Qt.Key_Right, Qt.Key_Plus, Qt.Key_Equal, Qt.Key_Minus].indexOf(event.key) >= 0) {
-            heldKeys = Object.assign({}, heldKeys, { [event.key]: true })
+            const key = event.key === Qt.Key_Plus ? Qt.Key_Equal : event.key
+            heldKeys = Object.assign({}, heldKeys, { [key]: true })
             event.accepted = true
         }
     }
     Keys.onReleased: function(event) {
         if (!event.isAutoRepeat) {
             const next = Object.assign({}, heldKeys)
-            delete next[event.key]
+            const key = event.key === Qt.Key_Plus ? Qt.Key_Equal : event.key
+            delete next[key]
             heldKeys = next
         }
     }
@@ -531,7 +533,8 @@ Item {
     Row {
         anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 14; spacing: 8
         Button {
-            text: root.gestureWorker.running ? "停止摄像头" : "启动手势"
+            text: root.gestureWorker.stopping ? "正在停止…" : root.gestureWorker.running ? "停止摄像头" : "启动手势"
+            enabled: !root.gestureWorker.stopping
             onClicked: {
                 root.gestureWorker.running ? root.gestureWorker.stop() : root.gestureWorker.start()
                 root.forceActiveFocus()

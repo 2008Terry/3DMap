@@ -84,6 +84,10 @@ class GestureWorker(QThread):
     def running(self) -> bool:
         return self.isRunning()
 
+    @Property(bool, notify=runningChanged)
+    def stopping(self) -> bool:
+        return self.isRunning() and self._stop_event.is_set()
+
     @Slot()
     def start(self, priority=QThread.Priority.InheritPriority):
         if self.isRunning():
@@ -103,8 +107,7 @@ class GestureWorker(QThread):
         if self.isRunning():
             self._stop_event.set()
             self.requestInterruption()
-            self.wait(5000)
-        self.status_changed.emit("Gesture camera stopped")
+        self.status_changed.emit("正在停止摄像头 · 键鼠可用" if self.isRunning() else "摄像头已停止 · 键鼠可用")
         self._last_observation = 0.0
         with self._lock:
             self._latest = None
@@ -162,8 +165,12 @@ class GestureWorker(QThread):
                 min_hand_presence_confidence=0.65,
                 min_tracking_confidence=0.55,
             )
+            if self._stop_event.is_set():
+                return
             recognizer = mp.tasks.vision.GestureRecognizer.create_from_options(options)
 
+            if self._stop_event.is_set():
+                return
             capture = cv2.VideoCapture(self._camera_index, cv2.CAP_DSHOW)
             if not capture.isOpened():
                 capture.release()
@@ -172,6 +179,8 @@ class GestureWorker(QThread):
             capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
             capture.set(cv2.CAP_PROP_FPS, 30)
             capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            if self._stop_event.is_set():
+                return
             if not capture.isOpened():
                 self.status_changed.emit("Camera unavailable; mouse controls remain available")
                 return
@@ -213,4 +222,6 @@ class GestureWorker(QThread):
                 recognizer.close()
             with self._lock:
                 self._latest = None
+            if self.isInterruptionRequested():
+                self.status_changed.emit("摄像头已停止 · 键鼠可用")
             self.runningChanged.emit()

@@ -105,7 +105,10 @@ def main() -> int:
         return 1
     map_controller.select_building("shapiro-undergraduate-library")
     map_controller.focusRequested.emit(80, 70, 580)
-    return app.exec()
+    exit_code = app.exec()
+    # Finish native camera/model cleanup before QThread ownership is released.
+    gesture_worker.wait()
+    return exit_code
 
 
 if __name__ == "__main__":

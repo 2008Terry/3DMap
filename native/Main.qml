@@ -307,8 +307,8 @@ ApplicationWindow {
                                 onClicked: gestureWorkerObject.start()
                             }
                             Button {
-                                text: "停止"
-                                enabled: gestureWorkerObject.running
+                                text: gestureWorkerObject.stopping ? "停止中" : "停止"
+                                enabled: gestureWorkerObject.running && !gestureWorkerObject.stopping
                                 onClicked: gestureWorkerObject.stop()
                             }
                             Button {

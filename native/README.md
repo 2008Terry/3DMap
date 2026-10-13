@@ -17,6 +17,13 @@ The application reads its data from `src/campusBuildings.json`, `src/campusBuild
 ## Current gesture controls (2026-10-13)
 
 Use **启动手势**, **暂停控制** and **手势设置** in the map's persistent toolbar.
+
+Stopping the camera stops gesture controls immediately and releases the camera
+and recognizer on their worker thread. The UI shows **正在停止…** and prevents
+restart until that thread finishes. Initialization checks for cancellation
+before creating the recognizer or opening the camera. Application exit waits
+for cleanup after leaving the GUI event loop; driver-dependent shutdown time
+has not been measured.
 Settings include a camera index (six choices, without opening devices to scan
 them), sensitivity, a smaller pointing reach, dwell selection, and pointing-center
 calibration. For calibration, hold an index finger comfortably, then click
@@ -65,6 +72,8 @@ an established pose can persist at 0.45, stopping below that threshold.
 Keyboard, while the map has focus: hold WASD/arrows to walk/turn indoors or
 orbit outdoors; hold +/- to zoom; E enters; M cycles modes; PageUp/PageDown
 changes floors; Esc returns; R resets; Space pauses/resumes gesture control.
+Plus and equals share one held-key entry so releasing Shift before the zoom
+key does not leave zoom active.
 Mouse: left drag orbits; right/middle drag or Ctrl-left drag pans; right drag
 looks around indoors; wheel zooms or walks. Double-click enters a selected
 building. Qt-supported touchpad/touch pinch, rotation and translation are also

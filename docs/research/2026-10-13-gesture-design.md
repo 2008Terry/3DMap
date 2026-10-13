@@ -95,6 +95,12 @@ Python 文件通过语法解析；更新后的原生窗口成功加载，无启�
 
 流超时与“明确识别到没有手”分开处理：超时停止连续动作、清除旧指向和稳定判定，保留离散动作锁定。只有不同稳定姿态或连续无手观测才重新解锁，避免一次延迟／界面忙导致重复确认。观测时间从 OpenCV 读出完成开始，无法反推摄像头驱动缓存中的图像实际曝光时间。此轮仍未运行测试或作实际延迟比较。
 
+## 代码审阅补充
+
+停止摄像头原来在界面线程调用 `wait(5000)`，可能造成等待期间界面不响应。这轮移除按钮路径的等待：先停止控制和清空旧结果，后台线程关闭摄像头及识别器，结束前显示“正在停止”并禁止重启。初始化过程在建识别器和开摄像头前检查取消请求。应用退出在界面事件循环结束后等待线程释放资源，不强行终止原生推理。关闭耗时仍取决于设备驱动，未作实测。
+
+键盘缩放统一 `+`／`=` 持键状态，避免 Shift 提前松开使释放事件与按下事件的键值不同而残留缩放。按用户指示，此轮未运行测试。
+
 ## 调研依据
 
 - [MediaPipe Python Gesture Recognizer](https://developers.google.com/edge/mediapipe/solutions/vision/gesture_recognizer/python)：VIDEO/LIVE_STREAM 利用跟踪；实时模式异步输出，忙时忽略新输入。
@@ -106,3 +112,4 @@ Python 文件通过语法解析；更新后的原生窗口成功加载，无启�
 - [Qt PinchHandler](https://doc.qt.io/qt-6/qml-qtquick-pinchhandler.html)：触摸与触控板捏合输入；本项目 Qt 6.8 API 以安装环境为准。
 - [Qt 6.8 鼠标事件](https://doc.qt.io/qt-6.8/qmouseevent.html)、[原生手势事件](https://doc.qt.io/qt-6.8/qnativegestureevent.html)、[按键事件](https://doc.qt.io/qt-6.8/qkeyevent.html)：核对按下状态、手势起止与自动重复事件，用于应用内输入仲裁。
 - [Qt PickResult](https://doc.qt.io/qt-6/qml-pickresult.html)：通过命中模型与场景位置选择示意房间。
+- [Qt QThread](https://doc.qt.io/qt-6.8/qthread.html)：`wait()` 会阻塞调用线程；交互界面通过线程完成信号更新状态，退出时等待资源释放。

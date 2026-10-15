@@ -1,5 +1,11 @@
 # Repository instructions
 
+## Primary workspace
+
+The primary checkout is `D:\ChatGPTLocalProjects\3DMap`. Use this directory for all development, Git changes, application launches, and generated project artifacts. Set the working directory explicitly when the chat is still attached to a different folder.
+
+Do not develop or run this project from the C: drive Codex worktree, and do not create another worktree unless the user explicitly requests one. Create any needed feature branch in the primary checkout, preserving existing local changes.
+
 ## Commits and remote updates
 
 After completing each requested set of changes, create a Git commit before reporting completion. Use Conventional Commits format: `<type>[optional scope]: <description>` (for example, `feat: add interactive building explorer`). Keep each commit focused on the completed change.

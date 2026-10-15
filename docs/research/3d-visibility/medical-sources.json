@@ -1,0 +1,715 @@
+{
+  "domain": "medical and scientific volume visualization",
+  "search_date": "2026-10-15",
+  "queries": [
+    "importance driven volume rendering Viola Kanitsar Groller 2004",
+    "illustrative context preserving volume rendering Bruckner Grimm Kanitsar Groller 2005",
+    "interactive volume exploration dynamic 3d slicing 2024 medical visualization lens",
+    "site.graphics.stanford.edu Levoy display surfaces volume data 1988 transfer function",
+    "site.cs.utah.edu Kniss Kindlmann Hansen multidimensional transfer functions direct volume rendering 2002",
+    "site.cg.tuwien.ac.at curved planar reformation 2002 Kanitsar Fleischmann",
+    "site.cg.tuwien.ac.at opacity optimization controllable occlusion volume 2009",
+    "site.cg.tuwien.ac.at VolumeShop 2005",
+    "site.slicer.readthedocs.io Volume Rendering maximum intensity minimum",
+    "site.cg.tuwien.ac.at peeling volume",
+    "site.vismd.de ghost vascular visualization",
+    "volume peeling visualization Rezk",
+    "volumetric lens visualization medical paper",
+    "ghosted views blood flow visualization evaluation",
+    "ClipGS medical visualization 2025",
+    "ClearView Interactive Volume Kruger 2006",
+    "Opacity Peeling for Direct Volume Rendering Kolb",
+    "Perceptual Evaluation of Ghosted View site.vismd.de",
+    "Advanced Curved Planar Reformation site.cg.tuwien.ac.at/research/publications",
+    "MedVA 2609.14874",
+    "Hidden Tumour Visualization in Augmented Monocular Liver Laparoscopy",
+    "2610.18422",
+    "Nested Semi-Transparent Isosurface pubmed",
+    "Instant Volume Visualization using Maximum Intensity Difference Accumulation",
+    "MedVA visualization github",
+    "Interactive obstruction-free lensing 2019"
+  ],
+  "sources": [
+    {
+      "id": "med-01",
+      "title": "Display of Surfaces from Volume Data",
+      "year": 1988,
+      "url": "https://graphics.stanford.edu/papers/volume-cga88/",
+      "authors_or_org": "Marc Levoy; Stanford-hosted author archive / IEEE CG&A",
+      "source_type": "paper",
+      "methods": [
+        "direct volume rendering",
+        "scalar opacity classification",
+        "gradient shading",
+        "alpha compositing"
+      ],
+      "domains": [
+        "medical imaging",
+        "molecular graphics"
+      ],
+      "mechanism_zh": "直接对体素分类、着色并沿视线合成，不必先拟合三角网格。标量与边界检测决定部分不透明度，局部梯度作为表面法向。",
+      "visible_information_zh": "可保留弱边界和部分体积特征，把多种组织及电子密度等标量场映射成同一幅二维图。",
+      "tradeoffs_zh": "后方贡献仍被前方累积不透明度衰减；降低全部不透明度会混色，不能保证每个内部目标可辨认。",
+      "evaluation_zh": "原作者页面给出医学和分子图形示例、平滑轮廓与抗锯齿描述；此轮未读完整原文，未核实任务实验。",
+      "geometry_effect_zh": "原体数据坐标不重排；只改变体素的光学映射与图像合成。",
+      "interaction_zh": "基础机制允许更换视点、分类范围与透明度；具体现代交互界面并非此文证据。",
+      "implementation_zh": "体数据采样、梯度计算、前后顺序合成是核心。作者特别更正：插值时颜色应预乘透明度，避免边界渗色。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "已打开作者原始摘要及纠错页；它建立DVR机制，而不是证明全体积同时无歧义可见。",
+      "limitations_zh": "需要已采集的三维标量数据；显示透明度不能发现扫描中没有的结构，也不能从外壳模型恢复内部。",
+      "related_ids": [
+        "med-02",
+        "med-04",
+        "med-13"
+      ]
+    },
+    {
+      "id": "med-02",
+      "title": "Multidimensional Transfer Functions for Interactive Volume Rendering",
+      "year": 2002,
+      "url": "https://people.cs.uchicago.edu/~glk/pubs/pdf/Kniss-MultidimensionalTransferFunctions-TVCG-2002.pdf",
+      "authors_or_org": "Joe Kniss; Gordon Kindlmann; Charles Hansen",
+      "source_type": "paper",
+      "methods": [
+        "multidimensional transfer functions",
+        "classification widgets",
+        "material-boundary enhancement"
+      ],
+      "domains": [
+        "medical volume data",
+        "scalar and multivariate scientific data"
+      ],
+      "mechanism_zh": "把颜色和不透明度映射从单一标量扩展到多维特征域，通过直接操纵控件选取材料和边界；强调GPU上的交互分类与体阴影。",
+      "visible_information_zh": "原来数值范围相近、仅靠一维阈值难区分的组织边界可获得不同外观，适合选出重点材料。",
+      "tradeoffs_zh": "分类变好不等于遮挡消失；共享相同特征的内外组织仍无法被纯特征映射分开，参数空间也更难理解。",
+      "evaluation_zh": "作者存档摘要报告控件和硬件组合支持交互探索；本轮未成功直接打开PDF，不报告人数、定量增益或临床效能。",
+      "geometry_effect_zh": "保持体素空间布局，修改分类函数；不切开、不展开、也不移动结构。",
+      "interaction_zh": "在多维特征空间拖动分类控件，然后观察渲染即时改变；需要用户知道或探索目标对应的特征。",
+      "implementation_zh": "需计算或提供额外特征、多维查找表与GPU分类着色；实现难点包含可理解的分类界面。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "原始作者PDF的搜索索引确认题名、作者、2002年及方法摘要；直接打开多次返回502/超时，证据保守标为摘要级。",
+      "limitations_zh": "不能把语义相同、但空间位置不同的对象自动分离；此轮未核实完整三维函数细节与评估章节。",
+      "related_ids": [
+        "med-01",
+        "med-03",
+        "med-07"
+      ]
+    },
+    {
+      "id": "med-03",
+      "title": "Importance-Driven Volume Rendering",
+      "year": 2004,
+      "url": "https://www.cg.tuwien.ac.at/research/publications/2004/Viola-2004-ImpX/Viola-2004-ImpX-paper.pdf",
+      "authors_or_org": "Ivan Viola; Armin Kanitsar; M. Eduard Gröller",
+      "source_type": "paper",
+      "methods": [
+        "importance-driven visibility",
+        "view-dependent cutaway",
+        "levels of sparseness",
+        "maximum importance projection"
+      ],
+      "domains": [
+        "medical visualization",
+        "anatomical focus and context"
+      ],
+      "mechanism_zh": "给预分类对象赋重要度；沿每条视线比较遮挡关系，只在低重要度对象挡住高重要度目标处降低其显示密度。可用透明、轮廓或完全隐藏。",
+      "visible_information_zh": "肿瘤、血管与器官的相对位置可在选择的视角中显现，同时让未造成遮挡的周边组织维持较完整显示。",
+      "tradeoffs_zh": "最高重要度投影会移除同射线其余对象；平均重要度合成保留更多背景但可能重新拥挤，重要度选择会决定看见什么。",
+      "evaluation_zh": "已打开7页原文，核实医学数据示例与算法；未见可支持普遍任务性能提升的受控用户研究。",
+      "geometry_effect_zh": "保留原始坐标；改变局部表示。完全透明模式等同显示上的切除，不代表组织真实不存在。",
+      "interaction_zh": "用户指定对象重要度和稀疏表示；旋转视点后遮挡抑制自动更新。",
+      "implementation_zh": "需要对象分类/分割、对象footprint或逐射线重要度合成；文中给出柱状/锥状切口及平滑过渡方案。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "原文明确说明固定透明度与轮廓只能部分缓解遮挡，并以视点依赖的重要度合成替代全局降透明度。",
+      "limitations_zh": "最高优先目标彼此仍可遮挡；依赖正确目标定义，不构成任意复杂场景中所有内部信息同时可读的保证。",
+      "related_ids": [
+        "med-04",
+        "med-05",
+        "med-18"
+      ]
+    },
+    {
+      "id": "med-04",
+      "title": "Illustrative Context-Preserving Volume Rendering",
+      "year": 2005,
+      "url": "https://www.cg.tuwien.ac.at/research/vis/adapt/2004_cpvr/",
+      "authors_or_org": "Stefan Bruckner; Sören Grimm; Armin Kanitsar; M. Eduard Gröller",
+      "source_type": "paper",
+      "methods": [
+        "context-preserving volume rendering",
+        "selective opacity modulation",
+        "illustrative ghosting"
+      ],
+      "domains": [
+        "CT visualization",
+        "medical illustration"
+      ],
+      "mechanism_zh": "用着色强度、梯度幅度、到眼睛距离与已累积不透明度共同调制后续样本，降低不重要区域的遮挡，由两个参数控制整体效果。",
+      "visible_information_zh": "查看内部骨骼、组织与血管时仍保留部分外部形状和定位线索，缓解硬裁切丢失上下文的问题。",
+      "tradeoffs_zh": "保留的上下文只是被选择的视觉线索，非全部表面细节；透明多层仍可能混叠，特征判定也可能压低需要的信息。",
+      "evaluation_zh": "已打开作者页面及8页PDF。页面提供相同传递函数下DVR、梯度调制、裁切与本法比较，以及手、头、全身CT示例；不宣称临床诊断获益。",
+      "geometry_effect_zh": "不重排体素、不改变真实形状；对屏幕贡献进行特征驱动的透明度调制。",
+      "interaction_zh": "两个连续参数配合旋转和传递函数；可调制参数使特定组织如骨保持不可穿透。",
+      "implementation_zh": "在DVR采样着色阶段加入局部调制函数；需梯度、深度与累计不透明度。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "作者明确指出过透明会产生重叠杂乱，裁切会移除潜在重要上下文；本法是二者之间的可调折中。",
+      "limitations_zh": "没有在一幅图内无损展示所有深度；页面路径含2004，但论文出版年份为EuroVis 2005。",
+      "related_ids": [
+        "med-01",
+        "med-03",
+        "med-05",
+        "med-10"
+      ]
+    },
+    {
+      "id": "med-05",
+      "title": "ClearView: An Interactive Context Preserving Hotspot Visualization Technique",
+      "year": 2006,
+      "url": "https://www.cs.cit.tum.de/cg/research/publications/2006/clearview-an-interactive-context-preserving-hotspot-visualization-technique/",
+      "authors_or_org": "Jens Krüger; Jens Schneider; Rüdiger Westermann",
+      "source_type": "paper",
+      "methods": [
+        "distortion-free hotspot",
+        "layered ray casting",
+        "curvature-preserving ghosting",
+        "focus and context"
+      ],
+      "domains": [
+        "medical visualization",
+        "technical volumes"
+      ],
+      "mechanism_zh": "先把焦点与上下文层渲染到位置、法向及曲率纹理，再合成。球形热点内让上下文衰减，同时保留曲率高的边缘；可按结构间距控制透明。",
+      "visible_information_zh": "局部内层及其外层轮廓、相邻结构距离可同时显现，热点外保持整体概观；不需要预先生成额外特征体。",
+      "tradeoffs_zh": "层的阈值和先后关系仍需指定。原文要求用户保证层顺序；不同层相交时，正确混合没有保证。",
+      "evaluation_zh": "已打开8页原文和作者页，核实方法、示例与性能讨论；作者页报告相关工具获2006可视化竞赛奖，不能等同受控医学效果证据。",
+      "geometry_effect_zh": "热点为无畸变显示，保留体数据坐标；改变可见性与着色，不是把组织挤开。",
+      "interaction_zh": "点选热点、调球半径与透明度、选择着色器；可随鼠标和视角交互探索。",
+      "implementation_zh": "GPU多通道ray casting、geometry image、屏幕空间曲率和延迟着色；可用曲率或距离重要度。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "ClearView不是一般透明材质，而是热点、层提取、特征重要度与合成的组合。",
+      "limitations_zh": "主要解决局部焦点与背景协调；不能保证复杂相交层或所有分支都无遮挡。",
+      "related_ids": [
+        "med-03",
+        "med-04",
+        "med-11",
+        "med-12"
+      ]
+    },
+    {
+      "id": "med-06",
+      "title": "VolumeShop: An Interactive System for Direct Volume Illustration",
+      "year": 2005,
+      "url": "https://www.cg.tuwien.ac.at/research/publications/2005/TR-186-2-05-04/TR-186-2-05-04-Technical%20Report.pdf",
+      "authors_or_org": "Stefan Bruckner; M. Eduard Gröller",
+      "source_type": "paper",
+      "methods": [
+        "volumetric painting",
+        "selection and ghost",
+        "selective deformation",
+        "cutaway",
+        "multi-object compositing"
+      ],
+      "domains": [
+        "medical and biological illustration",
+        "technical illustration"
+      ],
+      "mechanism_zh": "把场景分为选中体、原位置ghost和背景。用户涂画选区后可移动、旋转或放大选中结构，结合裁切、透明和二维交叉传递函数表现相交区域。",
+      "visible_information_zh": "内部器官可被单独放大或移出遮挡，原位置ghost帮助追踪来源，交叉区域可显示接触或碰撞关系。",
+      "tradeoffs_zh": "移动/缩放后不再保持原来的空间距离和尺度；需要明确连接、ghost与原图，避免把插图布局误当真实解剖。",
+      "evaluation_zh": "已打开作者15页技术报告，核实三对象模型与GPU实现；该系统以交互插图制作为目标，不能据此宣称临床测量准确。",
+      "geometry_effect_zh": "既可只调外观，也可显式变换选中体；数据原位置通过ghost保留，而显示几何会重排或放大。",
+      "interaction_zh": "三维体涂画、变换选区、调每类及交叉传递函数、自动放置标注。",
+      "implementation_zh": "选区体、标量体、变换矩阵与多对象GPU合成；原报告使用C++/Cg/OpenGL。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已核实2005年4月技术报告；同名IEEE Visualization 2005论文为同一研究，不计作第二个来源。",
+      "limitations_zh": "大量对象交叉的组合会迅速增长；可表达关系的插图不应直接承担真实位置测量。",
+      "related_ids": [
+        "med-04",
+        "med-09",
+        "med-12"
+      ]
+    },
+    {
+      "id": "med-07",
+      "title": "Opacity Peeling for Direct Volume Rendering",
+      "year": 2006,
+      "url": "https://www.cg.informatik.uni-siegen.de/sites/www.cg.informatik.uni-siegen.de/files/data/Publications/2006/OpacityPeeling_EG06-fin-electronic.pdf",
+      "authors_or_org": "Christof Rezk-Salama; Andreas Kolb",
+      "source_type": "paper",
+      "methods": [
+        "opacity peeling",
+        "layered volume rendering",
+        "threshold hysteresis",
+        "multisampling"
+      ],
+      "domains": [
+        "MRI",
+        "preoperative and intraoperative medical data"
+      ],
+      "mechanism_zh": "前向累积达到高阈值后不终止射线，而等待当前样本不透明度降到低阈值再开始新层；双阈值避免厚组织被反复切成碎层。",
+      "visible_information_zh": "可逐层显现被皮肤、脂肪、脑膜遮住的脑表面与更深结构，即使组织强度相同、常规传递函数无法区分。",
+      "tradeoffs_zh": "层是沿视线的光学层，并非稳定语义器官分割；低阈值不当会出洞，噪声使相邻射线换层位置跳变。",
+      "evaluation_zh": "已打开10页原文，包含临床MRI、噪声数据、性能与多重采样示例；不将示例改善当成受控诊断研究。",
+      "geometry_effect_zh": "保留体素位置，输出多张分层图；某层显示时抑制其前方内容，未把原体几何移开。",
+      "interaction_zh": "选层、调两项剥离阈值及亮度/不透明度窗口，旋转后重新生成视点相关层。",
+      "implementation_zh": "可改造现有ray caster，单pass写多个render targets；多重采样降低噪声引发的层不连续。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "原文强调最适合洋葱式组织分层，且明确承认图像仍有伪影。",
+      "limitations_zh": "依赖低透明度或梯度边界分隔组织；剥开外层后内部自身仍会遮挡。",
+      "related_ids": [
+        "med-02",
+        "med-03",
+        "med-13"
+      ]
+    },
+    {
+      "id": "med-08",
+      "title": "CPR - Curved Planar Reformation",
+      "year": 2002,
+      "url": "https://cg.tuwien.ac.at/research/vis/adapt/Vis2002/AKanitsar_CPR.pdf",
+      "authors_or_org": "Armin Kanitsar; Dominik Fleischmann; Rainer Wegenkittl; Petr Felkel; M. Eduard Gröller",
+      "source_type": "paper",
+      "methods": [
+        "curved planar reformation",
+        "projected CPR",
+        "stretched CPR",
+        "straightened CPR",
+        "thick and rotating CPR"
+      ],
+      "domains": [
+        "CT angiography",
+        "tubular structures"
+      ],
+      "mechanism_zh": "沿管道中心线构造弯曲采样面并映射到二维。比较投影、伸展和拉直三种方式，并扩展厚层、绕中心线旋转及多分支CPR。",
+      "visible_information_zh": "一张图连续展示血管全长的管腔、管壁、钙化与附近组织，避免外表面渲染看不到内部通道。",
+      "tradeoffs_zh": "投影CPR空间感较强但可能重叠且不等距；伸展保等距且消重叠；拉直也保等距但空间形状感最弱。",
+      "evaluation_zh": "已打开8页原文；对专门CT管道phantom进行短评估。原文将旋转CPR增加诊断信心写为推测，不当作已验证结论。",
+      "geometry_effect_zh": "原体保留；显示采样面被展开或拉直。等距性指所述映射属性，不等于所有三维距离均被保留。",
+      "interaction_zh": "提取/指定中心线、旋转采样方向、选择厚度和MIP/MinIP/平均重采样。",
+      "implementation_zh": "需要可信中心线、采样方向及体数据插值；多分支另需树状布局。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "原文表1明确列出三类CPR的空间感、等距性与遮挡权衡，是保持形状与完整显示不可兼得的直接证据。",
+      "limitations_zh": "单采样面会漏掉未被切到的偏心病变；不能仅依赖一张CPR宣布整个管腔无异常。",
+      "related_ids": [
+        "med-09",
+        "med-14"
+      ]
+    },
+    {
+      "id": "med-09",
+      "title": "Advanced Curved Planar Reformation: Flattening of Vascular Structures",
+      "year": 2003,
+      "url": "https://www.cg.tuwien.ac.at/research/vis/adapt/Vis2003_03/AKanitsar_Adv.pdf",
+      "authors_or_org": "Armin Kanitsar; Rainer Wegenkittl; Dominik Fleischmann; M. Eduard Gröller",
+      "source_type": "paper",
+      "methods": [
+        "helical CPR",
+        "untangled CPR",
+        "branch-point rotation",
+        "vascular flattening"
+      ],
+      "domains": [
+        "vascular tree visualization",
+        "CTA"
+      ],
+      "mechanism_zh": "螺旋CPR用围绕中心线的采样螺旋覆盖管腔更多位置；解缠CPR在分叉点微调子树角度并分配图像区域，消除投影血管重叠。",
+      "visible_information_zh": "显示直线切面漏掉的偏心狭窄通道，并让整棵血管树的分支与连通关系可追踪。",
+      "tradeoffs_zh": "以放松空间一致性换特征完整；螺旋模式可能重复显示同一病灶，角采样会放大中心且增加畸变。",
+      "evaluation_zh": "已打开8页原文，包含病变phantom及真实CTA实例；未把全部血管可见的算法目标扩展为临床检测性能保证。",
+      "geometry_effect_zh": "体数据不变，但螺旋重采样与图像空间分支旋转改变显示；保拓扑比保原始角度/位置优先。",
+      "interaction_zh": "选择重采样方向、常角/常弧长采样及固定/自适应树布局，可连续查看解缠结果。",
+      "implementation_zh": "需中心线树、子树包围hull、非交叉旋转与图像分区；算法不会仅靠透明材质实现。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "论文直接说明两方法都牺牲一定空间一致性，以提高管腔病变与完整分支的可感知性。",
+      "limitations_zh": "解缠图不能直接代表患者体内真实分支夹角；螺旋映射需要解释图例与原位视图对照。",
+      "related_ids": [
+        "med-06",
+        "med-08",
+        "med-11"
+      ]
+    },
+    {
+      "id": "med-10",
+      "title": "Perceptual Evaluation of Ghosted View Techniques for the Exploration of Vascular Structures and Embedded Flow",
+      "year": 2011,
+      "url": "https://www.vismd.de/wp-content/uploads/legacy/baer_2011_eurovis.pdf",
+      "authors_or_org": "Alexandra Baer; Rocco Gasteiger; Douglas Cunningham; Bernhard Preim",
+      "source_type": "paper",
+      "methods": [
+        "ghosted vessel surface",
+        "flow visibility",
+        "depth enhancement",
+        "controlled perception experiments"
+      ],
+      "domains": [
+        "cerebral aneurysm",
+        "vascular flow simulation"
+      ],
+      "mechanism_zh": "用选择性ghosting表现包围血管壁与内部流线，并比较额外深度增强；重点不是把整个表面用同一alpha淡化，而是保留帮助识别形状的线索。",
+      "visible_information_zh": "同时观察血管外形与腔内流动编码，评估表面形状、前后关系与内部颜色是否可正确辨认。",
+      "tradeoffs_zh": "壁和流同时显示会互相影响；深度增强可能改变颜色或增加负担，偏好更高不代表每项任务都更准确。",
+      "evaluation_zh": "已打开10页原始论文；摘要确认三项受控感知研究，以五个临床数据集的动脉瘤模型为刺激，测准确率、反应时间与偏好。报告对两种ghosting的强偏好。",
+      "geometry_effect_zh": "保持血管和流线几何位置，选择性改变外壁可见性与深度编码。",
+      "interaction_zh": "研究条件涉及模型浏览/旋转，不能把有限刺激实验外推为任意镜头与任意密度场景。",
+      "implementation_zh": "需表面与嵌入流对象分别着色，控制外壁ghost表示并加入可选深度提示。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "存在直接比较普通半透明与两类ghosting的任务实验；仅据本轮核实内容不报告未确认的人数或统一胜出结论。",
+      "limitations_zh": "刺激来自少量动脉瘤数据，不能推论所有内部3D结构；旋转、颜色任务与空间任务应分别评估。",
+      "related_ids": [
+        "med-04",
+        "med-05",
+        "med-19"
+      ]
+    },
+    {
+      "id": "med-11",
+      "title": "Interactive Obstruction-Free Lensing for Volumetric Data Visualization",
+      "year": 2019,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30235132/",
+      "authors_or_org": "Michael Traoré; Christophe Hurter; Alexandru Telea",
+      "source_type": "paper",
+      "methods": [
+        "obstruction-free lens",
+        "deformed ray casting",
+        "fish-eye",
+        "local viewpoint"
+      ],
+      "domains": [
+        "baggage inspection",
+        "3D fluid flow",
+        "chest radiology",
+        "air traffic",
+        "DTI fibers"
+      ],
+      "mechanism_zh": "用户指定部分可见的目标区域，透镜在边界把遮挡物视觉上推开，再用鱼眼扩展视野，并允许只在镜内改变观察点。",
+      "visible_information_zh": "可查看与遮挡物密度近似、难以用传递函数分开的隐藏目标及邻域；论文举五类跨领域场景。",
+      "tradeoffs_zh": "推开遮挡与鱼眼会改变局部空间外观；原位尺度、角度和距离不再能从镜内图像直接读取。",
+      "evaluation_zh": "已打开PubMed原始摘要；作者/大学PDF打开失败。摘要只支持五场景演示与实时实现，不支持受控用户实验结论。",
+      "geometry_effect_zh": "原始体数据不必改变；通过弯曲采样射线/局部视点产生显示变形，不能说完全保留原来的投影几何。",
+      "interaction_zh": "放置透镜、调整范围及镜内局部视点，适合从已露出的线索追踪隐蔽物。",
+      "implementation_zh": "需GPU ray caster支持射线变形、局部光照与局部相机，复杂度高于裁切或alpha调节。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "在线先发表为2018-09-18；最终TVCG卷25期1为2019。该记录year采用最终卷年，非网页抓取日期。",
+      "limitations_zh": "方法从部分可见的目标出发；不能假定自动发现完全隐藏且未知的对象，也不保全度量几何。",
+      "related_ids": [
+        "med-05",
+        "med-09",
+        "med-12"
+      ]
+    },
+    {
+      "id": "med-12",
+      "title": "Interactive Importance-Driven Visualization Techniques for Medical Volume Data",
+      "year": 2005,
+      "url": "https://viscom.uni-ulm.de/publications/interactive-importance-driven-visualization-techniques-for-medical-volume-data/",
+      "authors_or_org": "Timo Ropinski; Frank Steinicke; Klaus Hinrichs",
+      "source_type": "paper",
+      "methods": [
+        "volumetric lens",
+        "convex 3D focus region",
+        "local rendering style",
+        "non-photorealistic rendering"
+      ],
+      "domains": [
+        "medical volume exploration"
+      ],
+      "mechanism_zh": "用凸三维形状定义焦点区域，区域与体数据相交的部分采用不同视觉外观，在同一数据上局部启用非真实感显示。",
+      "visible_information_zh": "让局部目标从其余体数据中突出，背景仍给出定位；适合比较同一位置在不同渲染规则下的内部特征。",
+      "tradeoffs_zh": "改变镜内风格只改善局部表达，镜外遮挡仍可能挡住镜内目标；必须决定背景是否透明、裁切或另画。",
+      "evaluation_zh": "已打开作者大学页面，摘要说明给出实现和性能结果；未取得全文，不能补写用户数量或诊断收益。",
+      "geometry_effect_zh": "摘要描述为局部外观变化，而非空间重排；几何默认原位保留，具体透镜种类需查原文。",
+      "interaction_zh": "交互定义/移动凸焦点体，并在探索过程中改变局部显示规则。",
+      "implementation_zh": "以三维区域相交判定驱动样本着色；需处理区域边界、焦点与上下文合成。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "已核实2005年、作者、凸3D焦点及局部非真实感渲染；没有把泛称透镜误当作所有透镜都能穿透遮挡。",
+      "limitations_zh": "本轮证据仅作者摘要；具体控制方式和各类透镜是否需要分割尚未核实。",
+      "related_ids": [
+        "med-05",
+        "med-06",
+        "med-11"
+      ]
+    },
+    {
+      "id": "med-13",
+      "title": "3D Slicer documentation: Volume rendering",
+      "year": null,
+      "url": "https://slicer.readthedocs.io/en/latest/user_guide/modules/volumerendering.html",
+      "authors_or_org": "3D Slicer contributors; Kitware; Isomics; PerkLab; SPL/BWH",
+      "source_type": "official-doc",
+      "methods": [
+        "DVR presets",
+        "MIP",
+        "MinIP",
+        "ROI crop",
+        "segmentation mask"
+      ],
+      "domains": [
+        "CT",
+        "MRI",
+        "open-source medical software"
+      ],
+      "mechanism_zh": "官方实现提供强度/梯度传递函数、阴影合成、逐射线最大值MIP、最小值MinIP，以及六平面ROI裁切和分割mask移除区域。",
+      "visible_information_zh": "MIP选高强度血管等目标；MinIP选低强度通道；裁切或mask可让被肋骨等外层挡住的区域进入视线。",
+      "tradeoffs_zh": "MIP/MinIP每射线只保留一个极值，深度顺序及非极值结构会丢失。mask修改的是另一个待显示体数据，应保留原体。",
+      "evaluation_zh": "已打开完整官方使用文档；这是功能和限制证据，未在本机执行，也不是效果比较研究。",
+      "geometry_effect_zh": "DVR/投影保原坐标；裁切抑制显示范围；Mask volume可用空值重写被选区域。",
+      "interaction_zh": "鼠标窗口/level调整、预设/offset、控制点编辑、裁切框、Paint/Scissors选区。",
+      "implementation_zh": "VTK CPU/GPU ray casting与实验性Multi-Volume；后者文档列明裁切及MIP/MinIP等限制。",
+      "evidence_status": "official-doc",
+      "verified_claim_zh": "当前latest页面确实区分DVR、MIP、MinIP和显式遮挡移除；页面未给出版日期，year为null。",
+      "limitations_zh": "预设需按数据调节；GPU分辨率/内存限制影响交互。X-ray-like显示不等于进行了真实X射线测量。",
+      "related_ids": [
+        "med-01",
+        "med-07",
+        "med-14",
+        "med-15"
+      ]
+    },
+    {
+      "id": "med-14",
+      "title": "3D Slicer documentation: Reformat",
+      "year": null,
+      "url": "https://slicer.readthedocs.io/en/latest/user_guide/modules/reformat.html",
+      "authors_or_org": "3D Slicer; Michael Jeulin-Lagarrigue / Kitware",
+      "source_type": "official-doc",
+      "methods": [
+        "MPR",
+        "oblique slice",
+        "slice offset",
+        "slice normal"
+      ],
+      "domains": [
+        "medical cross-sectional imaging",
+        "volumetric inspection"
+      ],
+      "mechanism_zh": "从原体数据重采样一个可定位、旋转的切片平面，提供轴向/矢状/冠状、任意法向、相机对齐及平面内旋转。",
+      "visible_information_zh": "直接查看特定深度的内部横截面；外层不会像三维投影那样遮住切面内的数据。",
+      "tradeoffs_zh": "一张薄切片只显示与平面相交的体素，其余结构暂时不可见；需要扫动、多个相交切片或原位3D视图来重建整体。",
+      "evaluation_zh": "已打开官方Reformat文档，验证控件和精确参数；未测试应用，亦无任务研究数据。",
+      "geometry_effect_zh": "原体不变；显示一个采样面，不把所有三维内容压在同一投影里。",
+      "interaction_zh": "改变offset、origin、normal或三个旋转角；可将切面法向对齐当前相机。",
+      "implementation_zh": "需要三维标量/图像数据、世界坐标转换与切面插值；对只有封闭表面的模型只能得到几何截线而非内部影像。",
+      "evidence_status": "official-doc",
+      "verified_claim_zh": "MPR是对已有体数据的重采样，解决特定切面可见性；官方文档未署出版年，year为null。",
+      "limitations_zh": "斜切插值会受体素各向异性和原始分辨率影响，此为机制推论；文档未量化精度。",
+      "related_ids": [
+        "med-08",
+        "med-13"
+      ]
+    },
+    {
+      "id": "med-15",
+      "title": "Open Inventor 2026.1 reference: SoVolumeRender.RenderModes",
+      "year": null,
+      "url": "https://developer.openinventor.com/refmans/2026.1/RefManJava/com/openinventor/volumeviz/nodes/SoVolumeRender.RenderModes.html",
+      "authors_or_org": "Open Inventor / Thermo Fisher Scientific",
+      "source_type": "official-doc",
+      "methods": [
+        "sum projection",
+        "average projection",
+        "MIP",
+        "MinIP",
+        "MIDA",
+        "gradient difference accumulation"
+      ],
+      "domains": [
+        "scientific volume rendering",
+        "medical and industrial visualization"
+      ],
+      "mechanism_zh": "2026.1 API明确列出alpha合成、最大/最小、总和/平均，以及强度/梯度差调制。总和按统一名义采样数归一化；平均按每射线实际样本数归一化。",
+      "visible_information_zh": "总和/平均显示整条射线的总体标量贡献；差调制让内部强度跃迁或梯度跃迁更突出，形成不同信息摘要。",
+      "tradeoffs_zh": "压缩成总和/均值会混合前后对象；平均还可能被大量低值体素稀释。统计贡献存在不代表独立层可被辨认。",
+      "evaluation_zh": "已打开2026.1官方API及2023.1用户指南；仅验证当前版本文档存在这些模式，不宣称已测试性能。",
+      "geometry_effect_zh": "保留数据位置，改变射线合成规则。图像值是汇总量，不是某一个实体表面的真实位置。",
+      "interaction_zh": "应用通过renderMode选择方法；窗口、颜色表及采样参数仍影响结果。",
+      "implementation_zh": "可直接使用VolumeViz渲染模式；用户指南指出非普通体渲染合成仅支持raycasting且不保留深度信息。",
+      "evidence_status": "official-doc",
+      "verified_claim_zh": "2026.1是所读API版本而非可核实发布日期，因此year=null；新版文档证明这些组合仍是实际产品能力。",
+      "limitations_zh": "总和投影不是完整物理X射线传播模型；不能把所有体素参与数值合成等同于所有对象视觉可辨。",
+      "related_ids": [
+        "med-13",
+        "med-20"
+      ]
+    },
+    {
+      "id": "med-16",
+      "title": "ClipGS: Clippable Gaussian Splatting for Interactive Cinematic Visualization of Volumetric Medical Data",
+      "year": 2025,
+      "url": "https://papers.miccai.org/miccai-2025/paper/0380_paper.pdf",
+      "authors_or_org": "Chengkun Li; Yuqi Tong; Kai Chen; Zhenya Yang; Ruiyang Li; Shi Qiu; Jason Ying-Kuen Chan; Pheng-Ann Heng; Qi Dou",
+      "source_type": "paper",
+      "methods": [
+        "clippable Gaussian splatting",
+        "cinematic rendering",
+        "learnable truncation",
+        "adaptive Gaussian deformation"
+      ],
+      "domains": [
+        "CT",
+        "anatomical slice data",
+        "interactive medical visualization"
+      ],
+      "mechanism_zh": "把高质量体渲染表示为Gaussian splatting，引入随裁切平面调整primitive可见性的可学习截断，以及动态Gaussian变形调节模型。",
+      "visible_information_zh": "交互裁切平面可显露内部截面，同时保留较高质量的照明和解剖表现，缓解传统电影级渲染速度不足。",
+      "tradeoffs_zh": "高画质不等于完整可见，内部依旧靠切平面暴露；学习表示的图像相似度不能保证小病灶、测量或所有未见切面准确。",
+      "evaluation_zh": "已打开MICCAI官方11页开放论文。五组医学体数据上报告平均PSNR 36.635、156 FPS、16.1 MB；其实验用RTX 4090，非任意设备承诺。",
+      "geometry_effect_zh": "原数据转成学习的Gaussian表示，显示可截断/变形；裁切部分从当前图像移除。",
+      "interaction_zh": "改变视点和裁切平面，实时更新内部截面外观。",
+      "implementation_zh": "需离线训练/构建、动态截断和GPU splat渲染；不是向已有普通表面网格直接加透明度即可。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "2025-07-09 arXiv首发、MICCAI2025官方论文；性能为原文实验数字，未在当前项目复现。",
+      "limitations_zh": "PSNR/FPS是渲染质量/速度指标，不是诊断准确度；不从未采集的体积信息创造可靠解剖。",
+      "related_ids": [
+        "med-07",
+        "med-13",
+        "med-18"
+      ]
+    },
+    {
+      "id": "med-17",
+      "title": "Nested Semi-Transparent Isosurface Simulated Volume-Rendering (NESTIS-VR) - An efficient on-device rendering approach for Augmented Reality headsets increasing surgeon confidence of kidney donor arterial anatomy",
+      "year": 2024,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39405728/",
+      "authors_or_org": "Fabian N. Necker; Marc L. Melcher; Stephan Busque; Christoph W. Leuze; Pejman Ghanouni; Chris Le Castillo; Elizabeth Nguyen; Bruce L. Daniel",
+      "source_type": "paper",
+      "methods": [
+        "nested semitransparent isosurfaces",
+        "interactive rendering parameters",
+        "2D versus stereoscopic display"
+      ],
+      "domains": [
+        "kidney donor MRA",
+        "vascular surgical planning"
+      ],
+      "mechanism_zh": "用多个嵌套半透明等值面模拟体渲染，减少设备端实时ray casting开销；允许用户调整基本渲染参数。",
+      "visible_information_zh": "帮助检查肾蒂动脉及分支；通过交互阈值/外观探索，让预计算固定参数图像未强调的结构出现。",
+      "tradeoffs_zh": "离散等值面是体数据的近似，透明层仍可重叠；新颖显示设备与交互参数两个因素不能混为同一效果。",
+      "evaluation_zh": "已打开PubMed摘要：2位移植外科医生、20位潜在供体，测信心。2D交互NESTIS也优于预计算2D体渲染；双眼3D相对2D没有显著差异。",
+      "geometry_effect_zh": "保留等值面原位，改变标量到嵌套表面的表示；未进行分支布局重排。",
+      "interaction_zh": "设备端实时调渲染参数和观察方向；主要获益被作者归因于交互参数控制。",
+      "implementation_zh": "面向HoloLens计算限制的多层表面替代方案；本轮未取得全文算法和源代码。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "正式卷期为2024年12月，2024-10-12在线；证据支持信心提高，不能改写成诊断正确率或3D显示必然更好。",
+      "limitations_zh": "仅2名专家且比较项包含交互与静态差异；属于AR研究，但其2D对照直接与普通屏幕有关。",
+      "related_ids": [
+        "med-02",
+        "med-13",
+        "med-16"
+      ]
+    },
+    {
+      "id": "med-18",
+      "title": "MedVA: An End-to-End Neuro-Symbolic Agentic System for Medical Volume Visualization",
+      "year": 2026,
+      "url": "https://arxiv.org/abs/2609.14874",
+      "authors_or_org": "Haill An; Suhyeon Kim; Minjun Kang; Eunwoo Lee; Bin Sheng; Lei Bi; Younhyun Jung",
+      "source_type": "paper",
+      "methods": [
+        "intent-grounded ROI selection",
+        "multi-model segmentation",
+        "volume-based visibility objective",
+        "automated visualization optimization"
+      ],
+      "domains": [
+        "medical volume visualization",
+        "natural-language interaction"
+      ],
+      "mechanism_zh": "三个环节分别把自然语言意图转为有临床知识约束的ROI要求、在原体数据调用分割模型找ROI、用体积可见性目标优化其强调与遮挡。",
+      "visible_information_zh": "目标不是额外发明一种透视材质，而是根据任务选择哪些内部区域需要露出，并显式检查它们在原数据中的遮挡。",
+      "tradeoffs_zh": "ROI和目标函数决定什么被优先展示；分割、意图解释错误会把错误对象突出，优化分数也不等于人能理解所有关系。",
+      "evaluation_zh": "原始arXiv摘要声明多数据/交互场景的agent和系统评估及形成性用户研究；本轮全文不可开，未核实样本数、收益幅度或公式。",
+      "geometry_effect_zh": "摘要说在原体数据识别和评估ROI；具体通过哪些渲染参数改变几何/可见性尚未从全文确认。",
+      "interaction_zh": "自然语言请求到自动ROI识别和视觉优化，可作为半自动探索工作流。",
+      "implementation_zh": "需要临床知识推理、医学分割模型和体积可见性度量；本轮未验证官方代码。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "arXiv原始摘要检索可读，首发2026-09-14；直接abs/HTML/PDF打开均失败，因此严格限于摘要，不把聚合网站评语作证据。",
+      "limitations_zh": "新预印本，尚无本轮可验证独立复现；不会从只有外表面的模型恢复可信内部解剖。",
+      "related_ids": [
+        "med-03",
+        "med-16",
+        "med-19"
+      ]
+    },
+    {
+      "id": "med-19",
+      "title": "Hidden Tumour Visualization in Augmented Monocular Liver Laparoscopy",
+      "year": 2026,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12889570/",
+      "authors_or_org": "Kirana Hanifati; Mohammad Alkhatib; Erol Ozgur; Emmanuel Buc; Bertrand Le Roy; Hestiasari Rante; Youcef Mezouar; Adrien Bartoli",
+      "source_type": "paper",
+      "methods": [
+        "mesh-over-tumour",
+        "ROI mesh",
+        "virtual window",
+        "metric depth indicator",
+        "instrument occlusion handling"
+      ],
+      "domains": [
+        "monocular laparoscopy",
+        "surgical AR",
+        "subsurface target visualization"
+      ],
+      "mechanism_zh": "用术中超声做刚性肿瘤配准，把表面或ROI网格覆盖在肿瘤图像之上，通过部分遮挡使其看起来位于肝内；RoT-D再加深度指示条。",
+      "visible_information_zh": "单目二维手术画面内同时呈现隐藏肿瘤位置与表面关系，避免普通透明叠加让目标看似漂浮在外面。",
+      "tradeoffs_zh": "需要可靠配准和工具遮挡处理；文中由学习深度生成的表面网格可对齐图像但未必几何准确，不能把网格当精确测量表面。",
+      "evaluation_zh": "PMC索引可读方法与结果：39人含10名外科医生，以10次手术图像投票，偏好RoT-D；这是偏好证据，不能当作毫米级深度误差实测。",
+      "geometry_effect_zh": "原CT肿瘤经刚性配准；显示加入估计表面网格、窗口及深度符号，没有把人体真实切开。",
+      "interaction_zh": "面向持续手术指导、超声定位及处理器械前后关系；本轮未实际操作系统。",
+      "implementation_zh": "需要CT分割模型、LUS到相机配准、深度读取、虚拟窗口、网格及工具分割。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "正式发表2026-02-10，DOI10.1049/htl2.70043；PMC搜索索引返回较完整方法/结果，但直接打开被验证码阻挡，保守按摘要级记录。",
+      "limitations_zh": "论文只实验单肿瘤；多肿瘤与血管为作者提出的扩展。深度传达改善与深度值真实准确是两个问题。",
+      "related_ids": [
+        "med-05",
+        "med-10",
+        "med-18"
+      ]
+    },
+    {
+      "id": "med-20",
+      "title": "Instant Volume Visualization using Maximum Intensity Difference Accumulation",
+      "year": 2009,
+      "url": "https://www.cg.tuwien.ac.at/research/publications/2009/bruckner-2009-IVV/bruckner-2009-IVV-Paper.pdf",
+      "authors_or_org": "Stefan Bruckner; M. Eduard Gröller",
+      "source_type": "paper",
+      "methods": [
+        "MIDA",
+        "DVR-MIP continuum",
+        "maximum-dependent opacity modulation",
+        "gradient shading"
+      ],
+      "domains": [
+        "angiography",
+        "ultramicroscopy",
+        "industrial CT"
+      ],
+      "mechanism_zh": "沿视线遇到超过已有最大值的新样本时，根据增长量降低先前累积颜色与不透明度，使后方高强度结构重新贡献，同时保留DVR合成与着色。",
+      "visible_information_zh": "显露被普通DVR雾状累积压住的高强度血管或荧光目标，且比纯MIP保留更多表面和空间线索。",
+      "tradeoffs_zh": "仍假设重要信息强度较高；主动覆盖某些遮挡关系并非物理真实透视，低强度目标和真实前后顺序可能被弱化。",
+      "evaluation_zh": "已打开8页原文；比较血管、鼠胚超显微、背包CT等数据，给出GPU实时结果。未据此声称有受控用户或临床诊断提升。",
+      "geometry_effect_zh": "体数据原位，改射线合成公式；几何不重排，但图像中遮挡逻辑可被部分覆盖。",
+      "interaction_zh": "标准window/level及一个连续参数，从DVR经MIDA滑到MIP，观察形状线索与穿透程度变化。",
+      "implementation_zh": "只需在ray caster中跟踪当前最大值并调制累计颜色/opacity；2009算法已在2026.1商业API中列出。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "原文明确不主张完全替代DVR/MIP，而提供中间地带；MIP越强，累积与着色越弱。",
+      "limitations_zh": "高强度不等于高语义重要度，不能保证任意内部对象可见；阴影伪影与同值结构问题仍需处理。",
+      "related_ids": [
+        "med-01",
+        "med-13",
+        "med-15"
+      ]
+    }
+  ],
+  "synthesis_zh": "必须把数据获取和显示可见性分开。CT/MRI等采集提供内部三维标量数据；DVR、MIP、CPR、透镜和裁切只重新表达已有数据。只有外壳或照片的模型不能因为调透明度就得到真实内部结构；X-ray-like渲染也不等于进行了真实X射线测量。\n\n至少有五个不同目标：找到某个内部对象、读懂表面形状、判断前后/深度、追踪完整连接、覆盖所有区域。单幅二维图没有由这些文献证明可同时无损实现全部目标；每类方法都有信息选择和视觉编码成本。\n\n原位且不改几何的路线包括DVR/多维传递函数、选择性ghosting、importance compositing、ClearView。它们主要调节谁贡献多少、边缘保留多少；仍可能有重叠与色混，不能把几何保留等同于所有几何都可读。\n\n降低显示内容的路线包括MPR、裁切、分割mask、opacity peeling。MPR使一个截面免受前方遮挡，但把其余体积暂时排除；opacity peeling用多层图覆盖深度，是序列探索而非一次看到全部。\n\nMIP/MinIP/总和/平均把每条射线压成极值或统计量。参与合成的所有体素未必能被单独识别，极值投影通常丢前后顺序。MIDA用受控修改遮挡来折中穿透与形状，仍有高强度即重要的假设。\n\n要让完整树形连接同时可追踪，可以考虑untangled CPR等显式展开/分支旋转。它保证的对象是抽象连接或展开采样面，代价为真实角度/空间位置变化；应保留原位视图及可回溯对应。\n\n交互是证据中的核心：旋转、滚动切片、窗口/level、焦点透镜、逐层剥离与参数比较共同补足静态图的歧义。2024 NESTIS观察研究说明，交互参数本身可能比立体硬件更关键，但只测两位医生信心，不能泛化成正确率结论。\n\n2025 ClipGS推进电影级显示的实时裁切效率；2026 MedVA把ROI可见性/遮挡显式纳入任务优化；2026单目肿瘤显示强调部分遮挡与深度标记。新算法提高速度、自动化或深度传达，不代表找到了无需取舍的全部可见方案。\n\n检验标准应分别记录：目标检测/遗漏、连接追踪、形状/深度判断、颜色读取、操作时间、用户信心。渲染FPS/PSNR、主观偏好和真实临床准确性是三类证据，不能相互替代。",
+  "coverage_gaps": [
+    "没有对当前项目运行任何医学/科研渲染实现，也没有本机性能或可用性测试；所有实现字段为文献/官方文档线索。",
+    "MedVA 2026原始arXiv摘要可通过搜索索引取得，但abs/HTML/PDF直接打开失败；其具体可见性公式、样本量和优化变量未核实。检索2610.18422未得到可核验原始结果，未收录为来源。",
+    "Hidden Tumour 2026的PMC索引返回完整方法和结果段落，直接页面受验证码阻挡；因此保守标abstract-primary，并明确偏好研究不等于度量深度精度。",
+    "Kniss 2002作者PDF直接打开多次502/超时，只使用原始摘要索引与作者信息，不编造全文实验结果。",
+    "Obstruction-free lensing作者PDF打开失败，已打开PubMed原始摘要；最终2019卷年和2018先发表日期分别标注。",
+    "旧基础论文未因抓取日期近就标为新研究。官方Slicer latest及Open Inventor 2026.1文档未核实发布日期，year为null，版本/访问时间另述。",
+    "未展开真实X射线/CT成像物理、扫描重建、临床诊断建议；本研究聚焦已有三维数据如何在二维屏幕上变得可观察。",
+    "未单独覆盖内窥镜飞行/虚拟结肠镜、神经纤维束拓扑简化、医学全景/表面展开及全套不确定性显示；这些是可继续拓展的独立子领域。",
+    "没有把2026 ClipGS-VR或VolumeShop同名会议/技术报告作为多条来源填数；相关版本与同一研究合并处理。"
+  ]
+}

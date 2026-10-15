@@ -1,0 +1,55 @@
+filters:
+  and:
+  - file.inFolder("3D结构透视研究/来源")
+  - file.ext == "md"
+properties:
+  file.name:
+    displayName: 来源
+  note.year:
+    displayName: 年份
+  note.evidence:
+    displayName: 证据层级
+  note.source_type:
+    displayName: 资料类型
+  note.domains:
+    displayName: 领域
+  note.methods:
+    displayName: 方法
+  note.source_url:
+    displayName: 原始链接
+views:
+- type: table
+  name: 全部来源
+  order:
+  - file.name
+  - note.year
+  - note.evidence
+  - note.domains
+  - note.methods
+  - note.source_url
+- type: table
+  name: 2023–2026研究
+  filters:
+    and:
+    - note.year >= 2023
+    - note.source_type != "official-doc"
+  order:
+  - file.name
+  - note.year
+  - note.evidence
+  - note.source_url
+- type: table
+  name: 全文级
+  filters: note.evidence == "full-primary"
+  order:
+  - file.name
+  - note.year
+  - note.domains
+  - note.source_url
+- type: table
+  name: 待取得全文
+  filters: note.evidence == "abstract-primary"
+  order:
+  - file.name
+  - note.year
+  - note.source_url

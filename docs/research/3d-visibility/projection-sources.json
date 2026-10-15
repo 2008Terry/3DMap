@@ -1,0 +1,715 @@
+{
+  "domain": "非线性与多透视相机、空间展开、联动多视图、室内拓扑与高维投影类比",
+  "search_date": "2026-10-15",
+  "queries": [
+    "general linear cameras Yu McMillan 2004 paper",
+    "graph camera multiperspective visualization Popescu 2009 paper",
+    "3D buildings interior visualization unfolding floor plans occlusion paper",
+    "virtual colon flattening unfolding visualization paper conformal",
+    "multiperspective rendering survey Yu McMillan Sturm 2010 pdf",
+    "occlusion management 3D urban visualization deformation focus context paper",
+    "2023 2024 2025 indoor multi floor visualization exploded floor plans graph paper",
+    "Interactive design of multi-perspective images Stanford",
+    "Multiple-center-of-projection images Bishop 1998 pdf",
+    "3D floor topology visualization indoor maps schematic paper",
+    "2024 2025 unfolding visualization anatomy flattening",
+    "site.docs.paraview.org slice multiple views comparative visualization",
+    "site.slicer.readthedocs.io layout slice lightbox linked views",
+    "site.ogc.org IndoorGML 2.0 2025 standard dual graph",
+    "Unlocking history virtual unfolding nature 2021",
+    "4D visualization projection Hanson paper pdf",
+    "2023 2024 virtual unwrapping paper scroll",
+    "Single Camera Flexible Projection pdf Brosz 2007",
+    "A Simplified Method of Cartographic Visualisation authors 2D+",
+    "An Evaluation of 3-D Scene Exploration 2011",
+    "HippUnfold Nature Methods 2022",
+    "Occlusion-Free Conformal Lensing for Spatiotemporal Visualization in 3D Urban Analytics"
+  ],
+  "sources": [
+    {
+      "id": "proj-01",
+      "title": "General Linear Cameras",
+      "year": 2004,
+      "url": "https://groups.csail.mit.edu/graphics/pubs/eccv2004_linearcameras.pdf",
+      "authors_or_org": "Jingyi Yu; Leonard McMillan",
+      "source_type": "paper",
+      "methods": [
+        "generalized camera",
+        "two-plane ray parameterization",
+        "multiperspective projection"
+      ],
+      "domains": [
+        "计算机图形学",
+        "计算成像"
+      ],
+      "mechanism_zh": "用两平面交点给视线四维参数，并将三条生成射线的仿射组合定义为相机；统一针孔、正交、推扫、双狭缝等模型。这里的四维是射线空间，不能理解为额外空间维度让人直接绕过所有实体。",
+      "visible_information_zh": "可把通常需要多个视点的特征组织在同一图像中；给长走廊、街区等设计不同方向或位置的采样视线提供基础。论文本身没有自动寻找建筑所有内表面的算法。",
+      "tradeoffs_zh": "局部透视关系、尺度和直线形状可能改变，某些相机类型具有退化或特殊成像性质；射线仍会命中首先遇到的遮挡物。",
+      "evaluation_zh": "论文给出相机分类、几何推导和合成图像示例，属于数学与图形验证；未给出完整建筑内部覆盖率或用户研究。",
+      "geometry_effect_zh": "原始三维顶点无需移动；改变的是像素与射线之间的映射，因此屏幕上的位置与普通透视不一致。",
+      "interaction_zh": "相机生成射线和图像区域可由应用配置；并非现成的房间交互界面。",
+      "implementation_zh": "需实现按像素生成射线的光线追踪，或从已有光场取样；常规单个4×4投影矩阵不足以覆盖全部类型。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开MIT作者PDF，14页；正文明确把GLC定义为四维射线参数空间中的二维仿射子空间，并列出八种标准相机类型。",
+      "limitations_zh": "提供通用相机表达，不提供无条件内部可见保证；遮挡处理还需目标选择、路径构造、裁切或其他表示。",
+      "related_ids": [
+        "proj-02",
+        "proj-05",
+        "proj-20"
+      ]
+    },
+    {
+      "id": "proj-02",
+      "title": "The Graph Camera (Purdue Technical Report 08-005)",
+      "year": 2008,
+      "url": "https://www.cs.purdue.edu/cgvlab/www/resources/papers/Rosen-CS_Technical_reports-2008-The_graph_camera.pdf",
+      "authors_or_org": "Paul Rosen; Voicu Popescu; Nicoletta Adamo-Villani",
+      "source_type": "paper",
+      "methods": [
+        "graph camera",
+        "piecewise multiperspective",
+        "frustum bending splitting merging"
+      ],
+      "domains": [
+        "室内迷宫",
+        "场景总览",
+        "监控"
+      ],
+      "mechanism_zh": "把许多平面针孔相机组成图，通过弯折、分裂和合并视锥让视线绕过墙角，并将多个兴趣区域映入单层图像。迷宫版本利用几何与遍历路径递归构造相机。",
+      "visible_information_zh": "可在一幅连续图中看到直视线后方的支路、转角与目标，适合显示走廊网络；与单纯把墙设透明相比，它把隐藏区域分配到不同屏幕区域。",
+      "tradeoffs_zh": "有环图若覆盖全部回边可能产生重复或图像不连续；远端分支会变小，屏幕分辨率限制实际可辨认的覆盖。",
+      "evaluation_zh": "技术报告展示虚拟场景、真实视频整合及交互渲染；后续2011年论文单独提供用户任务实验。",
+      "geometry_effect_zh": "模型世界位置保留，但相机把普通投影重叠区域重新安置到不同屏幕位置，全球距离与方向不再直接可读。",
+      "interaction_zh": "支持动态场景和交互导航，构造参数可手工或按场景结构自动生成。",
+      "implementation_zh": "需房间/走廊门户或目标区域信息、相机图与分段投影；作者提出前向投影支持交互渲染。封闭物体内部没有可绕行射线时仍需另配裁切。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开Purdue完整10页技术报告；其自动算法明确限定直角转弯迷宫，并把足够屏幕分辨率列为显示全部走廊的条件。另有2009年TOG正式版本，不能把该PDF封面年份写成2009。",
+      "limitations_zh": "连续、无重复和完整覆盖不是对任意有环建筑同时成立的无条件性质；不等于显示每个房间内的所有表面。",
+      "related_ids": [
+        "proj-01",
+        "proj-06",
+        "proj-17"
+      ]
+    },
+    {
+      "id": "proj-03",
+      "title": "Interactive Design of Multi-Perspective Images for Visualizing Urban Landscapes",
+      "year": 2004,
+      "url": "https://graphics.stanford.edu/papers/multi-cross-slits/interactive-multi-X-slits.pdf",
+      "authors_or_org": "Augusto Román; Gaurav Garg; Marc Levoy",
+      "source_type": "paper",
+      "methods": [
+        "cross-slits camera",
+        "serial blending",
+        "interactive picture surface"
+      ],
+      "domains": [
+        "街景",
+        "城市街区",
+        "长场景总览"
+      ],
+      "mechanism_zh": "从侧向移动视频建立多个双狭缝相机；用户指定第二狭缝及画面曲面，系统插入相机使相邻边界射线一致，从而无缝连接局部透视。",
+      "visible_information_zh": "同图汇总弯曲街道、路口、巷道和深广场，保留沿街连续感；可以避免普通推扫全景把巷道扩张得难以辨认。",
+      "tradeoffs_zh": "消除接缝不等于消除透视失真；需要人工设计，主要针对大致平面、沿线展开的场景，有限输入视线看不到的室内不能凭此恢复。",
+      "evaluation_zh": "以真实城市街区图像示例验证交互构图和失真控制，未报告通用室内用户研究。",
+      "geometry_effect_zh": "原三维空间或拍摄对象不移动，输出图像的横纵透视关系和尺度经过设计。",
+      "interaction_zh": "调整狭缝位置、区间和画面曲面，直观改变不同区域的透视。",
+      "implementation_zh": "需有位姿的侧向图像序列、双狭缝采样与插值、画面参数化；若改用于几何模型可按所定义射线渲染。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开Stanford作者项目页及8页PDF；页面给出IEEE Visualization 2004，并明确展示推扫和人工设计结果的巷道与树木失真差别。",
+      "limitations_zh": "城市外部条带图像方法，不是建筑体积展开；不能从外观视频生成未观测内部。",
+      "related_ids": [
+        "proj-04",
+        "proj-01",
+        "proj-20"
+      ]
+    },
+    {
+      "id": "proj-04",
+      "title": "Automatic Multiperspective Images",
+      "year": 2006,
+      "url": "https://graphics.stanford.edu/papers/autoperspective/",
+      "authors_or_org": "Augusto Román; Hendrik P. A. Lensch",
+      "source_type": "paper",
+      "methods": [
+        "automatic multiperspective optimization",
+        "distortion metric",
+        "importance/depth map"
+      ],
+      "domains": [
+        "长街景",
+        "非平面街区"
+      ],
+      "mechanism_zh": "把偏离普通透视的变形量作为误差度量，优化每段视点和画面曲面；利用粗略深度图或二维重要性图，为高深度变化区域分配更合适的透视。",
+      "visible_information_zh": "在单幅长全景中汇总许多位置的沿街细节，特别改善路口与巷道；作者页面示例沿旧金山18th Avenue约2公里。",
+      "tradeoffs_zh": "长图仍需压缩、横向浏览或大量像素，不能同时保证全部细节可读；优化依赖输入图像、粗几何和重要性定义。",
+      "evaluation_zh": "作者页面展示推扫对照与长街景结果；本次PDF请求超时，因此不补写未核对的运行时间或定量实验细节。",
+      "geometry_effect_zh": "不移动原对象；改变输出画面参数化和局部透视，几何测量需返回原空间。",
+      "interaction_zh": "可自动生成，重要性图仍允许引入用户关注区域；结果可作为可浏览全景。",
+      "implementation_zh": "需要相机序列、粗深度或重要性图、分段投影优化和图像重采样。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "已打开Stanford作者页，核对EGSR 2006、摘要、示例说明及2公里案例；PDF链接已尝试但超时，未按全文证据记载。",
+      "limitations_zh": "只保留输入照片中已有信息；扩展视野与减少失真不能保证暴露任意封闭内部。",
+      "related_ids": [
+        "proj-03",
+        "proj-06"
+      ]
+    },
+    {
+      "id": "proj-05",
+      "title": "Single Camera Flexible Projection",
+      "year": 2007,
+      "url": "https://brosz.ca/research/projection/index.html",
+      "authors_or_org": "John Brosz; Faramarz Samavati; Sheelagh Carpendale; Mario Costa Sousa",
+      "source_type": "paper",
+      "methods": [
+        "flexible viewing volume",
+        "curved projectors",
+        "nonlinear projection"
+      ],
+      "domains": [
+        "艺术投影",
+        "计算机图形学",
+        "可定制相机"
+      ],
+      "mechanism_zh": "用参数化体积定义近远裁剪面和投射线，允许视锥及投射线弯曲，在单个相机框架内形成线性、非线性和手工艺术投影。",
+      "visible_information_zh": "可针对场景让射线绕向侧面或汇集通常不兼容的局部视图；提供设计可见性分配的基础，不能自动判定每个内部部件应出现在哪里。",
+      "tradeoffs_zh": "画面可能弯曲、非均匀放大，屏幕到世界点的逆映射更复杂；相机模型自由度高会增加设计与理解负担。",
+      "evaluation_zh": "作者页展示投影样例，论文摘要说明光线投射和受限GPU扫描转换两种渲染方式；本次完整PDF因大小限制未成功解析，不报告其具体速度或用户实验。",
+      "geometry_effect_zh": "原模型坐标可保留，变化发生在视体、射线和屏幕映射；并非把所有物体搬开。",
+      "interaction_zh": "以参数或控制点调整弯曲视体；对应界面需要另行设计。",
+      "implementation_zh": "需参数化视体、按曲线采样射线和相交运算，或实现其适用范围有限的GPU近似；标准透视相机插件不足以完整实现。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "已打开作者页，确认NPAR 2007与后续2009/2010扩展；大学论文索引的原文摘要可访问，完整11MB PDF尝试受大小限制。",
+      "limitations_zh": "本文证明投影表达能力，不证明对任意场景存在不失真、无重复、无限分辨率的完全可见图。",
+      "related_ids": [
+        "proj-01",
+        "proj-02",
+        "proj-20"
+      ]
+    },
+    {
+      "id": "proj-06",
+      "title": "An Evaluation of 3-D Scene Exploration Using a Multiperspective Image Framework",
+      "year": 2011,
+      "url": "https://www.cs.purdue.edu/xrlab/assets/pdf/popescuGC_CGI2011.pdf",
+      "authors_or_org": "Paul Rosen; Voicu Popescu",
+      "source_type": "paper",
+      "methods": [
+        "graph camera",
+        "multiperspective user study"
+      ],
+      "domains": [
+        "迷宫搜索",
+        "计数",
+        "空间定向"
+      ],
+      "mechanism_zh": "使用可调多透视框架，把遮挡目标映射到不同画面区域，并将去遮挡能力与图像复杂度作为可调权衡。",
+      "visible_information_zh": "让侧走廊中的静态和动态目标同时出现，支持发现、搜索和计数，而非通过连续相机旅行记忆目标。",
+      "tradeoffs_zh": "发现与计数更好不代表空间定向更好；多透视改变全局关系，画面足够大仍受用户并行处理能力限制。",
+      "evaluation_zh": "47人完成搜索、计数与空间定向任务；摘要报告搜索平均快28%，计数准确率91%对普通图像42%。问卷路径匹配略偏普通相机；实验是抽象迷宫而非真实建筑。",
+      "geometry_effect_zh": "三维几何不移动，屏幕空间关系被重组；原位置可通过另一个正常视图或点选映射保留参照。",
+      "interaction_zh": "支持交互导航与动态场景；论文区分短时观看和多次练习情形。",
+      "implementation_zh": "需要graph camera渲染基础、可控视锥图和用于实验的真实目标覆盖记录；应用时应另测房间辨认、上下楼和距离理解。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开Purdue完整10页作者稿并核对实验、表格与结论；作者明确讨论封闭发动机等无直接可达射线情况需结合透明，以及全局空间理解可能不适用。",
+      "limitations_zh": "受控任务的显著收益不能外推到所有BIM、任意室内模型或全部结构同时理解。",
+      "related_ids": [
+        "proj-02",
+        "proj-04",
+        "proj-16"
+      ]
+    },
+    {
+      "id": "proj-07",
+      "title": "Interactive Urban Context-Aware Visualization via Multiple Disocclusion Operators",
+      "year": 2016,
+      "url": "https://geogother.bnu.edu.cn/teacherweb/zhangliqiang/papers/Interactive%20Urban%20Context-Aware%20Visualization-proof.pdf",
+      "authors_or_org": "Hao Deng; Liqiang Zhang; Xiancheng Mao; Huamin Qu",
+      "source_type": "paper",
+      "methods": [
+        "constrained optimization",
+        "view elevation",
+        "road shifting",
+        "building scaling",
+        "building displacement"
+      ],
+      "domains": [
+        "城市可视化",
+        "导航路线",
+        "重要地理要素"
+      ],
+      "mechanism_zh": "联合视点抬高、道路位移、建筑缩放与建筑位移四种操作，以约束优化和后处理在目标可见与城市失真之间寻找折中。",
+      "visible_information_zh": "让被成簇建筑挡住的兴趣要素、路线和信息覆盖得到清晰总览；目标必须先定义，算法不是枚举所有建筑内部。",
+      "tradeoffs_zh": "保持城市外观近似需要让多个操作分担变形，但建筑精确位置、体积和道路尺度仍发生变化；同时显示大量目标会增加约束冲突。",
+      "evaluation_zh": "原论文与作者稿展示真实城市数据的交互结果及导航、寻路、信息覆盖场景；未在此摘录未经进一步核对的参与人数或效应量。",
+      "geometry_effect_zh": "除相机变化外明确修改对象位置和缩放，不能作为精确建筑测量视图。",
+      "interaction_zh": "随用户关注目标提供上下文感知去遮挡；恢复原布局或动画对应是应用设计的必要配套。",
+      "implementation_zh": "需建筑分组、道路与兴趣要素语义、可见性约束、优化器及后处理；迁移到室内应先界定允许移动的墙、家具或楼层。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开北京师范大学作者13页校样PDF，书目信息以正式TVCG 22(7),1862–1874及2016年7月为准；DOI含2015不等于卷期年份。",
+      "limitations_zh": "研究关注城市外部要素；将其变形优化用于室内是可行性推断，尚非该文已验证结论。",
+      "related_ids": [
+        "proj-08",
+        "proj-09",
+        "proj-19"
+      ]
+    },
+    {
+      "id": "proj-08",
+      "title": "Multi-perspective occlusion-free urban navigation visualization",
+      "year": 2026,
+      "url": "https://www.sciencedirect.com/science/article/pii/S1569843225007216",
+      "authors_or_org": "Shen Ying; Haoran Yang; Junru Su",
+      "source_type": "paper",
+      "methods": [
+        "undulating curved projection surface",
+        "route segmentation",
+        "distance-weighted building displacement and scaling"
+      ],
+      "domains": [
+        "城市导航",
+        "focus+context"
+      ],
+      "mechanism_zh": "用起伏曲面承接多透视投影，再按路线分段调整相机倾角与视场角；通过基于用户距离的权重移动和缩放挡路建筑。",
+      "visible_information_zh": "单屏同时容纳较大城市范围与局部路线细节，使导航路线免于相关建筑遮挡；不以室内墙体或全部体积结构为对象。",
+      "tradeoffs_zh": "路线可见是选择性目标；建筑地理位置和大小被调整，多透视产生尺度变化。所谓occlusion-free必须限定为文中的导航路线。",
+      "evaluation_zh": "出版商摘要报告巴塞罗那区域案例及信息细节度量，并与单调圆柱曲面和固定权重方法比较；无法核对全文实验参数和普适性。",
+      "geometry_effect_zh": "同时改变投影与建筑位置/尺度，不保留严格原位置。",
+      "interaction_zh": "距离权重和焦点到上下文转换随观察关系调整；具体操作界面未在可访问摘要中说明。",
+      "implementation_zh": "摘要可证需要路线分段、曲面参数、相机倾角/FOV以及遮挡建筑优化；求解细节待取得全文。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "出版商原始索引返回完整摘要与卷146、105074、2026年2月；DOI为10.1016/j.jag.2025.105074。已尝试直接打开出版商页，返回403；因此仅记摘要证据。",
+      "limitations_zh": "不把DOI中的2025误写为卷期日期；未取得全文，不能验证其所谓无挡路线保证的约束、失败案例或用户效应。",
+      "related_ids": [
+        "proj-07",
+        "proj-03",
+        "proj-09"
+      ]
+    },
+    {
+      "id": "proj-09",
+      "title": "Occlusion-Free Conformal Lensing for Spatiotemporal Visualization in 3D Urban Analytics",
+      "year": 2026,
+      "url": "https://arxiv.org/html/2602.03743v1",
+      "authors_or_org": "Roberta Mota; Julio D. Silva; Fabio Miranda; Usman Alim; Ehud Sharlin; Nivan Ferreira",
+      "source_type": "paper",
+      "methods": [
+        "conformal footprint partition",
+        "nested temporal ribbons",
+        "view-dependent cutaway",
+        "embedded lens"
+      ],
+      "domains": [
+        "城市时间数据",
+        "建筑立面",
+        "沉浸式分析"
+      ],
+      "mechanism_zh": "先将不规则建筑底面按骨架与图分区，分别作Schwarz–Christoffel映射并拼接；以嵌套条带编码时间，用依赖视角的双面剖切持续暴露时间显示。",
+      "visible_information_zh": "同一层高可同时比较建筑各立面多个时间状态；它揭示的是嵌入的时间属性，不是楼内墙、房间或设备的全部真实几何。",
+      "tradeoffs_zh": "剖去自遮挡外壳会削弱深度线索；高度不规则、细长、锐角/深凹底面存在数值拥挤和间距失真，细条带损害读值。",
+      "evaluation_zh": "2026-02-03预印本；28人、168次任务，均值误差8.17%对16.66%及23.3%。时间40.87s对51.5s的两种x-ray条件无明确差异，均快于102.7s基线。",
+      "geometry_effect_zh": "总体建筑布局保留；删除当前遮挡表面，显示底面内重编码条带；不是保持所有几何完整可见。",
+      "interaction_zh": "支持角向空间筛选、径向时间筛选和循环重排、桌面缩略透镜；实验刻意未测这些缩略图交互。",
+      "implementation_zh": "Unity、Quest2、RTX3060约45FPS；映射为Matlab离线预计算，交互时不重算SC布局。需底面、立面属性和剖切渲染。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开完整arXiv HTML，核对方法、实验和限制；没有把摘要的总体时间提升误写成相对x-ray基线的显著提速。",
+      "limitations_zh": "预印本证据，不宣称已确认最终期刊发表；单一时间属性、少量任务与时空实例，外推到密集内部结构尚无验证。",
+      "related_ids": [
+        "proj-07",
+        "proj-08",
+        "proj-13",
+        "proj-19"
+      ]
+    },
+    {
+      "id": "proj-10",
+      "title": "Nondistorting Flattening Maps and the 3-D Visualization of Colon CT Images",
+      "year": 2000,
+      "url": "https://repository.gatech.edu/server/api/core/bitstreams/787dbaab-cb92-48fa-bae2-2bed515c7500/content",
+      "authors_or_org": "Steven Haker; Sigurd Angenent; Allen Tannenbaum; Ron Kikinis",
+      "source_type": "paper",
+      "methods": [
+        "conformal flattening",
+        "Laplace–Beltrami finite elements",
+        "cine distortion correction"
+      ],
+      "domains": [
+        "管状器官内表面",
+        "虚拟结肠镜",
+        "医学"
+      ],
+      "mechanism_zh": "从三角网格内壁离散Laplace–Beltrami算子，利用有限元和边界条件将管状表面共形铺平；通过动态显示的局部尺度修正检查表面。",
+      "visible_information_zh": "把弯折器官的隐藏内壁作为平面图册浏览，使褶皱深处不再按原相机方向相互遮挡；对象是二维曲面，非任意三维实体内部。",
+      "tradeoffs_zh": "共形保角不等于整体保长度、面积和原位置；标题中的nondistorting包含动态局部校正，不能简化为一张平图全局无失真。",
+      "evaluation_zh": "2000年7月IEEE TMI 19(7),665–670；论文提供CT表面映射及动态校正实例，属于算法验证，不是临床诊断效能定论。",
+      "geometry_effect_zh": "建立新的二维参数域并改变表面显示坐标；原网格可以保存，平面位置不是解剖位置。",
+      "interaction_zh": "以cine连续检查不同局部，使校正尺度跟随查看区域；联动原三维位置可补回空间定位。",
+      "implementation_zh": "需要可靠分割、三角化内壁、拓扑处理、边界选择、稀疏线性求解与纹理/属性重采样。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开Georgia Tech学术库6页原论文，封面明确2000年7月；摘要明确使用保角映射和实时cine公式纠正失真。",
+      "limitations_zh": "只解决可参数化表面显示；把建筑所有房间墙面拼成图册需另定义切缝、门户关系及重复边界。",
+      "related_ids": [
+        "proj-11",
+        "proj-12",
+        "proj-13"
+      ]
+    },
+    {
+      "id": "proj-11",
+      "title": "Volumetric Colon Wall Unfolding Using Harmonic Differentials",
+      "year": 2011,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3134375/",
+      "authors_or_org": "Wei Zeng; Joseph Marino; Arie Kaufman; Xianfeng David Gu",
+      "source_type": "paper",
+      "methods": [
+        "volumetric harmonic mapping",
+        "tetrahedral mesh",
+        "canonical cuboid",
+        "direct volume rendering"
+      ],
+      "domains": [
+        "厚壁体积展开",
+        "医学",
+        "管状结构"
+      ],
+      "mechanism_zh": "把CT内外壁之间的组织建成四面体体网格，沿经向面切开，求三组调和1-形式并积分，将有厚度管壁周期映射到规范长方体。",
+      "visible_information_zh": "比只展内壁更进一步，保留从内壁至外壁的厚度方向采样，便于体绘制、纹理分析和虚拟活检；可同时查看沿管道的组织分布。",
+      "tradeoffs_zh": "体积虽展开成规则块仍需要选择厚度采样、切片或体绘制；原空间度量发生变形，复杂拓扑要增加切面与处理。",
+      "evaluation_zh": "2011年Computers & Graphics论文，在真实医学数据上展示算法和体绘制；调和能量最小化及稀疏系统提供理论/计算基础，未证任意体积可无失真压成平面。",
+      "geometry_effect_zh": "显示坐标被体积映射改变；内外壁对应到长方体两平行面，原三维网格可通过映射保留对应。",
+      "interaction_zh": "算法自动化并允许人为干预；查看结果可使用平面图、厚度切片和联动原模型。",
+      "implementation_zh": "需内外壁分割、四面体剖分、经向面计算、调和形式线性系统、参数域体绘制和可逆位置映射。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开PMC作者全文；正式出版为2011-06-01，PMC可访问日期2012不是出版年。全文明确原有中心线截面可能交叉、重复或遗漏。",
+      "limitations_zh": "主要建立管状厚壁的规范参数域，不能不经适配直接用于分支、多房间建筑；长方体仍是三维表示而非一次性消除所有体积遮挡。",
+      "related_ids": [
+        "proj-10",
+        "proj-12",
+        "proj-14"
+      ]
+    },
+    {
+      "id": "proj-12",
+      "title": "Unlocking History through Automated Virtual Unfolding of Sealed Documents Imaged by X-ray Microtomography",
+      "year": 2021,
+      "url": "https://www.nature.com/articles/s41467-021-21326-w.pdf",
+      "authors_or_org": "Jana Dambrogio; Amanda Ghassaei; Daniel Starza Smith; Holly Jackson; Martin L. Demaine; Graham Davis; David Mills; Rebekah Ahrendt; Nadine Akkerman; David van der Linden; Erik D. Demaine",
+      "source_type": "paper",
+      "methods": [
+        "X-ray microtomography",
+        "surface reconstruction",
+        "virtual unfolding",
+        "texture transfer"
+      ],
+      "domains": [
+        "文化遗产",
+        "折叠薄片",
+        "密封信件"
+      ],
+      "mechanism_zh": "从体扫描重建复杂折叠、插入和切缝的纸张层，再计算展开并转移扫描中的文字信息，产生平面可读文本及折痕图。",
+      "visible_information_zh": "外部完全看不到的内层文字和折叠结构可在平面被检查；这是先有内部成像数据、再改变表示的强例子，不能凭外部RGB照片推断隐藏内容。",
+      "tradeoffs_zh": "纸张必须可靠分层，接触、破损、扫描对比不足会影响重建；平面图牺牲原折叠空间位置，需要保留映射和折痕证据。",
+      "evaluation_zh": "Nature Communications 12,1184，2021-03-02；在四封文艺复兴时期信包上演示，首次读取其中一封未拆信。数据、代码及补充方法公开。",
+      "geometry_effect_zh": "将三维折叠薄片重参数化成二维纸面，位置明显改变，但对应关系可保存以回溯折叠证据。",
+      "interaction_zh": "主要是自动离线流程与可浏览重建结果；不是实时交互相机技术。",
+      "implementation_zh": "需高分辨率体扫描、层面提取、网格重建、展开和纹理采样；建筑应用的类比是给每面内墙建立平面图册并链接原位置。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开Nature官方10页PDF，出版商摘要核对日期与四信包案例；网页和PMC曾受访问限制，但官方PDF成功。",
+      "limitations_zh": "方法基于薄片性质，不能直接无损铺平任意有体积物体；可读结果受数据采集和分割质量限制。",
+      "related_ids": [
+        "proj-10",
+        "proj-11",
+        "proj-13"
+      ]
+    },
+    {
+      "id": "proj-13",
+      "title": "HippoMaps: Multiscale Cartography of Human Hippocampal Organization",
+      "year": 2025,
+      "url": "https://www.nature.com/articles/s41592-025-02783-3",
+      "authors_or_org": "Jordan DeKraker; Donna Gift Cabalo; Jessica Royer; Alexander Ngo; Ali R. Khan; Boris C. Bernhardt; and collaborators",
+      "source_type": "paper",
+      "methods": [
+        "topology-informed unfolding",
+        "intrinsic coordinates",
+        "multimodal surface atlas"
+      ],
+      "domains": [
+        "神经影像",
+        "褶皱薄层",
+        "多尺度数据图册"
+      ],
+      "mechanism_zh": "依赖统一海马分割、已知拓扑及形状内在配准，建立统一展开坐标，将不同受试者和模态的表面属性映射到可比较图册。",
+      "visible_information_zh": "把紧密卷曲、普通稀疏切片难以理解的海马层结构与组织学、MRI、功能和电生理属性并列展示；显露的是具有已知薄层拓扑的亚区组织。",
+      "tradeoffs_zh": "图册需要强领域先验，展开位置不等于原解剖位置；跨人群配准与属性聚合会隐藏个体差异及深度细节。",
+      "evaluation_zh": "Nature Methods 22,2211–2222，2025-10-01；提供30幅整理后的组平均图，含离体组织学、9.4T MRI、3T/7T MRI与颅内记录，开放代码数据。",
+      "geometry_effect_zh": "提供折叠和展开两种空间；新坐标保存有意义的内在邻接与轴向顺序，但不保原空间距离。",
+      "interaction_zh": "工具箱和在线数据仓库支持统一空间查阅与比较；建筑类比应采用点击房间/墙面回到三维的联动。",
+      "implementation_zh": "需稳定分割、拓扑先验、原空间到内在坐标的映射、标准化网格和数据属性投影。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开Nature完整官方正文，明确发表于2025-10-01；同一页面推荐的2026论文不是本论文日期。本文依赖HippUnfold等先前分割技术。",
+      "limitations_zh": "作为建筑平面化灵感有价值，但海马的片状拓扑与房间/楼层网络不同；不证明任意建筑可用同样方法铺平。",
+      "related_ids": [
+        "proj-10",
+        "proj-12",
+        "proj-17",
+        "proj-09"
+      ]
+    },
+    {
+      "id": "proj-14",
+      "title": "ParaView Documentation 6.2.0: Displaying Data",
+      "year": null,
+      "url": "https://docs.paraview.org/en/latest/UsersGuide/displayingData.html",
+      "authors_or_org": "ParaView / Kitware",
+      "source_type": "official-doc",
+      "methods": [
+        "multiple coordinated views",
+        "Slice View",
+        "Quad View",
+        "orthogonal slices"
+      ],
+      "domains": [
+        "科学可视化",
+        "体数据",
+        "切片图册"
+      ],
+      "mechanism_zh": "将同一数据源分别放入多个渲染、图表和切片视图；Slice View按三个正交轴的偏移生成多张截面，用户增删和拖动截面位置。",
+      "visible_information_zh": "各截面直接显示外壳后方的内部交线或体素，正交视图补足不同方向结构；若系统覆盖全部有效高度/部件，切片图册可系统检索内部。",
+      "tradeoffs_zh": "有限切片之间仍可能漏掉薄结构；同屏多视图分掉像素，需要标注坐标和截面相交线维持对应。不能把一个截面称为全部体积。",
+      "evaluation_zh": "这是可用软件功能的官方文档证据，不是比较用户表现的论文；本次没有启动软件或测速度。",
+      "geometry_effect_zh": "原始数据坐标保留；截面是对数据的选择性显示，独立视窗改变版面而非源几何。",
+      "interaction_zh": "双击添加/删除切片、拖动位置、切换可见；视图可分割与重排。",
+      "implementation_zh": "网页迁移可用多个viewport、独立相机及裁剪/求交或体采样；共享对象ID与切片位置，将选中结构反向高亮到三维。",
+      "evidence_status": "official-doc",
+      "verified_claim_zh": "已打开官方6.2.0文档全文，核对Multiple Views及Slice View章节与XSliceValues/Y/Z设置；页面未给明确发布日期，因此year=null。",
+      "limitations_zh": "功能存在不等于对特定模型有完整覆盖；全覆盖需另外定义采样密度、边界和可读分辨率。",
+      "related_ids": [
+        "proj-15",
+        "proj-16",
+        "proj-11"
+      ]
+    },
+    {
+      "id": "proj-15",
+      "title": "ParaView Documentation 6.2.0: Comparative Visualization",
+      "year": null,
+      "url": "https://docs.paraview.org/en/latest/ReferenceManual/comparativeViews.html",
+      "authors_or_org": "ParaView / Kitware",
+      "source_type": "official-doc",
+      "methods": [
+        "small multiples",
+        "parameter study",
+        "linked interactions"
+      ],
+      "domains": [
+        "参数比较",
+        "多切片",
+        "分层图册"
+      ],
+      "mechanism_zh": "建立可配置m×n内部渲染视图，让同一数据与显示属性同步，按视图改变过滤器参数或时间值；交互同步更新。",
+      "visible_information_zh": "可把不同楼层高度、剖切深度、时间或阈值的结果同时排列，避免仅靠滑块前后记忆；采用切片参数时可做内部结构联系图。",
+      "tradeoffs_zh": "小图数量多会降低每图可辨信息；所有视图都显示同一原模型时仍有普通遮挡，必须配合切片或其他过滤器。",
+      "evaluation_zh": "官方文档给出工作流程和参数比较示例；未声称小倍图在所有空间任务上优于单图。",
+      "geometry_effect_zh": "各视图保留源几何坐标；增加的是独立显示空间，不是移动实体。",
+      "interaction_zh": "共享颜色、表示和相机交互，统一改变参数范围；支持叠加全部比较结果，但叠加可能重新形成遮挡。",
+      "implementation_zh": "需共享数据状态、每视窗的参数与可见性、同步选择/相机；单页面WebGL scissor viewports或离屏纹理均是工程推断。",
+      "evidence_status": "official-doc",
+      "verified_claim_zh": "已打开官方Comparative View全文；m×n、参数/时间变化、属性同步和交互联动均明确记载。无明确发布日期，year=null。",
+      "limitations_zh": "软件示例用于参数研究；转换成楼层图册的设计属于应用推断，需单独实现覆盖与对应关系。",
+      "related_ids": [
+        "proj-14",
+        "proj-16",
+        "proj-17"
+      ]
+    },
+    {
+      "id": "proj-16",
+      "title": "3D Slicer User Interface: Slice Views, View Linking and Cross-Reference",
+      "year": null,
+      "url": "https://slicer.readthedocs.io/en/latest/user_guide/user_interface.html",
+      "authors_or_org": "3D Slicer",
+      "source_type": "official-doc",
+      "methods": [
+        "linked 2D/3D views",
+        "orthogonal/oblique slicing",
+        "crosshair cross-reference",
+        "lightbox"
+      ],
+      "domains": [
+        "医学体数据",
+        "内部定位",
+        "多视图"
+      ],
+      "mechanism_zh": "把轴向、冠状、矢状或斜切面与三维视图组成布局；联动体数据选择、缩放等属性，并将同一RAS坐标通过十字线同步到各视图。",
+      "visible_information_zh": "内部体素可直接在切面读出，同时借三维视窗定位；跨视图指向同一点能减少小图与原空间的对应负担。",
+      "tradeoffs_zh": "切片仍需浏览或充分采样；lightbox并非所有操作都支持，文档明确可能将来移除，不能以旧版截图假定稳定功能。",
+      "evaluation_zh": "官方文档提供功能与交互说明，没有本次设备性能或用户实验；用于说明成熟实现范式。",
+      "geometry_effect_zh": "原空间坐标保持，切面只是取样；独立二维窗口不需要改变模型几何。",
+      "interaction_zh": "Shift移动十字线联动其他切片到同坐标，视图可同步、放大和切换方向，切面可显示在三维中。",
+      "implementation_zh": "需要统一世界坐标、对象/体素ID、切面求交、交叉引用事件和视图分组；建筑可将RAS换成建筑世界坐标。",
+      "evidence_status": "official-doc",
+      "verified_claim_zh": "已打开最新官方User Interface全文，核对Cross-Reference、view link、切片方向；文档没有明确出版年份，year=null。",
+      "limitations_zh": "医学网格切片与建筑网格语义不同；若只显示墙面交线，房间家具等需要额外标签与筛选。",
+      "related_ids": [
+        "proj-14",
+        "proj-15",
+        "proj-06"
+      ]
+    },
+    {
+      "id": "proj-17",
+      "title": "OGC IndoorGML 2.0 Part 1: Conceptual Model",
+      "year": 2025,
+      "url": "https://www.ogc.org/announcement/ogc-publishes-indoorgml-2-0-part-1-conceptual-model-standard/",
+      "authors_or_org": "Open Geospatial Consortium",
+      "source_type": "official-doc",
+      "methods": [
+        "indoor cellular space",
+        "topological navigation model",
+        "geometry/graph correspondence"
+      ],
+      "domains": [
+        "室内空间",
+        "跨楼层导航",
+        "图与几何混合"
+      ],
+      "mechanism_zh": "将室内可导航空间及其连接以标准概念模型表达，使房间、通道和连接能与几何关联。以此构建抽象连通图时，可显示全部房间节点而无需让所有三维墙面无遮挡。",
+      "visible_information_zh": "适合完整检查有哪些空间、哪些门/楼梯/电梯连接它们，以及路线经过哪层；图不能单独揭示墙厚、局部形状和室内物品。",
+      "tradeoffs_zh": "拓扑保连接不等于保距离、方向和几何布局；连通图中相交的边也不一定是实际空间交叉。",
+      "evaluation_zh": "2025-08-28官方发布IndoorGML2.0 Part1；这是互操作标准，不是证明某种平面布局易懂或全覆盖的实验。",
+      "geometry_effect_zh": "源几何可以保留；图节点屏幕位置可以重新布局，保留的是明确编码的关系。标准本身并未规定无重叠可视布局。",
+      "interaction_zh": "建议图节点与三维空间、楼层平面图双向联动；此为应用层推断，不当成标准提供的现成交互。",
+      "implementation_zh": "需要房间/门/楼梯等语义划分、可达性边、唯一ID和几何映射；具体XML/版本适配须阅读完整标准。",
+      "evidence_status": "official-doc",
+      "verified_claim_zh": "已打开OGC官方标准页与2025年发布说明；完整22-045r5 HTML/PDF因24.8MB/16.3MB超出读取限制，故仅以官方概览核实范围，不宣称完成标准全文审阅。",
+      "limitations_zh": "为导航而设计，不覆盖建筑的全部结构语义；仅可作为保持连通性的底层资料，不是自动拓扑保真的二维制图算法。",
+      "related_ids": [
+        "proj-02",
+        "proj-13",
+        "proj-15"
+      ]
+    },
+    {
+      "id": "proj-18",
+      "title": "The Simplex Projection: Lossless Visualization of 4D Compositional Data on a 2D Canvas",
+      "year": 2024,
+      "url": "https://arxiv.org/pdf/2403.11141",
+      "authors_or_org": "Marvin Schmitt; Yuga Hikida; Stefan T. Radev; Filip Sadlo; Paul-Christian Bürkner",
+      "source_type": "paper",
+      "methods": [
+        "simplex facet projection",
+        "barycentric ratios",
+        "multiple corresponding projections"
+      ],
+      "domains": [
+        "组成数据",
+        "高维统计可视化",
+        "四维类比"
+      ],
+      "mechanism_zh": "四个正分量和为一的数据位于三维单纯形；把点分别从多个顶点投到对面的三角面，并以一组相互对应的投影编码原点。每次投影保留其余分量比例。",
+      "visible_information_zh": "可在二维画布检查四部分组成关系、点云与密度示例；其启发是增加多个有对应关系的表示，而不是一条普通投影射线保存全部空间深度。",
+      "tradeoffs_zh": "单个原点对应多个二维点，不是将任意四维物体一一映为单个二维坐标；点身份与投影间关联不可省。密度近似与数学信息保留应分开讨论。",
+      "evaluation_zh": "2024-03-17预印本，含数学证明和Dirichlet解析边缘分布对照；没有针对建筑内部可见性或人类识别能力的研究。",
+      "geometry_effect_zh": "不保原欧氏三维形状；保留的是特定组成数据表示中的比例/可恢复关系，和空间几何不是同一任务。",
+      "interaction_zh": "论文以静态绘图为主；大量点需颜色、索引或交互联动帮助区分对应投影。",
+      "implementation_zh": "适用输入必须满足组成约束；实现多面重心投影并保存对应元组。不可把任意房间坐标归一化后就宣称空间可见性无损。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开14页arXiv PDF及摘要页，核对多面投影、正分量和为一及理论/数值示例；其lossless结论按论文限定数据和编码解释。",
+      "limitations_zh": "本次未独立复核所有数学证明，尤其不把有限边缘密度图普遍恢复任意联合密度当作已验证普适定理；这不是4D绕过3D遮挡的证据。",
+      "related_ids": [
+        "proj-01",
+        "proj-15",
+        "proj-17"
+      ]
+    },
+    {
+      "id": "proj-19",
+      "title": "The State of the Art in Visual Analytics for 3D Urban Data",
+      "year": 2024,
+      "url": "https://arxiv.org/html/2404.15976v1",
+      "authors_or_org": "Fabio Miranda; Thomas Ortner; Gustavo Moreira; Maryam Hosseini; Milena Vuckovic; Filip Biljecki; Claudio T. Silva; Marcos Lage; Nivan Ferreira",
+      "source_type": "survey",
+      "methods": [
+        "why/what/how taxonomy",
+        "occlusion handling survey",
+        "physical/thematic view integration"
+      ],
+      "domains": [
+        "城市可视分析",
+        "建筑",
+        "工程"
+      ],
+      "mechanism_zh": "按分析目的、数据和表达方式整理3D城市研究，分离物理几何与专题属性，讨论多视图、嵌入图、去遮挡和导航策略，帮助避免把不同任务的成功混为一谈。",
+      "visible_information_zh": "提供选择方法的知识框架：要看室内连通、几何形状、空间属性和时间趋势时，需要不同表示组合；综述本身不渲染隐藏内容。",
+      "tradeoffs_zh": "物理真实性与抽象属性可读性存在冲突；第三维带来遮挡与上下文整合成本，二维指标也可能遗漏真实三维影响。",
+      "evaluation_zh": "2024年CGF43(3)综述，arXiv首版2024-04-24；回顾20余个期刊/会议、2008至2023研究，指出经验验证不足。",
+      "geometry_effect_zh": "取决于所综述方法，可保几何、重排多视图或变形；不能对全部类别给统一保真承诺。",
+      "interaction_zh": "包括导航、筛选、嵌入及联动等模式；没有单一现成交互实现。",
+      "implementation_zh": "可用于先建立任务与覆盖矩阵，再为物理层、专题层及去遮挡策略选择独立模块，工程流程属于综合推断。",
+      "evidence_status": "full-primary",
+      "verified_claim_zh": "已打开完整arXiv HTML，核对作者、2024年卷期、检索范围和Why/What/How框架；正式综述也是寻找近期主要文献的入口。",
+      "limitations_zh": "主要检索范围截至2023，不等于覆盖2024–2026最新进展；不提供统一全内部可见算法。",
+      "related_ids": [
+        "proj-07",
+        "proj-08",
+        "proj-09",
+        "proj-17"
+      ]
+    },
+    {
+      "id": "proj-20",
+      "title": "Multiperspective Modeling, Rendering, and Imaging",
+      "year": 2008,
+      "url": "https://diglib.eg.org/items/3a46658f-7a6c-4d2d-9606-7d03601dc099",
+      "authors_or_org": "Jingyi Yu; Leonard McMillan; Peter Sturm",
+      "source_type": "survey",
+      "methods": [
+        "multiperspective ray geometry survey",
+        "camera classification",
+        "distortion analysis"
+      ],
+      "domains": [
+        "计算机图形学",
+        "计算机视觉",
+        "艺术投影"
+      ],
+      "mechanism_zh": "综述如何把不同视点采样汇为一个图像，联系艺术多透视、通用射线相机、图像生成与重建，强调设计相机映射而不必固守针孔模型。",
+      "visible_information_zh": "有助于寻找广角、沿路径展开、反射/折射与多透视构图方案；这类相机能合并不共视的局部特征，但需要实际可获得的射线。",
+      "tradeoffs_zh": "不同相机的投影、校准、采样和变形性质不同；无缝、保角、保尺度、完整覆盖不能默认同时满足。",
+      "evaluation_zh": "Eurographics2008 State-of-the-Art Report，属于文献综合。作者2010课程页也明确列出2008报告及后续期刊版本，避免将教程年份套到报告。",
+      "geometry_effect_zh": "一般不改变源几何，而改变射线组织与图像参数化；具体方法也可能组合空间变形。",
+      "interaction_zh": "艺术/设计者可控制图像构成，自动构图与可理解交互并非所有方法都有。",
+      "implementation_zh": "需按选定模型实现射线生成、采样或前向投影，并确保选择/测量能回到原三维。综述不提供一个通吃的渲染器。",
+      "evidence_status": "abstract-primary",
+      "verified_claim_zh": "已打开Eurographics官方条目并核对标题、三位作者及下载入口；报告年份由作者官方CVPR2010课程的相关出版列表交叉确认。本文未读完报告PDF。",
+      "limitations_zh": "保守记录为官方摘要/条目证据，不将综述中的单个方法效果作为已经全文核实的结论；更具体结论由本清单原论文支撑。",
+      "related_ids": [
+        "proj-01",
+        "proj-03",
+        "proj-05",
+        "proj-06"
+      ]
+    }
+  ],
+  "synthesis_zh": [
+    "不存在本次证据支持的万能相机：保持原位置、单屏同时呈现全部内表面、无重叠无失真且细节可辨，不能由上述任何方法无条件保证。应把覆盖对象明确为房间、通路、部件、表面或体素，并分别记录已呈现、可访问和仍隐藏。",
+    "多透视最适合绕墙角/走廊分支：Graph Camera是直接相关的基础，保留世界几何但重组屏幕关系。2011年研究显示搜索和计数获益，全球空间理解却有保留，必须保留普通位置视图作为联动参照。",
+    "平面化真正适合表面或薄层：结肠内壁、折叠信件、海马图册说明将原空间改成内在坐标可显露隐藏细节。迁移建筑应先把房间墙面、楼层、管道等分成有边界和对应ID的图册；任意实体体积不能凭表面展开一次显示完。",
+    "位置必须精确时，联动楼层/切片图册加三维参照比全局变形更容易验证。采用明确切片间距、对象覆盖清单和点击回原位置，才能说明是否覆盖全部相关内部，而不是只凭视觉上看起来丰富。",
+    "房间连通性可以通过图+几何混合完整展示：拓扑图显示节点与门户，楼层图显示平面布局，三维视图恢复高度和形状。IndoorGML提供导航概念模型，未提供自动无交叉二维布局或全部结构语义。",
+    "2026年两项城市工作分别侧重路线与时间立面数据。起伏多透视+建筑移动并不保精确地理位置；共形透镜采用剖切和时间条带，保建筑上下文但不是建筑所有内部几何。其28人实验中两种x-ray条件间未有明确时间差异，不能过度宣传。",
+    "4D类比应区分额外表示、数据约束和空间维度。GLC的4D是射线参数空间；Simplex Projection对组成数据采用多份有对应关系的投影。这两者均不能证明在普通二维屏幕上用一幅位置保真的图显露任意三维内部。",
+    "实施路径的综合建议属于本研究推断：以统一对象ID维持原三维、楼层/表面图册、连通图与局部多透视图双向联动，再按任务使用局部剖切；单张惊艳变形图适合总览，不应取代精确定位参照。"
+  ],
+  "coverage_gaps": [
+    "城市2026路线论文只能核对出版商索引摘要，直接出版商页面403；单相机Flexible Projection PDF因大小限制，Automatic Multiperspective PDF超时，2008综述仅条目/摘要。已明确标为abstract-primary。",
+    "IndoorGML2.0完整规范HTML/PDF超读取大小限制，当前只使用官方标准概览及发布日期说明，不声称完成标准一致性分析。",
+    "本次找到2024城市综述、2025海马图册与室内标准、两篇2026城市研究；尚未核实2023–2026直接针对任意多楼层室内全部结构的无损平面化用户研究。",
+    "未独立完成4D任意实体投影的数学不可能性证明，未将组成数据的lossless论文结论泛化为建筑几何。",
+    "尚无特定3DMap模型的语义完整性、房间/墙面覆盖率、可读最小像素、GPU成本或用户测试；本文件仅研究，不修改应用或运行实现。",
+    "主要实证来自迷宫、城市路线/立面和医学/薄片场景；复杂共享墙、弧形房间、非平面楼层、环形走廊及封闭设备需要专门覆盖和定位实验。",
+    "全覆盖可访问与同屏可理解是不同指标；本次未找到可消除有限屏幕像素和注意力限制的通用方法。"
+  ]
+}

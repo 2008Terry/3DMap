@@ -1,0 +1,774 @@
+{
+  "domain": "cross-domain-taxonomy-perception-rendering-hardware-sensing-and-inference",
+  "search_date": "2026-10-15",
+  "queries": [
+    "3D occlusion management taxonomy Elmqvist Tsigas 2008 50 techniques",
+    "dynamic transparency BalloonProbe view projection animation occlusion",
+    "CHI2025 Seeing Through Overlap color opacity depth order",
+    "2024 Evaluation depth perception crowded volumes",
+    "Dichoptic Opacity2025",
+    "blueprint rendering hidden lines depth peeling NVIDIA",
+    "OIT algorithms Wyman continuum stochastic transparency",
+    "NIST neutron Xray tomography NeXT",
+    "Nature muography2023",
+    "2026 consumer LiDAR motion induced sampling NLOS",
+    "2024 two edge resolved camera NLOS",
+    "OCT Huang1991 USGS GPR permafrost",
+    "MIT closed book terahertz imaging2016",
+    "AAAI2026 DeOcc1to3",
+    "Tensor Displays MIT light field2012",
+    "TU Wien molecular visibility equalizer semantic occlusion",
+    "MIT see through walls WiFi Adib Katabi",
+    "Nature ultrasound synthetic aperture NLOS2025",
+    "FDA MRI physical imaging"
+  ],
+  "sources": [
+    {
+      "id": "cross-01",
+      "title": "A Taxonomy of 3D Occlusion Management for Visualization",
+      "year": 2008,
+      "url": "https://www.cs.au.dk/~elm/pdf/occmgt-journal.pdf",
+      "authors_or_org": "Niklas Elmqvist; Philippas Tsigas",
+      "source_type": "survey",
+      "evidence_status": "full-primary",
+      "methods": [
+        "occlusion taxonomy",
+        "discovery access spatial relations"
+      ],
+      "domains": [
+        "HCI",
+        "visualization"
+      ],
+      "mechanism_zh": "按发现、访问、空间关系等任务，以及深度线索、几何不变量、交互和解空间梳理50种方法。归为多视窗、虚拟X-ray、路径游览、体积探针、投影畸变五种模式。",
+      "visible_information_zh": "给出比较不同显露机制的共同语言。",
+      "tradeoffs_zh": "分类是文献组织框架，不代表五种模式中有一种普遍最优；对象出现不等于关系可读。",
+      "evaluation_zh": "综述本身不提供统一基准下50种方法的性能排名。",
+      "geometry_effect_zh": "分别改变显示、几何、视点、投影或时间。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "先确定任务与必须保留的不变量，再选方法。",
+      "verified_claim_zh": "已读作者期刊全文；2007会议版为25种，不能混用数量。",
+      "limitations_zh": "分类是文献组织框架，不代表五种模式中有一种普遍最优；对象出现不等于关系可读。",
+      "related_ids": []
+    },
+    {
+      "id": "cross-02",
+      "title": "Employing Dynamic Transparency for 3D Occlusion Management: Design Issues and Evaluation",
+      "year": 2007,
+      "url": "https://www.cs.au.dk/~elm/pdf/dyntrans.pdf",
+      "authors_or_org": "Niklas Elmqvist; Ulf Assarsson; Philippas Tsigas",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "dynamic transparency",
+        "target-driven disclosure"
+      ],
+      "domains": [
+        "HCI",
+        "architecture"
+      ],
+      "mechanism_zh": "根据目标和视线动态降低遮挡物的不透明度，避免整场景统一透明。",
+      "visible_information_zh": "显露目标并保留周围外形。",
+      "tradeoffs_zh": "透明仍会混色、削弱深度与表面分离，依赖目标定义。",
+      "evaluation_zh": "16名参与者；抽象盒子和建筑场景中的发现、访问、空间关系任务。不能把一项任务结果推广成所有场景优胜。",
+      "geometry_effect_zh": "保留几何坐标，改变显示。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "需要识别视线与遮挡对象，控制透明区域随视点更新。",
+      "verified_claim_zh": "核对作者全文、研究设计与参与者。",
+      "limitations_zh": "透明仍会混色、削弱深度与表面分离，依赖目标定义。",
+      "related_ids": [
+        "cross-01",
+        "cross-05"
+      ]
+    },
+    {
+      "id": "cross-03",
+      "title": "Occlusion Management in Immersive and Desktop 3D Virtual Environments: Theory and Evaluation",
+      "year": 2007,
+      "url": "https://www.cs.au.dk/~elm/pdf/balloonprobe-journal.pdf",
+      "authors_or_org": "Niklas Elmqvist; Eugene Tudoreanu",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "BalloonProbe",
+        "volumetric probes",
+        "displacement"
+      ],
+      "domains": [
+        "HCI",
+        "VR",
+        "architecture"
+      ],
+      "mechanism_zh": "球形或楔形力场把遮挡物推开，比较普通导航、缩放、透明和探针。",
+      "visible_information_zh": "扩大局部结构的可见空间。",
+      "tradeoffs_zh": "推开改变原始位置；速度和准确度存在取舍。",
+      "evaluation_zh": "CAVE组16人、桌面组8人；计数、模式识别、关系任务。普通导航快但错误较多，球探针准确且相对稳定；不能据此保证真实建筑任务。",
+      "geometry_effect_zh": "局部位移或缩放。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "碰撞与布局更新、原位提示和还原动画。",
+      "verified_claim_zh": "已核对全文实验设计和结论。",
+      "limitations_zh": "推开改变原始位置；速度和准确度存在取舍。",
+      "related_ids": [
+        "cross-01"
+      ]
+    },
+    {
+      "id": "cross-04",
+      "title": "View-projection animation for 3D occlusion management",
+      "year": 2007,
+      "url": "https://pure.au.dk/portal/da/publications/view-projection-animation-for-3d-occlusion-management/",
+      "authors_or_org": "Niklas Elmqvist; Philippas Tsigas",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "projection animation",
+        "perspective orthographic interpolation"
+      ],
+      "domains": [
+        "HCI",
+        "projection"
+      ],
+      "mechanism_zh": "连续改变投影参数，在透视和平行投影之间过渡，不移动模型或视点。",
+      "visible_information_zh": "暴露因投影重叠而隐藏的部分。",
+      "tradeoffs_zh": "改变投影不能保证解除所有遮挡；变化中仍需辨认对应关系。",
+      "evaluation_zh": "机构摘要报告用户实验支持部分显露收益，全文访问失败，未核对具体样本或效果量。",
+      "geometry_effect_zh": "几何原位，屏幕投影改变。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "需连续投影变换及稳定对象身份。",
+      "verified_claim_zh": "核实Aarhus机构记录；作者PDF和出版社全文本次未成功打开。",
+      "limitations_zh": "改变投影不能保证解除所有遮挡；变化中仍需辨认对应关系。",
+      "related_ids": [
+        "cross-01"
+      ]
+    },
+    {
+      "id": "cross-05",
+      "title": "Seeing Through the Overlap: The Impact of Color and Opacity on Depth Order Perception in Visualization",
+      "year": 2025,
+      "url": "https://amesholland.github.io/DepthOrderStudy/static/chi25_979.pdf",
+      "authors_or_org": "Zhiyuan Meng et al.",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "opacity perception",
+        "color depth order"
+      ],
+      "domains": [
+        "HCI",
+        "perception"
+      ],
+      "mechanism_zh": "系统改变重叠圆盘颜色、不透明度与层序，测量人对前后的判断。",
+      "visible_information_zh": "解释为何相同透明度在不同配色下读起来不同。",
+      "tradeoffs_zh": "二维圆盘实验不能直接证明建筑全模型的理解表现；没有通用alpha。",
+      "evaluation_zh": "主实验192人、先导24人；8颜色、3透明度。80.72%是预测模型准确率，不能写成人类识别率。",
+      "geometry_effect_zh": "无三维几何变换。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "透明设计应同时评估配色、层序与任务。",
+      "verified_claim_zh": "已读CHI2025作者全文与项目页。",
+      "limitations_zh": "二维圆盘实验不能直接证明建筑全模型的理解表现；没有通用alpha。",
+      "related_ids": [
+        "cross-02",
+        "cross-06"
+      ]
+    },
+    {
+      "id": "cross-06",
+      "title": "Evaluation of depth perception in crowded volumes",
+      "year": 2024,
+      "url": "https://lgm.fri.uni-lj.si/wp-content/uploads/2024/09/192959491.pdf",
+      "authors_or_org": "Žiga Lesar; Ciril Bohak; Matija Marolt",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "depth perception",
+        "crowded volumes",
+        "motion"
+      ],
+      "domains": [
+        "HCI",
+        "scientific visualization"
+      ],
+      "mechanism_zh": "用拥挤体数据视频比较四种绘制风格下的深度估计。",
+      "visible_information_zh": "检验外观逼真是否带来更可靠的深度理解。",
+      "tradeoffs_zh": "内容、拥挤程度和相机运动不能被单一漂亮材质替代；视频实验没有自由交互。",
+      "evaluation_zh": "47人参加，29人完成128试次；4340次估计。所测动态条件中NPR可与写实风格相当。",
+      "geometry_effect_zh": "原位体数据，改变着色和视频视点。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "需任务实验，而非仅评判截图好不好看。",
+      "verified_claim_zh": "已核对作者全文人数、条件及限制。",
+      "limitations_zh": "内容、拥挤程度和相机运动不能被单一漂亮材质替代；视频实验没有自由交互。",
+      "related_ids": [
+        "cross-05"
+      ]
+    },
+    {
+      "id": "cross-07",
+      "title": "Dichoptic Opacity: Managing Occlusion in Stereoscopic Displays via Dichoptic Presentation",
+      "year": 2025,
+      "url": "https://arxiv.org/html/2506.22841v1",
+      "authors_or_org": "George Bell; Alma Cantu",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "dichoptic opacity",
+        "stereoscopy"
+      ],
+      "domains": [
+        "VR",
+        "display hardware"
+      ],
+      "mechanism_zh": "左右眼看到不同不透明度，让遮挡物与内部目标获得不同的双眼可见性。",
+      "visible_information_zh": "在双目显示中兼顾外壳和内部形体线索。",
+      "tradeoffs_zh": "需要双目硬件；双眼竞争、个体差异和复杂场景效果尚不明确。",
+      "evaluation_zh": "11人参加、排除1人，分析10人中7人偏好；外立方体与内金字塔旋转，属于小样本探索偏好。",
+      "geometry_effect_zh": "几何原位，双眼呈现不同。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "独立左右眼渲染；不是普通单屏功能。",
+      "verified_claim_zh": "2025-06-28预印本全文；版本写条件接收，未断言最终出版状态。",
+      "limitations_zh": "需要双目硬件；双眼竞争、个体差异和复杂场景效果尚不明确。",
+      "related_ids": [
+        "cross-06",
+        "cross-21"
+      ]
+    },
+    {
+      "id": "cross-08",
+      "title": "Blueprint Rendering and Sketchy Drawings",
+      "year": 2005,
+      "url": "https://developer.nvidia.com/gpugems/gpugems2/part-ii-shading-lighting-and-shadows/chapter-15-blueprint-rendering-and-sketchy",
+      "authors_or_org": "Marc Nienhaus; Jürgen Döllner",
+      "source_type": "official-doc",
+      "evidence_status": "official-doc",
+      "methods": [
+        "blueprint",
+        "hidden lines",
+        "depth peeling"
+      ],
+      "domains": [
+        "technical illustration",
+        "architecture"
+      ],
+      "mechanism_zh": "深度剥离提取多层表面，检测深度与法线间断，把可见和隐藏的特征线合成蓝图。",
+      "visible_information_zh": "内外结构边界可同时出现在原位。",
+      "tradeoffs_zh": "大量隐藏线仍会拥挤、交叉和失去层序；多层提取增加成本。",
+      "evaluation_zh": "官方技术章节与示例，不是建筑理解用户实验。",
+      "geometry_effect_zh": "保留坐标，删减面填充、强调边。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "多层深度/法线、轮廓提取、线条分级。",
+      "verified_claim_zh": "已读NVIDIA原始章节。",
+      "limitations_zh": "大量隐藏线仍会拥挤、交叉和失去层序；多层提取增加成本。",
+      "related_ids": [
+        "cross-09"
+      ]
+    },
+    {
+      "id": "cross-09",
+      "title": "Exploring and Expanding the Continuum of OIT Algorithms",
+      "year": 2016,
+      "url": "https://research.nvidia.com/sites/default/files/pubs/2016-06_Exploring-and-Expanding/hpg16_oitContinuum.pdf",
+      "authors_or_org": "Chris Wyman",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "OIT",
+        "fragment storage",
+        "transparency algorithms"
+      ],
+      "domains": [
+        "rendering"
+      ],
+      "mechanism_zh": "把片元保存、排序、压缩和合成看作连续设计空间，比较精确与近似透明算法。",
+      "visible_information_zh": "避免物体绘制顺序造成的透明错误。",
+      "tradeoffs_zh": "正确合成不等于每层可读；存储、带宽、通道数、近似误差仍需取舍。",
+      "evaluation_zh": "算法与性能比较，未评价复杂内部结构的理解。",
+      "geometry_effect_zh": "不改变几何。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "按场景深度复杂度和显存选择方案；不是靠更低alpha解决排序。",
+      "verified_claim_zh": "已读作者11页全文。",
+      "limitations_zh": "正确合成不等于每层可读；存储、带宽、通道数、近似误差仍需取舍。",
+      "related_ids": [
+        "cross-10",
+        "cross-11"
+      ]
+    },
+    {
+      "id": "cross-10",
+      "title": "Stochastic Transparency",
+      "year": 2010,
+      "url": "https://www.nvidia.com/docs/IO/88888/StochasticTransparency_I3D2010.pdf",
+      "authors_or_org": "Eric Enderton et al.",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "stochastic transparency",
+        "multisampling"
+      ],
+      "domains": [
+        "rendering"
+      ],
+      "mechanism_zh": "以随机样本覆盖表示透明，借助多重采样在无排序条件下估计合成。",
+      "visible_information_zh": "减少排序依赖，适合大量透明细节。",
+      "tradeoffs_zh": "有限样本带来噪声，收敛与时域稳定性有代价；仍会重叠混合。",
+      "evaluation_zh": "论文算法示例与性能分析，不等于可读性实证。",
+      "geometry_effect_zh": "几何原位。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "MSAA、随机覆盖与抗噪处理。",
+      "verified_claim_zh": "核对NVIDIA作者全文。",
+      "limitations_zh": "有限样本带来噪声，收敛与时域稳定性有代价；仍会重叠混合。",
+      "related_ids": [
+        "cross-09"
+      ]
+    },
+    {
+      "id": "cross-11",
+      "title": "Vulkan Order-Independent Transparency Sample",
+      "year": null,
+      "url": "https://github.com/nvpro-samples/vk_order_independent_transparency",
+      "authors_or_org": "NVIDIA nvpro-samples",
+      "source_type": "official-doc",
+      "evidence_status": "official-doc",
+      "methods": [
+        "OIT",
+        "WBOIT",
+        "A-buffer"
+      ],
+      "domains": [
+        "rendering",
+        "implementation"
+      ],
+      "mechanism_zh": "官方示例对照七类OIT实现，包括链表、循环、互锁及加权混合。",
+      "visible_information_zh": "提供透明渲染实现与对比入口。",
+      "tradeoffs_zh": "有限片元容量会溢出或退化；加权混合为近似；部分路径需要特定硬件扩展。",
+      "evaluation_zh": "维护中的示例，未核对发行年；访问日期不是发表年。",
+      "geometry_effect_zh": "原位。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "Vulkan与对应GPU功能；可研究实现原则，不作为本项目选型限制。",
+      "verified_claim_zh": "已读官方README与算法约束。",
+      "limitations_zh": "有限片元容量会溢出或退化；加权混合为近似；部分路径需要特定硬件扩展。",
+      "related_ids": [
+        "cross-09"
+      ]
+    },
+    {
+      "id": "cross-12",
+      "title": "Neutron and X-ray Tomography NeXT System",
+      "year": 2025,
+      "url": "https://www.nist.gov/programs-projects/imaging-neutron-and-x-ray-tomography-next-system",
+      "authors_or_org": "NIST",
+      "source_type": "official-doc",
+      "evidence_status": "official-doc",
+      "methods": [
+        "physical tomography",
+        "neutron",
+        "X-ray CT"
+      ],
+      "domains": [
+        "materials",
+        "data acquisition"
+      ],
+      "mechanism_zh": "中子对原子核、X-ray对电子分布的响应不同，同时采集并配准断层形成互补材料对比。",
+      "visible_information_zh": "获得样本内部材料与形状数据，再交给三维显示方法。",
+      "tradeoffs_zh": "仪器、样本尺度与材料决定可测性；采集和屏幕显露是两个问题。",
+      "evaluation_zh": "官方设施说明及示例，非所有建筑可扫描的承诺。",
+      "geometry_effect_zh": "重建测量数据，不是改已有网格的材质。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "需要实体成像设备、配准与分割。",
+      "verified_claim_zh": "页面创建2021-03-29、更新2025-03-26；year为更新年。",
+      "limitations_zh": "仪器、样本尺度与材料决定可测性；采集和屏幕显露是两个问题。",
+      "related_ids": [
+        "cross-13",
+        "cross-22"
+      ]
+    },
+    {
+      "id": "cross-13",
+      "title": "Muography",
+      "year": 2023,
+      "url": "https://www.nature.com/articles/s43586-023-00270-7",
+      "authors_or_org": "Hiroyuki K. M. Tanaka et al.",
+      "source_type": "survey",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "muon tomography",
+        "density imaging"
+      ],
+      "domains": [
+        "geology",
+        "archaeology",
+        "data acquisition"
+      ],
+      "mechanism_zh": "用宇宙射线缪子的穿透与衰减估计大尺度物体内部密度。",
+      "visible_information_zh": "可研究金字塔、地质体等的内部密度异常或空腔。",
+      "tradeoffs_zh": "密度信息不等于清晰房间模型；探测几何、通量和反演条件限制结果。",
+      "evaluation_zh": "本次只读出版社摘要与公开图示，未核对完整仪器指标。",
+      "geometry_effect_zh": "从测量重建密度。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "粒子探测器、采样与反演。",
+      "verified_claim_zh": "Nature Reviews Methods Primers；2023-11-23。",
+      "limitations_zh": "密度信息不等于清晰房间模型；探测几何、通量和反演条件限制结果。",
+      "related_ids": [
+        "cross-12"
+      ]
+    },
+    {
+      "id": "cross-14",
+      "title": "Imaging hidden objects with consumer LiDAR via motion-induced sampling",
+      "year": 2026,
+      "url": "https://www.nature.com/articles/s41586-026-10502-x",
+      "authors_or_org": "Siddharth Somasundaram; Aaron Young; Akshat Dave; Adithya Pediredla; Ramesh Raskar",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "NLOS",
+        "LiDAR",
+        "motion fusion"
+      ],
+      "domains": [
+        "data acquisition",
+        "computer vision"
+      ],
+      "mechanism_zh": "多帧融合运动产生的采样变化，从间接光回波重建拐角后目标。",
+      "visible_information_zh": "作者展示三维重建、目标跟踪及借隐藏物定位相机。",
+      "tradeoffs_zh": "需要可用间接光路径与测量信号；不是任意手机照片透墙，也不能凭此恢复整栋楼全部房间。",
+      "evaluation_zh": "出版社摘要和作者项目展示；未读订阅正文。",
+      "geometry_effect_zh": "测量反演新数据。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "smartphone-grade LiDAR、连续采集和计算。",
+      "verified_claim_zh": "正式发布日期2026-05-20；作者项目https://cornar.media.mit.edu/已读，项目时间线与出版社不一致时采用出版社。",
+      "limitations_zh": "需要可用间接光路径与测量信号；不是任意手机照片透墙，也不能凭此恢复整栋楼全部房间。",
+      "related_ids": [
+        "cross-15",
+        "cross-24"
+      ]
+    },
+    {
+      "id": "cross-15",
+      "title": "Two-edge-resolved three-dimensional non-line-of-sight imaging with an ordinary camera",
+      "year": 2024,
+      "url": "https://www.nature.com/articles/s41467-024-45397-7",
+      "authors_or_org": "Robinson Czajkowski; John Murray-Bruce",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "NLOS",
+        "computational periscopy",
+        "penumbra"
+      ],
+      "domains": [
+        "data acquisition",
+        "computer vision"
+      ],
+      "mechanism_zh": "利用门框两条正交边对间接光的编码，从普通相机看到的半影反演隐藏场景。",
+      "visible_information_zh": "在实验条件下恢复全彩三维隐藏目标。",
+      "tradeoffs_zh": "需合适门框/中继面、照明和先验；普通相机不代表任意照片都能透视。",
+      "evaluation_zh": "论文场景实验；不能外推成任意墙体内完整结构重建。",
+      "geometry_effect_zh": "物理信号的逆问题。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "相机、几何校准与逆问题求解。",
+      "verified_claim_zh": "已读Nature Communications开放全文；2024-02-07。",
+      "limitations_zh": "需合适门框/中继面、照明和先验；普通相机不代表任意照片都能透视。",
+      "related_ids": [
+        "cross-14"
+      ]
+    },
+    {
+      "id": "cross-16",
+      "title": "Optical coherence tomography",
+      "year": 1991,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/1957169/",
+      "authors_or_org": "David Huang et al.",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "OCT",
+        "coherence interferometry"
+      ],
+      "domains": [
+        "medical imaging",
+        "data acquisition"
+      ],
+      "mechanism_zh": "低相干干涉测量反向散射的深度分布，形成组织横截面。",
+      "visible_information_zh": "示例为视网膜、冠状动脉内部微结构。",
+      "tradeoffs_zh": "散射介质、穿透深度和采样决定能看到什么；不能把组织尺度能力推广到楼宇。",
+      "evaluation_zh": "原始Science摘要及图注；MIT扫描PDF无可提取正文，未标全文阅读。",
+      "geometry_effect_zh": "测量重建。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "光学干涉硬件与扫描。",
+      "verified_claim_zh": "1991-11-22；DOI10.1126/science.1957169。",
+      "limitations_zh": "散射介质、穿透深度和采样决定能看到什么；不能把组织尺度能力推广到楼宇。",
+      "related_ids": [
+        "cross-12"
+      ]
+    },
+    {
+      "id": "cross-17",
+      "title": "Application of ground-penetrating radar imagery for three-dimensional visualisation of near-surface structures in ice-rich permafrost, Barrow, Alaska",
+      "year": 2007,
+      "url": "https://www.usgs.gov/publications/application-ground-penetrating-radar-imagery-three-dimensional-visualisation-near",
+      "authors_or_org": "Jeffrey S. Munroe et al.",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "GPR",
+        "subsurface reconstruction"
+      ],
+      "domains": [
+        "geology",
+        "data acquisition"
+      ],
+      "mechanism_zh": "用探地雷达并结合土芯核对地下反射结构，组成立体可视化。",
+      "visible_information_zh": "研究浅层冻土中的冰楔网络等结构。",
+      "tradeoffs_zh": "电磁传播、含水状态、尺度和解释约束；反射强度不是直接的建筑构件语义。",
+      "evaluation_zh": "USGS记录摘要：三个场地，两个冰楔网络结果；未读订阅全文。",
+      "geometry_effect_zh": "测量和解释生成模型。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "GPR扫描、空间配准和实地对照。",
+      "verified_claim_zh": "2007，DOI10.1002/ppp.594。",
+      "limitations_zh": "电磁传播、含水状态、尺度和解释约束；反射强度不是直接的建筑构件语义。",
+      "related_ids": [
+        "cross-12"
+      ]
+    },
+    {
+      "id": "cross-18",
+      "title": "Reading Through a Closed Book",
+      "year": 2016,
+      "url": "https://www.media.mit.edu/projects/reading-through-a-closed-book/overview/",
+      "authors_or_org": "MIT Media Lab",
+      "source_type": "official-doc",
+      "evidence_status": "official-doc",
+      "methods": [
+        "terahertz",
+        "time-gated imaging"
+      ],
+      "domains": [
+        "data acquisition",
+        "layered structures"
+      ],
+      "mechanism_zh": "太赫兹飞行时间区分页层，谱对比加计算方法恢复层内文字。",
+      "visible_information_zh": "示例展示至少九页内容的分离读取。",
+      "tradeoffs_zh": "信噪、纸页形变、对比度限制；不能推成任意实体所有层均可分辨。",
+      "evaluation_zh": "机构项目页和演示；关联论文Nature Communications 7:12665全文本次访问失败。",
+      "geometry_effect_zh": "测量分层数据。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "THz硬件、时间门控和内容恢复。",
+      "verified_claim_zh": "已读MIT项目；项目内另一错误论文链接不作为本条证据。",
+      "limitations_zh": "信噪、纸页形变、对比度限制；不能推成任意实体所有层均可分辨。",
+      "related_ids": [
+        "cross-12"
+      ]
+    },
+    {
+      "id": "cross-19",
+      "title": "DeOcc-1-to-3: 3D De-Occlusion from a Single Image via Self-Supervised Multi-View Diffusion",
+      "year": 2026,
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/view/37820",
+      "authors_or_org": "Yuze Wang; You Shen; Shengchuan Zhang; Liujuan Cao",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "generative deocclusion",
+        "multi-view diffusion"
+      ],
+      "domains": [
+        "computer vision",
+        "data inference"
+      ],
+      "mechanism_zh": "从被遮挡的单图经扩散模型生成一致新视图，以伪真值学习补全。",
+      "visible_information_zh": "产生合理的完整物体外观或形状假设。",
+      "tradeoffs_zh": "生成内容不等于被测真实内部；物体表面补全不能证明实际室内墙体位置。",
+      "evaluation_zh": "出版社摘要报告基准实验；本次未读完整实验表。",
+      "geometry_effect_zh": "推断并生成缺失数据。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "训练数据、生成模型与置信/来源标记。",
+      "verified_claim_zh": "AAAI2026出版社页面，2026-03-14；DOI10.1609/aaai.v40i11.37820。",
+      "limitations_zh": "生成内容不等于被测真实内部；物体表面补全不能证明实际室内墙体位置。",
+      "related_ids": [
+        "cross-14"
+      ]
+    },
+    {
+      "id": "cross-20",
+      "title": "Tensor Displays: Compressive Light Field Synthesis using Multilayer Displays with Directional Backlighting",
+      "year": 2012,
+      "url": "https://www.media.mit.edu/publications/tensor-displays-compressive-light-field-synthesis-using-multilayer-displays-with-directional-backlighting/",
+      "authors_or_org": "Gordon Wetzstein; Douglas Lanman; Matthew Hirsch; Ramesh Raskar",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "light field",
+        "multilayer display"
+      ],
+      "domains": [
+        "display hardware"
+      ],
+      "mechanism_zh": "多层LCD、时分和定向背光通过张量分解合成光场。",
+      "visible_information_zh": "增加角度相关视觉信息与运动视差线索。",
+      "tradeoffs_zh": "硬件增加观看通道，并不自动移除不透明外壳；光场也需内容显露设计。",
+      "evaluation_zh": "机构摘要报告原型、模拟与实验；本次未读全文。",
+      "geometry_effect_zh": "几何原位，改变显示光线分布。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "专用显示装置；不能当作普通2D屏幕软件能力。",
+      "verified_claim_zh": "MIT原始出版页，2012。",
+      "limitations_zh": "硬件增加观看通道，并不自动移除不透明外壳；光场也需内容显露设计。",
+      "related_ids": [
+        "cross-07"
+      ]
+    },
+    {
+      "id": "cross-21",
+      "title": "Visibility Equalizer: Cutaway Visualization of Mesoscopic Biological Models",
+      "year": 2016,
+      "url": "https://www.cg.tuwien.ac.at/research/publications/2016/lemuzic-mindek-2016-viseq/",
+      "authors_or_org": "Mathieu Le Muzic et al.",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "semantic cutaway",
+        "visibility distribution",
+        "instance filtering"
+      ],
+      "domains": [
+        "molecular visualization",
+        "biology"
+      ],
+      "mechanism_zh": "先放裁剪对象，再按分子类型的可见/遮挡/裁掉比例调节显示。",
+      "visible_information_zh": "看清不同类型结构的分布，而非试图把每个重复实例都画完整。",
+      "tradeoffs_zh": "显示比例和代表性需明确；隐藏实例会损失局部密度与个体信息。",
+      "evaluation_zh": "作者摘要称有领域专家评价；本次未核对样本和具体量表。",
+      "geometry_effect_zh": "选择性裁剪，保留未裁掉实例的位置。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "类型层级、实例身份、可见性统计和调节条。",
+      "verified_claim_zh": "已读TU Wien作者页面、年份与机制。",
+      "limitations_zh": "显示比例和代表性需明确；隐藏实例会损失局部密度与个体信息。",
+      "related_ids": [
+        "cross-22"
+      ]
+    },
+    {
+      "id": "cross-22",
+      "title": "Semantic Screen-Space Occlusion for Multiscale Molecular Visualization",
+      "year": 2018,
+      "url": "https://www.cg.tuwien.ac.at/research/publications/2018/koch_bernhard_2018-1/",
+      "authors_or_org": "Thomas Bernhard Koch et al.",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "semantic shading",
+        "multiscale abstraction"
+      ],
+      "domains": [
+        "molecular visualization",
+        "biology"
+      ],
+      "mechanism_zh": "仅让选定语义层级产生遮蔽阴影，其余保持平坦，控制多尺度场景的着色杂乱。",
+      "visible_information_zh": "突出组织层级与重要结构边界。",
+      "tradeoffs_zh": "阴影是深度提示，不负责穿透外壳；着色过多本身会制造拥挤。",
+      "evaluation_zh": "作者摘要及生物场景示例；无本次核实的理解效果量。",
+      "geometry_effect_zh": "几何原位，改变语义层级的光照表达。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "层级语义数据、选择性屏幕空间着色。",
+      "verified_claim_zh": "TU Wien原始页面，2018-09。",
+      "limitations_zh": "阴影是深度提示，不负责穿透外壳；着色过多本身会制造拥挤。",
+      "related_ids": [
+        "cross-21",
+        "cross-06"
+      ]
+    },
+    {
+      "id": "cross-23",
+      "title": "See through walls with WiFi!",
+      "year": 2013,
+      "url": "https://www-prod.media.mit.edu/publications/see-through-walls-with-wifi/",
+      "authors_or_org": "Fadel Adib; Dina Katabi",
+      "source_type": "paper",
+      "evidence_status": "abstract-primary",
+      "methods": [
+        "RF through-wall sensing",
+        "MIMO nulling"
+      ],
+      "domains": [
+        "data acquisition",
+        "wireless sensing"
+      ],
+      "mechanism_zh": "消除静态反射，利用人体运动与无线反射跟踪隔墙目标。",
+      "visible_information_zh": "人数、相对位置和简单动作信息。",
+      "tradeoffs_zh": "原方法主动抑制静态反射；不能等同于测得房间全部静态结构。",
+      "evaluation_zh": "USRP软件无线电及办公楼实验；本次读作者摘要而非完整指标。",
+      "geometry_effect_zh": "测量目标状态，不是透明模型绘制。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "无线发射接收硬件与信号处理。",
+      "verified_claim_zh": "MIT作者页面，2013-08-12，DOI10.1145/2534169.2486039。",
+      "limitations_zh": "原方法主动抑制静态反射；不能等同于测得房间全部静态结构。",
+      "related_ids": [
+        "cross-14"
+      ]
+    },
+    {
+      "id": "cross-24",
+      "title": "Ultrasound synthetic aperture non-line-of-sight imaging",
+      "year": 2025,
+      "url": "https://www.nature.com/articles/s42005-025-02335-3",
+      "authors_or_org": "Tailin Li; Ilya Starshynov et al.",
+      "source_type": "paper",
+      "evidence_status": "full-primary",
+      "methods": [
+        "acoustic NLOS",
+        "synthetic aperture"
+      ],
+      "domains": [
+        "data acquisition",
+        "acoustic imaging"
+      ],
+      "mechanism_zh": "扫描声学孔径，通过墙面镜面反射和完整声波场反演拐角后形状。",
+      "visible_information_zh": "实验展示约1m距离的厘米量级隐藏目标结构。",
+      "tradeoffs_zh": "专用换能器、麦克风和扫描；声学反射条件与孔径制约结果，不能透视任意墙内细节。",
+      "evaluation_zh": "公开全文索引读取方法与实验；直接网页后续跳转失败。",
+      "geometry_effect_zh": "测量重建。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "声学扫描、f-k migration与波形采集。",
+      "verified_claim_zh": "正式出版2025-11-17；本条与光学NLOS的介质和反射机制不同。",
+      "limitations_zh": "专用换能器、麦克风和扫描；声学反射条件与孔径制约结果，不能透视任意墙内细节。",
+      "related_ids": [
+        "cross-14",
+        "cross-15"
+      ]
+    },
+    {
+      "id": "cross-25",
+      "title": "MRI (Magnetic Resonance Imaging)",
+      "year": null,
+      "url": "https://www.fda.gov/radiation-emitting-products/medical-imaging/mri-magnetic-resonance-imaging",
+      "authors_or_org": "FDA",
+      "source_type": "official-doc",
+      "evidence_status": "official-doc",
+      "methods": [
+        "MRI",
+        "physical imaging"
+      ],
+      "domains": [
+        "medical imaging",
+        "data acquisition"
+      ],
+      "mechanism_zh": "强磁场和射频测量身体中主要来自水和脂肪质子的信号，重建内部结构影像。",
+      "visible_information_zh": "获得体内组织数据，后续仍需切片、分割或体绘制。",
+      "tradeoffs_zh": "材料信号与仪器环境决定适用性；不具备把任意建筑扫描成房间的能力。",
+      "evaluation_zh": "官方原理说明，不是本研究的医疗选择建议。",
+      "geometry_effect_zh": "采集内部数据。",
+      "interaction_zh": "交互能力以原始资料为准；本条机制与适用条件见下。",
+      "implementation_zh": "MRI仪器与图像重建。",
+      "verified_claim_zh": "已读FDA官方页面；未用访问日期替代出版年份。",
+      "limitations_zh": "材料信号与仪器环境决定适用性；不具备把任意建筑扫描成房间的能力。",
+      "related_ids": [
+        "cross-12",
+        "cross-16"
+      ]
+    }
+  ],
+  "synthesis_zh": "透明正确性、知觉可读性、空间显露、真实数据获取是四个不同层次。原位显示可以选择性删除或弱化遮挡；完整显露通常要改几何布局、投影、视窗数量或时间。专用硬件增加通道或获得未知数据，但不消除有限屏幕和目标选择的约束。",
+  "coverage_gaps": [
+    "非穷尽互联网或所有学科；未开展统一任务实验",
+    "物理成像只按原理与代表性资料比较，未做设备选型",
+    "多数全文不可达项只用原始摘要，不能支撑精确效果量",
+    "普通单屏上的全部结构同时可读尚未被这些资料普遍保证"
+  ]
+}

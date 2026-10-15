@@ -220,6 +220,33 @@ hand-recognition or a performance benchmark. Existing legacy gesture tests and
 the local MediaPipe/TensorFlow dependency conflict are recorded separately in
 the report; they are not fixed by the structural rendering changes.
 
+## Combined structural visibility (2026-10-15)
+
+Open a building, then choose **结构透视 · 展开与连接**. The separate workspace
+combines an expanded overview, a current-floor reverse perspective, an adjacent
+floor perspective, and a clickable floor plan. Selecting a space synchronizes
+the views and shows a wall-clearance path to its illustrative circulation core
+when one exists. Disconnected pieces of the same named zone are separate
+selectable regions. The unfold slider preserves floor/core correspondence;
+local cuts remove camera-facing wall fragments above a low sill, with orange
+edges and opaque remaining surfaces. Drag to orbit, scroll to zoom, double-click
+or press R to reset, PageUp/PageDown to select a floor, and Escape to return.
+
+This is a linked projective composite, not the general bent-ray Graph Camera.
+Walls, doors, cores and vertical links remain schematic. Paths describe the
+generated wall geometry, ignore furniture, and are not verified navigation or
+accessibility routes. The original gesture modules and five-mode cycle are
+unchanged. The underlying map input is suspended while this workspace is open,
+without changing the gesture-enabled preference.
+
+Hardware reproduction (no webcam):
+
+```powershell
+.\native\.venv\Scripts\python.exe scripts\validate_structure_visibility.py
+```
+
+See [implementation, GPU evidence and remaining limits](../docs/research/2026-10-15-structure-visibility-implementation.md).
+
 ## Local performance check (2026-10-11)
 
 The scene uses 10 static building geometry batches (two campus-wide meshes plus eight featured buildings), one ground model, and a selection overlay when a building is selected. Reusing vertices with identical positions, normals, and colors reduced the campus buffers from 51,600 to 27,422 vertices for Central and from 24,216 to 13,770 for North; triangle index counts are unchanged.

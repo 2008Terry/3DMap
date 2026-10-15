@@ -1,0 +1,154 @@
+{
+  "adapter_logs": [
+    "Creating QRhi with backend D3D11 for window 0x233480eb2c0 (wflags 0x1)\n  Graphics API debug/validation layers: 0\n  Debug markers: 0\n  Timestamps: 0\n  Prefer software device: 0\n  Shader/pipeline cache collection: 1",
+    "Adapter 0: 'Intel(R) Iris(R) Xe Graphics' (vendor 0x8086 device 0xA7A0 flags 0x0)",
+    "  using this adapter",
+    "Adapter 1: 'Intel(R) Iris(R) Xe Graphics' (vendor 0x8086 device 0xA7A0 flags 0x0)",
+    "Adapter 2: 'Intel(R) Iris(R) Xe Graphics' (vendor 0x8086 device 0xA7A0 flags 0x0)",
+    "Adapter 3: 'Microsoft Basic Render Driver' (vendor 0x1414 device 0x8C flags 0x2)"
+  ],
+  "captures": [
+    {
+      "file": "shapiro-undergraduate-library-main.png",
+      "floors": 5,
+      "room": "Askwith Media Library 2002 · 区域 1",
+      "routePoints": 2,
+      "api": "D3D11",
+      "bounds": {
+        "minX": -22.000000000000007,
+        "maxX": 44.88000000000001,
+        "maxY": 86.64000000000001,
+        "width": 66.88000000000002,
+        "height": 86.76000000000002,
+        "depth": 82.5,
+        "centerX": 11.440000000000001,
+        "centerY": 43.260000000000005
+      }
+    },
+    {
+      "file": "city-BLD-035111-main.png",
+      "floors": 5,
+      "room": "IdeaHub",
+      "routePoints": 2,
+      "api": "D3D11",
+      "bounds": {
+        "minX": -40.29999999999998,
+        "maxX": 82.21199999999996,
+        "maxY": 124.66239999999999,
+        "width": 122.51199999999994,
+        "height": 124.7824,
+        "depth": 128.2,
+        "centerX": 20.95599999999999,
+        "centerY": 62.27119999999999
+      }
+    },
+    {
+      "file": "burton-memorial-tower-main.png",
+      "floors": 11,
+      "room": "示意空间 1",
+      "routePoints": 2,
+      "api": "D3D11",
+      "bounds": {
+        "minX": -7.85,
+        "maxX": 16.014000000000003,
+        "maxY": 72.67199999999995,
+        "width": 23.864000000000004,
+        "height": 72.79199999999996,
+        "depth": 15.899999999999977,
+        "centerX": 4.082000000000002,
+        "centerY": 36.275999999999975
+      }
+    },
+    {
+      "file": "hatcher-graduate-library-North.png",
+      "floors": 10,
+      "room": "Hatcher Gallery Exhibit Room",
+      "routePoints": 23,
+      "api": "D3D11",
+      "bounds": {
+        "minX": -52.3,
+        "maxX": 106.69200000000001,
+        "maxY": 231.8112,
+        "width": 158.99200000000002,
+        "height": 231.93120000000002,
+        "depth": 87.10000000000001,
+        "centerX": 27.196000000000005,
+        "centerY": 115.8456
+      }
+    },
+    {
+      "file": "hatcher-graduate-library-South.png",
+      "floors": 8,
+      "room": "Book Stacks",
+      "routePoints": 2,
+      "api": "D3D11",
+      "bounds": {
+        "minX": -52.3,
+        "maxX": 106.69200000000001,
+        "maxY": 181.09759999999997,
+        "width": 158.99200000000002,
+        "height": 181.21759999999998,
+        "depth": 87.10000000000001,
+        "centerX": 27.196000000000005,
+        "centerY": 90.48879999999998
+      }
+    }
+  ],
+  "orbit_updates": [
+    {
+      "building": "shapiro-undergraduate-library-main",
+      "rendered_frames": 30,
+      "seconds": 1.5319999999992433,
+      "updates_per_second": 19.58224543081907
+    },
+    {
+      "building": "city-BLD-035111-main",
+      "rendered_frames": 28,
+      "seconds": 0.5619999999998981,
+      "updates_per_second": 49.822064056948534
+    },
+    {
+      "building": "burton-memorial-tower-main",
+      "rendered_frames": 31,
+      "seconds": 1.7030000000013388,
+      "updates_per_second": 18.20317087491229
+    },
+    {
+      "building": "hatcher-graduate-library-North",
+      "rendered_frames": 29,
+      "seconds": 0.5470000000004802,
+      "updates_per_second": 53.016453382037554
+    },
+    {
+      "building": "hatcher-graduate-library-South",
+      "rendered_frames": 29,
+      "seconds": 0.6090000000003783,
+      "updates_per_second": 47.61904761901803
+    }
+  ],
+  "3d_click_checks": [
+    {
+      "building": "shapiro-undergraduate-library-main",
+      "selected_space": "2:0:0"
+    },
+    {
+      "building": "city-BLD-035111-main",
+      "selected_space": "2:0:0"
+    },
+    {
+      "building": "burton-memorial-tower-main",
+      "selected_space": "2:0:0"
+    },
+    {
+      "building": "hatcher-graduate-library-North",
+      "selected_space": "2:0:0"
+    },
+    {
+      "building": "hatcher-graduate-library-South",
+      "selected_space": "2:0:0"
+    }
+  ],
+  "elapsed_s": 46.40599999999904,
+  "qml_errors": [],
+  "camera_started": false
+}

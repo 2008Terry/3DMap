@@ -31,7 +31,7 @@ ApplicationWindow {
         {key: "inside", name: "进入"}
     ]
     onActiveChanged: {
-        mapControllerObject.set_window_active(active && !planDialog.visible)
+        mapControllerObject.set_window_active(active && !planDialog.visible && !structureObject.active)
         if (!active) mapScene.heldKeys = ({})
     }
 
@@ -157,6 +157,12 @@ ApplicationWindow {
                         width: parent.width
                         spacing: 9
                         visible: inspectorObject.active
+                        Button {
+                            width: parent.width
+                            text: "结构透视 · 展开与连接"
+                            highlighted: true
+                            onClicked: structureObject.open()
+                        }
                         Label {
                             width: parent.width
                             text: inspectorObject.evidence
@@ -448,6 +454,7 @@ ApplicationWindow {
             clip: true
             MapScene {
                 id: mapScene
+                visible: !structureObject.active
                 anchors.fill: parent
                 campusExtent: campusBounds
                 centralGeometry: geometryCentral
@@ -464,6 +471,20 @@ ApplicationWindow {
             }
         }
     }
+    StructureExplorer {
+        anchors.fill: parent
+        state: structureObject
+        inspector: inspectorObject
+        z: 20
+    }
+    Connections {
+        target: structureObject
+        function onActiveChanged() {
+            mapControllerObject.set_window_active(window.active && !planDialog.visible && !structureObject.active)
+            mapScene.heldKeys = ({})
+            if (!structureObject.active) mapScene.forceActiveFocus()
+        }
+    }
     Dialog {
         id: planDialog
         title: "官方参考图 · University of Michigan Library"
@@ -472,7 +493,7 @@ ApplicationWindow {
         width: Math.min(window.width - 60, 1000)
         height: window.height - 70
         standardButtons: Dialog.Close
-        onVisibleChanged: mapControllerObject.set_window_active(window.active && !visible)
+        onVisibleChanged: mapControllerObject.set_window_active(window.active && !visible && !structureObject.active)
         contentItem: Flickable {
             clip: true
             contentWidth: width * 1.6

@@ -22,6 +22,7 @@ from PySide6.QtWidgets import QApplication
 import numpy as np
 
 from native.building_inspector import BuildingInspector
+from native.structure_visibility import StructureVisibility
 from native.campus_data import load_buildings
 from native.map_controller import MapController
 from native.gesture_worker import GestureWorker
@@ -41,6 +42,7 @@ def main():
     print("Application created", flush=True)
     buildings, extent = load_buildings(ROOT)
     inspector = BuildingInspector(buildings, ROOT)
+    structure = StructureVisibility(inspector)
     controller = MapController(buildings, extent, inspector)
     worker = GestureWorker(ROOT / "native/assets/gesture_recognizer.task")
     engine = QQmlApplicationEngine()
@@ -48,7 +50,7 @@ def main():
     values = dict(campusBuildings=[], geometryCentral=None, geometryNorth=None,
                   geometryFeatured=[], geometryEnvironment=[], geometryFacades=None,
                   environmentSummary="", mapControllerObject=controller,
-                  inspectorObject=inspector, selectionOverlayState=None,
+                  inspectorObject=inspector, structureObject=structure, selectionOverlayState=None,
                   gestureWorkerObject=worker,
                   campusBounds=dict(centerX=extent.center_x, centerZ=extent.center_z,
                                     width=extent.width, depth=extent.depth))

@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 
 from campus_data import load_buildings
 from building_inspector import BuildingInspector
+from structure_visibility import StructureVisibility
 from compiled_scene import load_compiled_scene
 from environment_data import load_environment
 from environment_mesh import build_environment_meshes
@@ -57,6 +58,7 @@ def main() -> int:
         facade_mesh = build_facade_mesh(buildings)
         facade_geometry = geometry_from_buffers(facade_mesh) if facade_mesh.indices else None
     inspector = BuildingInspector(buildings, repo_root)
+    structure = StructureVisibility(inspector)
     map_controller = MapController(buildings, extent, inspector, environment)
     app.installEventFilter(map_controller)
     gesture_worker = GestureWorker(repo_root / "native" / "assets" / "gesture_recognizer.task")
@@ -90,6 +92,7 @@ def main() -> int:
         f"{stats['trees']} 记录树木 + 示意植被/行人 · {stats['busStops']} 公交站 · City of Ann Arbor / © OpenStreetMap contributors / U-M GTFS")
     engine.rootContext().setContextProperty("mapControllerObject", map_controller)
     engine.rootContext().setContextProperty("inspectorObject", inspector)
+    engine.rootContext().setContextProperty("structureObject", structure)
     engine.rootContext().setContextProperty("selectionOverlayState", selection_overlay)
     engine.rootContext().setContextProperty("gestureWorkerObject", gesture_worker)
     engine.rootContext().setContextProperty("campusBounds", {

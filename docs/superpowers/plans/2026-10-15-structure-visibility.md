@@ -29,24 +29,24 @@
 
 Files: `native/structure_visibility.py`, `native/tests/test_structure_visibility.py`.
 
-- [ ] Write failing tests for empty state, floor bounds, connected/disconnected rooms and routed free-space containment.
-- [ ] Implement `build_floor_graph(floor, index)`, `room_route(floor, room)` and `StructureVisibility(inspector)` with semantic IDs, floor/room selection, unfold amount, cut/furniture toggles, explicit bounds, and adjacent portals.
-- [ ] Verify Burton, Hatcher wing changes, select/close/reopen, and all path points/segments.
+- [x] Write failing tests for empty state, floor bounds, connected/disconnected rooms and routed free-space containment.
+- [x] Implement `build_floor_graph(floor, index)`, `room_route(floor, room)` and `StructureVisibility(inspector)` with semantic IDs, floor/room selection, unfold amount, cut/furniture toggles, explicit bounds, and adjacent portals.
+- [x] Verify Burton, Hatcher wing changes, select/close/reopen, and all path points/segments.
 
 ## Task 2: Rendering and integration
 
 Files: `native/StructureExplorer.qml`, `native/StructureViewport.qml`, `native/StructureScene.qml`, `native/RevealMaterial.qml`, new reveal shaders; minimal `native/main.py` and `native/Main.qml` integration.
 
-- [ ] Add a production-QML hardware harness whose initial load fails until the new component exists.
-- [ ] Render expanded opaque floors, scene-space core links, local target cuts, independent projective portals, clickable floor plan, room list and floor labels.
-- [ ] Keep gesture preference intact and suspend underlying map input while active. Check narrow layout, reset/orbit/zoom, keyboard floor selection and exit.
+- [x] Add a production-QML hardware harness whose initial load fails until the new component exists.
+- [x] Render expanded opaque floors, scene-space core links, local target cuts, independent projective portals, clickable floor plan, room list and floor labels.
+- [x] Keep gesture preference intact and suspend underlying map input while active. Check narrow layout, reset/orbit/zoom, keyboard floor selection and exit.
 
 ## Task 3: Hardware verification and delivery
 
 Files: `scripts/validate_structure_visibility.py`, verification report and selected previews.
 
-- [ ] Run focused and existing native tests; record existing unrelated failures separately if any.
-- [ ] Capture Shapiro, Union, Burton and both Hatcher wings on hardware D3D11; verify selection sync, geometry bounds, cuts on/off, unfold zero/max, plan picking and exit/reopen.
-- [ ] Inspect screenshots and fix any visibility, shader, picking or layout failures.
-- [ ] Fresh whole-branch review; address material findings and recheck affected scenarios.
-- [ ] Commit, push only the new branch, verify remote SHA, and report actual hardware evidence and schematic-data limits.
+- [x] Run focused and existing native tests; record existing unrelated failures separately if any.
+- [x] Capture Shapiro, Union, Burton and both Hatcher wings on hardware D3D11; verify selection sync, geometry bounds, cuts on/off, unfold zero/max, plan picking and exit/reopen.
+- [x] Inspect screenshots and fix any visibility, shader, picking or layout failures.
+- [x] Fresh whole-branch review; address material findings and recheck affected scenarios.
+Delivery: commit and push only the new branch; verify the remote SHA before reporting completion.

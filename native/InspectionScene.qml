@@ -17,12 +17,12 @@ Node {
         materials: CutMaterial {
             sectionAxis: root.axis
             sectionPosition: root.positionOnAxis
-            materialAlpha: root.mode === "xray" ? root.inspector.shell_opacity : 1
+            materialAlpha: root.mode === "xray" ? root.inspector.shell_opacity * 0.5 : 1
         }
     }
     Model {
         geometry: root.inspector.facade
-        visible: root.mode !== "floor" && root.mode !== "inside" && root.mode !== "explode"
+        visible: root.mode !== "floor" && root.mode !== "inside" && root.mode !== "explode" && root.mode !== "xray"
         materials: CutMaterial {
             sectionAxis: root.axis
             sectionPosition: root.positionOnAxis
@@ -35,6 +35,7 @@ Node {
             id: level
             required property var modelData
             required property int index
+            readonly property bool current: index === root.inspector.selected_floor
             y: modelData.elevation + (root.mode === "explode" ? index * root.inspector.spread : 0)
             visible: (root.mode !== "floor" && root.mode !== "inside") || index === root.inspector.selected_floor
             Model {
@@ -44,7 +45,7 @@ Node {
                 materials: CutMaterial {
                     sectionAxis: root.axis
                     sectionPosition: root.positionOnAxis
-                    materialAlpha: root.mode === "xray" ? 0.32 : 1
+                    materialAlpha: root.mode === "xray" ? (level.current ? 0.18 : 0.018) : 1
                 }
             }
             Model {
@@ -54,19 +55,38 @@ Node {
                 materials: CutMaterial {
                     sectionAxis: root.axis
                     sectionPosition: root.positionOnAxis
-                    materialAlpha: root.mode === "xray" ? 0.25 : 1
+                    materialAlpha: root.mode === "xray" ? (level.current ? 0.60 : 0.035) : 1
                 }
             }
             Model {
-                geometry: level.modelData.slab
-                y: level.modelData.height
+                readonly property int inspectionFloor: level.index
+                geometry: level.modelData.zones
+                visible: root.mode !== "xray" || level.current
+                pickable: true
+                materials: CutMaterial {
+                    sectionAxis: root.axis
+                    sectionPosition: root.positionOnAxis
+                    materialAlpha: root.mode === "xray" ? 0.45 : 1
+                }
+            }
+            Model {
+                geometry: level.modelData.outline
+                visible: root.mode !== "inside"
+                materials: CutMaterial {
+                    sectionAxis: root.axis
+                    sectionPosition: root.positionOnAxis
+                    materialAlpha: root.mode === "xray" && !level.current ? 0.16 : 1
+                }
+            }
+            Model {
+                geometry: level.modelData.ceiling
                 visible: root.mode === "inside"
                 materials: CutMaterial { }
             }
             Model {
                 readonly property int inspectionFloor: level.index
                 geometry: level.modelData.furniture
-                visible: root.inspector.show_furniture
+                visible: root.inspector.show_furniture && (root.mode !== "xray" || level.current)
                 pickable: true
                 materials: CutMaterial {
                     sectionAxis: root.axis

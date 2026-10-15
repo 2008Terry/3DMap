@@ -202,6 +202,15 @@ ApplicationWindow {
                             wrapMode: Text.WordWrap
                             font.pixelSize: 11
                         }
+                        Label {
+                            width: parent.width
+                            visible: inspectorObject.mode === "xray"
+                            text: "透视焦点 · " + (inspectorObject.current_floor.label || "") +
+                                  " 层清晰显示，其他楼层为淡色轮廓。换层保留当前视图。"
+                            color: "#bed7d8"
+                            wrapMode: Text.WordWrap
+                            font.pixelSize: 11
+                        }
                         Row {
                             spacing: 5
                             visible: inspectorObject.mode === "section" || inspectorObject.mode === "dollhouse"

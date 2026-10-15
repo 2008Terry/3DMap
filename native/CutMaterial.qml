@@ -9,6 +9,9 @@ CustomMaterial {
     cullMode: CustomMaterial.NoCulling
     sourceBlend: materialAlpha < 0.99 ? CustomMaterial.SrcAlpha : CustomMaterial.NoBlend
     destinationBlend: materialAlpha < 0.99 ? CustomMaterial.OneMinusSrcAlpha : CustomMaterial.NoBlend
+    sourceAlphaBlend: materialAlpha < 0.99 ? CustomMaterial.One : CustomMaterial.NoBlend
+    destinationAlphaBlend: materialAlpha < 0.99 ? CustomMaterial.OneMinusSrcAlpha : CustomMaterial.NoBlend
+    depthDrawMode: materialAlpha < 0.99 ? Material.NeverDepthDraw : Material.OpaqueOnlyDepthDraw
     vertexShader: "shaders/section.vert"
     fragmentShader: "shaders/section.frag"
 }

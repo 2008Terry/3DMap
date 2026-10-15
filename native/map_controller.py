@@ -256,10 +256,7 @@ class MapController(QObject):
                 self.walkRequested.emit(direction * dt * 2.0 * self._sensitivity)
             elif frame.held >= 0.4 and now - self._last_floor_at >= 0.8:
                 self._last_floor_at = now
-                previous_floor = inspector.selected_floor
                 inspector.change_floor(direction)
-                if inspector.selected_floor != previous_floor and inspector.mode != "floor":
-                    inspector.set_mode("floor")
         else:
             self.zoom_by(exp(-direction * dt * 0.65 * self._sensitivity))
 

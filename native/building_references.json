@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "accessed": "2026-10-12",
+  "accessed": "2026-10-15",
   "buildings": {
     "shapiro-undergraduate-library": {
       "id": "shapiro-undergraduate-library",
@@ -129,28 +129,104 @@
           "mapping": "approximate source zones; walls and furniture inferred",
           "spaces": [
             {
-              "name": "Askwith Media Library",
-              "kind": "study"
+              "name": "Askwith Media Library 2002",
+              "kind": "collection",
+              "rect": [
+                0.27,
+                0.0,
+                0.59,
+                0.25
+              ]
             },
             {
-              "name": "Knox Adaptive Technology Center",
-              "kind": "study"
+              "name": "Learning Programs and Initiatives 2178 (nonpublic)",
+              "kind": "office",
+              "rect": [
+                0.03,
+                0.15,
+                0.24,
+                0.25
+              ]
+            },
+            {
+              "name": "Conference Room 2166 (nonpublic)",
+              "kind": "room",
+              "rect": [
+                0.03,
+                0.25,
+                0.24,
+                0.39
+              ]
+            },
+            {
+              "name": "Sweetland Center for Writing 2160",
+              "kind": "office",
+              "rect": [
+                0.03,
+                0.39,
+                0.24,
+                0.57
+              ]
             },
             {
               "name": "Group Study Rooms 2122-2144",
-              "kind": "study"
+              "kind": "room",
+              "rect": [
+                0.03,
+                0.57,
+                0.24,
+                0.85
+              ]
             },
             {
-              "name": "Sweetland Peer Writing Center",
-              "kind": "study"
+              "name": "PC Campus Computing Site 2054",
+              "kind": "computing",
+              "rect": [
+                0.73,
+                0.55,
+                0.97,
+                0.7
+              ]
             },
             {
-              "name": "Book Stacks P-Z",
-              "kind": "stacks"
+              "name": "Knox Adaptive Technology Center 2064",
+              "kind": "room",
+              "rect": [
+                0.73,
+                0.7,
+                0.97,
+                0.9
+              ]
             },
             {
-              "name": "Computing and Printing",
-              "kind": "study"
+              "name": "Mac Campus Computing Site 2000A",
+              "kind": "computing",
+              "rect": [
+                0.5,
+                0.56,
+                0.69,
+                0.66
+              ]
+            },
+            {
+              "name": "Book Stacks and Current Periodicals",
+              "kind": "stacks",
+              "rect": [
+                0.28,
+                0.43,
+                0.69,
+                0.85
+              ]
+            },
+            {
+              "name": "Study Space",
+              "kind": "study",
+              "rect": [
+                0.25,
+                0.85,
+                0.73,
+                0.94
+              ]
             }
           ]
         },
@@ -165,31 +241,93 @@
           "spaces": [
             {
               "name": "Conference Rooms 3178 and 3180 (nonpublic)",
-              "kind": "study"
+              "kind": "room",
+              "rect": [
+                0.1,
+                0.01,
+                0.35,
+                0.14
+              ]
             },
             {
-              "name": "Digital Scholarship (nonpublic)",
-              "kind": "study"
+              "name": "Digital Scholarship and Michigan Publishing 3020 (nonpublic)",
+              "kind": "office",
+              "rect": [
+                0.49,
+                0.01,
+                0.72,
+                0.17
+              ]
+            },
+            {
+              "name": "Deep Blue Repository and Research Data Services (nonpublic)",
+              "kind": "office",
+              "rect": [
+                0.72,
+                0.17,
+                0.96,
+                0.3
+              ]
+            },
+            {
+              "name": "Shapiro Gallery 3060",
+              "kind": "gallery",
+              "rect": [
+                0.03,
+                0.37,
+                0.25,
+                0.48
+              ]
+            },
+            {
+              "name": "Wellbeing Room 3021",
+              "kind": "room",
+              "rect": [
+                0.45,
+                0.43,
+                0.61,
+                0.48
+              ]
             },
             {
               "name": "Study Room 3042",
-              "kind": "study"
+              "kind": "room",
+              "rect": [
+                0.79,
+                0.43,
+                0.89,
+                0.47
+              ]
             },
             {
               "name": "Study Room 3046",
-              "kind": "study"
+              "kind": "room",
+              "rect": [
+                0.87,
+                0.47,
+                0.97,
+                0.52
+              ]
             },
             {
-              "name": "Shapiro Reading Room",
-              "kind": "study"
+              "name": "Open Study Space",
+              "kind": "study",
+              "rect": [
+                0.05,
+                0.5,
+                0.95,
+                0.85
+              ]
             },
             {
-              "name": "Shapiro Gallery",
-              "kind": "study"
-            },
-            {
-              "name": "Wellbeing Room",
-              "kind": "study"
+              "name": "Shapiro Reading Room 3100",
+              "kind": "reading",
+              "rect": [
+                0.2,
+                0.86,
+                0.73,
+                0.99
+              ]
             }
           ]
         },
@@ -203,28 +341,94 @@
           "mapping": "approximate source zones; walls and furniture inferred",
           "spaces": [
             {
-              "name": "Turkish American Friendship Room (nonpublic)",
-              "kind": "study"
+              "name": "Turkish American Friendship Room 4004 (nonpublic)",
+              "kind": "room",
+              "rect": [
+                0.49,
+                0.0,
+                0.67,
+                0.14
+              ]
             },
             {
-              "name": "Computer and Video Game Archive",
-              "kind": "study"
-            },
-            {
-              "name": "Shapiro 4059",
-              "kind": "study"
-            },
-            {
-              "name": "Science Book Stacks",
-              "kind": "stacks"
+              "name": "Michigan Publishing and University of Michigan Press 4190 (nonpublic)",
+              "kind": "office",
+              "rect": [
+                0.02,
+                0.12,
+                0.24,
+                0.37
+              ]
             },
             {
               "name": "Study Space",
-              "kind": "study"
+              "kind": "study",
+              "rect": [
+                0.27,
+                0.18,
+                0.63,
+                0.28
+              ]
             },
             {
-              "name": "Michigan Publishing (nonpublic)",
-              "kind": "study"
+              "name": "Science Oversize Book Stacks S-Z",
+              "kind": "stacks",
+              "rect": [
+                0.65,
+                0.2,
+                0.88,
+                0.31
+              ]
+            },
+            {
+              "name": "Book Stacks AC-QE",
+              "kind": "stacks",
+              "rect": [
+                0.08,
+                0.4,
+                0.27,
+                0.84
+              ]
+            },
+            {
+              "name": "Book Stacks QL-S",
+              "kind": "stacks",
+              "rect": [
+                0.74,
+                0.4,
+                0.92,
+                0.46
+              ]
+            },
+            {
+              "name": "Computer and Video Game Archive 4041",
+              "kind": "computing",
+              "rect": [
+                0.72,
+                0.48,
+                0.94,
+                0.69
+              ]
+            },
+            {
+              "name": "Shapiro 4059",
+              "kind": "room",
+              "rect": [
+                0.72,
+                0.69,
+                0.94,
+                0.85
+              ]
+            },
+            {
+              "name": "Book Stacks QE-QL",
+              "kind": "stacks",
+              "rect": [
+                0.29,
+                0.86,
+                0.72,
+                0.94
+              ]
             }
           ]
         }
@@ -1049,6 +1253,115 @@
           "label": "4",
           "name": "示意 4 层（未核实）",
           "basis": "inferred",
+          "spaces": []
+        }
+      ]
+    },
+    "burton-memorial-tower": {
+      "name": "Burton Memorial Tower",
+      "facility_ids": [
+        "BLD-000825"
+      ],
+      "evidence_level": "official tenth-floor bell chamber; basement and catalog from user review",
+      "mapping_status": "schematic heights, rooms and circulation; no surveyed floor plans",
+      "interior_notice": "B + 1–10 层目录按测试反馈修正 · 官方资料确认 10 层钟室；地下室待独立核实，室内结构为示意",
+      "sources": [
+        {
+          "label": "U-M Regents: tenth-floor bell chamber (2010)",
+          "url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf"
+        },
+        {
+          "label": "SMTD Burton Memorial Tower",
+          "url": "https://smtd.umich.edu/facilities/burton-memorial-tower/"
+        }
+      ],
+      "floors": [
+        {
+          "label": "B",
+          "name": "地下室（目录待独立核实）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "1",
+          "name": "1 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "2",
+          "name": "2 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "3",
+          "name": "3 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "4",
+          "name": "4 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "5",
+          "name": "5 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "6",
+          "name": "6 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "7",
+          "name": "7 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "8",
+          "name": "8 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "9",
+          "name": "9 层（室内示意）",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+          "spaces": []
+        },
+        {
+          "label": "10",
+          "name": "钟室 · 10 层",
+          "basis": "inferred",
+          "catalog_basis": "user-reviewed basement plus ten floors",
+          "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
           "spaces": []
         }
       ]

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from math import atan, cos, radians, sin, sqrt, tan
 from dataclasses import replace
 from pathlib import Path
 
@@ -112,6 +113,8 @@ class BuildingInspector(QObject):
 
     @Property(str, notify=changed)
     def evidence(self):
+        if self._profile.get("interior_notice"):
+            return self._profile["interior_notice"]
         if self._layout and self._layout.floors[self._floor]["reference"].get("basis") == "inferred":
             return "本层为设计示意 · 本建筑仅部分楼层有官方资料"
         if self._profile.get("floors"):
@@ -150,6 +153,32 @@ class BuildingInspector(QObject):
             return {"width": 100.0, "depth": 100.0, "height": 20.0, "scope": ""}
         a, b, c, d = self._layout.bounds
         return {"width": c - a, "depth": d - b, "height": self._layout.height, "scope": self._layout.scope}
+
+    @Property("QVariantMap", notify=changed)
+    def view_bounds(self):
+        if not self._layout:
+            return {"width": 100.0, "depth": 100.0, "height": 20.0, "centerY": 10.0}
+        floors = self._layout.floors
+        if self._mode in ("floor", "inside"):
+            low = floors[self._floor]["elevation"] - 0.12
+            high = floors[self._floor]["elevation"] + floors[self._floor]["height"]
+        else:
+            low = -0.12
+            high = max(f["elevation"] + f["height"] +
+                       (i * self._spread if self._mode == "explode" else 0)
+                       for i, f in enumerate(floors))
+        return {**self.bounds, "height": high - low, "centerY": (high + low) / 2}
+
+    @Slot(float, float, float, result="QVariantMap")
+    def fit_view(self, width, height, field_of_view):
+        bounds = self.view_bounds
+        vertical = radians(field_of_view) / 2
+        horizontal = atan(tan(vertical) * max(1, width) / max(1, height))
+        # Bounding sphere remains in frame for every orbit angle.
+        radius = sqrt(sum(bounds[key] ** 2 for key in ("width", "height", "depth"))) / 2
+        distance = radius * 1.12 / sin(min(vertical, horizontal))
+        return {"y": distance * sin(radians(38)), "z": distance * cos(radians(38)),
+                "centerY": bounds["centerY"]}
 
     @Property("QVariantList", notify=changed)
     def rooms(self):
@@ -197,7 +226,7 @@ class BuildingInspector(QObject):
             models = []
             for floor in layout.floors:
                 model = {key: floor[key] for key in ("label", "name", "elevation", "height")}
-                for key in ("slab", "walls", "furniture"):
+                for key in ("slab", "walls", "furniture", "zones", "outline", "ceiling"):
                     model[key] = geometry_from_buffers(floor[key]) if floor[key] else None
                 models.append(model)
             self._layout = layout
@@ -286,6 +315,8 @@ class BuildingInspector(QObject):
         if value != self._spread:
             self._spread = value
             self.changed.emit()
+            if self._active and self._mode == "explode":
+                self.viewRequested.emit()
 
     @Slot(float)
     def set_shell_opacity(self, value):

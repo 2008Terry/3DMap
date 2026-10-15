@@ -27,6 +27,7 @@ Item {
     property bool wasInspecting: false
     property string inspectionViewKey: ""
     property string walkViewKey: ""
+    property string inspectionMode: ""
     property string selectionMessage: ""
     readonly property int drawCalls: view.renderStats.drawCallCount
     readonly property int fps: view.renderStats.fps
@@ -51,23 +52,19 @@ Item {
     function syncInspectionHeight() {
         if (!root.inspector.active || !root.wasInspecting ||
             root.inspectionViewKey !== root.inspector.inspection_key || root.inspector.mode === "inside") return
-        const b = root.inspector.bounds
-        const height = root.inspector.mode === "floor" ? root.inspector.current_floor.elevation :
-            b.height / 2 + (root.inspector.mode === "explode" ?
-            root.inspector.spread * Math.max(0, root.inspector.floors.length - 1) / 2 : 0)
-        cameraOrigin.y = height
+        cameraOrigin.y = root.inspector.view_bounds.centerY
     }
     function resetInspectionView() {
         if (root.inspector.mode === "inside") { root.resetWalkView(); return }
-        const b = root.inspector.bounds
-        const distance = Math.max(35, b.width, b.depth, b.height) *
-            (root.inspector.mode === "explode" ? 2.1 : 1.6)
-        cameraOrigin.position = Qt.vector3d(0, 0, 0)
+        const fit = root.inspector.fit_view(root.width, root.height, mapCamera.fieldOfView)
+        cameraOrigin.position = Qt.vector3d(0, fit.centerY, 0)
         cameraOrigin.eulerRotation = Qt.vector3d(0, 0, 0)
-        mapCamera.position = Qt.vector3d(0, distance * 0.85, distance)
+        mapCamera.position = Qt.vector3d(0, fit.y, fit.z)
         mapCamera.eulerRotation = Qt.vector3d(-38, 0, 0)
         root.syncInspectionHeight()
     }
+    onWidthChanged: if (root.inspector && root.inspector.active && root.inspector.mode !== "inside") root.resetInspectionView()
+    onHeightChanged: if (root.inspector && root.inspector.active && root.inspector.mode !== "inside") root.resetInspectionView()
     function walk(distance) {
         if (!inspector.active || inspector.mode !== "inside")
             return
@@ -131,6 +128,8 @@ Item {
                      (inspector.cut_axis === "y" && point.y > inspector.cut * b.height)))
                     continue
                 if (mode === "dollhouse" && point.x > 0 && point.z > 0)
+                    continue
+                if (mode === "xray" && model.inspectionFloor !== inspector.selected_floor)
                     continue
                 if (inspector.select_room(model.inspectionFloor, point.x, point.z).length > 0)
                     return true
@@ -242,14 +241,14 @@ Item {
             DirectionalLight {
                 eulerRotation: Qt.vector3d(-42, -30, 0)
                 color: "#fff8e9"
-                brightness: 1.4
+                brightness: root.inspector.active ? 0.85 : 1.4
                 ambientColor: "#65716d"
                 castsShadow: root.inspector.active
             }
             DirectionalLight {
                 eulerRotation: Qt.vector3d(140, 40, 0)
                 color: "#b7d0df"
-                brightness: 0.55
+                brightness: root.inspector.active ? 0.25 : 0.55
             }
             PointLight {
                 position: walkCamera.position
@@ -402,6 +401,8 @@ Item {
                     return
                 }
                 const newBuilding = !root.wasInspecting || root.inspectionViewKey !== root.inspector.inspection_key
+                const modeChanged = root.inspectionMode !== root.inspector.mode
+                root.inspectionMode = root.inspector.mode
                 if (!root.wasInspecting) {
                     root.campusViewState = {origin: cameraOrigin.position,
                         rotation: cameraOrigin.eulerRotation, camera: mapCamera.position,
@@ -416,6 +417,8 @@ Item {
                 if (root.inspector.mode === "inside") {
                     if (root.walkViewKey !== root.inspector.inspection_key + ":" + root.inspector.selected_floor)
                         root.resetWalkView()
+                } else if (!newBuilding && (modeChanged || root.inspector.mode === "explode")) {
+                    root.resetInspectionView()
                 } else root.syncInspectionHeight()
             }
         }

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>建筑透视与内部结构优化 · 2026-10-15</title>
+<style>
+body{margin:0;background:#edf1ee;color:#203b42;font:16px/1.8 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1120px;margin:auto;padding:40px 24px 80px}h1{font-size:36px;line-height:1.3}h2{margin-top:42px;font-size:25px}a{color:#086f86}small{color:#566f74}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}figure{margin:0;background:white;padding:12px;border-radius:12px}img{width:100%;height:auto;display:block}figcaption{padding:8px 4px}table{width:100%;border-collapse:collapse;background:#fff}td,th{padding:13px;text-align:left;border-bottom:1px solid #d5deda;vertical-align:top}.note{border-left:4px solid #ac7f2e;padding:12px 18px;background:#fff9e9}code{background:#dce5e1;padding:2px 5px}li{margin:8px 0}@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:28px}}
+</style>
+<main>
+<small>3DMap · Windows 原生版本 · 研究与实施记录 · 2026-10-15</small>
+<h1>让透视视图真正显示楼内结构</h1>
+<p>透视发白已在 Windows Direct3D 11 中复现并修正。现在以当前楼层为焦点，保留整栋楼的淡色轮廓；房间、开放空间、通道和墙体分别表达。Burton 拆层完整入镜，换层保留当前视图，室内天花板使用独立的哑光材质。</p>
+<div class="grid">
+<figure><a href="previews/structural-before.png"><img src="previews/structural-before.png" alt="修复前透视整块发白"></a><figcaption>修复前 · Windows D3D11 原生截图</figcaption></figure>
+<figure><a href="previews/structural-xray.png"><img src="previews/structural-xray.png" alt="当前层清晰、其他楼层淡化的结构透视"></a><figcaption>修复后 · 当前层分区、墙线与背景楼层可区分</figcaption></figure>
+</div>
+
+<h2>研究后选择的方案</h2>
+<table><thead><tr><th>方向</th><th>得到什么</th><th>取舍</th></tr></thead><tbody>
+<tr><td>只修透明混合</td><td>白块消失，恢复透明</td><td>仍有多层楼板与墙面叠加，难以理解当前层。</td></tr>
+<tr><td>顺序无关透明 OIT</td><td>改善不同透明表面的合成顺序</td><td>Qt 原生支持从 6.11 开始；项目固定 6.8.3。升级整个运行时或自建多通道渲染器，成本超出本次问题。</td></tr>
+<tr><td><strong>结构透视 + 当前层强调</strong></td><td>全楼关系与当前层细节同时保留</td><td>采用。修正混合规则，降低背景楼层透明度；当前层显示家具和分区，背景层保留结构轮廓。</td></tr>
+</tbody></table>
+<p>透明排序和空间可读性是两个问题。<a href="https://jcgt.org/published/0002/02/09/">McGuire 与 Bavoil 的 OIT 论文（2013）</a>解决合成顺序，但没有替用户决定哪一层应该最清楚。本次的当前层强调是产品与模型表达的设计选择。</p>
+<p><a href="https://doc.qt.io/qt-6.8/qml-qtquick3d-custommaterial.html">Qt 6.8 材质文档</a>提供独立的颜色和 alpha 混合因子。原材质对输出 alpha 再乘一次自身 alpha，导致 View3D 纹理合成失真。新增独立 alpha 因子，并按<a href="https://doc.qt.io/qt-6.8/qml-qtquick3d-material.html#depthDrawMode-prop">材质深度规则</a>让透明表面不写深度。单独修正这组材质设置的中间截图已经消除白块，之后才加入结构表达优化。<a href="https://doc.qt.io/qt-6/qml-qtquick3d-sceneenvironment.html#oitMethod-prop">Qt OIT 版本边界</a>已查证。</p>
+
+<h2>内部模型的实际改动</h2>
+<ul>
+<li>楼板、空间色块、墙体、轮廓线、天花板和家具分成独立几何。透明度不再把所有细节一起冲淡。</li>
+<li>开放阅读区、书架区和咖啡区不再一律围成房间；需要封闭的房间保留门洞。空间分区扣除通道，并消除分区重叠。</li>
+<li>合并共用墙面，避免重复表面。门洞在墙体合并之后统一扣除，防止相邻墙面封门。</li>
+<li>逐张检查现有官方图纸，为 Shapiro 2–4 层补充不同的近似空间分区：二层媒体馆与学习区、三层画廊与阅读室、四层书架与游戏档案区。</li>
+<li>透视中只拾取当前楼层，背景楼层不会抢走房间选择。剖切规则同样作用于新增色块和轮廓。</li>
+<li>楼层改变统一保留当前模式。室内拇指动作继续控制前进后退。</li>
+</ul>
+<p><a href="https://www.lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/">Shapiro 官方目录</a>明确为地下室加四层；<a href="https://lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/floor-1/">一层空间说明</a>和<a href="https://www.lib.umich.edu/visit-and-study/floor-plans/shapiro-library-floors/floor-4/">四层说明</a>用于核对名称。图纸的空间位置被手工概括为分区，未当作测绘坐标。<a href="https://www.lib.umich.edu/visit-and-study/floor-plans/hatcher-library-south-floors/">Hatcher South 官方目录</a>有八层；North 完整目录页面抓取受页面大小限制，本次沿用已下载的官方逐层图纸，并验证两个楼翼切换。</p>
+<div class="grid">
+<figure><a href="previews/structural-shapiro-2.png"><img src="previews/structural-shapiro-2.png" alt="Shapiro 二层的媒体馆、学习室与计算区分区"></a><figcaption>Shapiro 2 层 · 按参考图重新分区</figcaption></figure>
+<figure><a href="previews/structural-shapiro-3.png"><img src="previews/structural-shapiro-3.png" alt="Shapiro 三层的开放学习区与阅读室分区"></a><figcaption>Shapiro 3 层 · 开放学习区与封闭房间分开表达</figcaption></figure>
+<figure><a href="previews/structural-shapiro-4.png"><img src="previews/structural-shapiro-4.png" alt="Shapiro 四层的书架与档案区分区"></a><figcaption>Shapiro 4 层 · 书架、档案与房间具有不同布局</figcaption></figure>
+</div>
+
+<div class="grid">
+<figure><a href="previews/structural-explode.png"><img src="previews/structural-explode.png" alt="Burton 最大层距完整显示所有楼层"></a><figcaption>Burton · B + 1–10，最大层距下完整显示</figcaption></figure>
+<figure><a href="previews/structural-inside.png"><img src="previews/structural-inside.png" alt="哑光天花板下的室内视角"></a><figcaption>室内 · 独立天花板、降低高光和过曝</figcaption></figure>
+</div>
+
+<h2>数据可信度和下一步模型路线</h2>
+<p class="note">这些是有资料边界的三维示意。Shapiro 空间名称有官方来源，位置为近似配准；墙厚、层高、楼梯和家具没有测绘证明。Hatcher 两个楼翼仍使用建筑整体外轮廓做示意配准。本次没有把它们变成可用于真实室内导航的精确模型。</p>
+<p>Burton 从按高度猜测的 12 层改为用户反馈的 B + 1–10。<a href="https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf">校董会文件（2010）</a>确认十层钟室，<a href="https://smtd.umich.edu/facilities/burton-memorial-tower/">SMTD 官方页面</a>确认钟塔用途；这两项来源没有独立证明地下室或全部内部几何，因此应用中明确标注地下室目录待核实。未把校董会工程文件标成官方楼层图。Union 参考<a href="https://uunions.umich.edu/union/">官方建筑页面</a>，内部几何仍为示意。</p>
+<p>更精确的下一阶段应从一栋楼开始，逐层人工描绘授权图纸的房间多边形、门、通道与楼梯井，先校准图纸方向和外轮廓，再核对门与通道连通性；不能靠建筑高度或自动生成家具推断真实室内。<a href="https://standards.buildingsmart.org/IFC/DEV/IFC4_3/HTML/lexical/IfcBuildingStorey.html">IFC 楼层模型</a>可以作为有授权 BIM 数据时的导入方向；<a href="https://www.ogc.org/announcement/ogc-publishes-indoorgml-2-0-part-1-conceptual-model-standard/">IndoorGML 2.0（2025）</a>则区分空间和连接关系，适合以后建立导航拓扑。本次使用轻量的现有模型结构，没有引入无数据可导入的 BIM 管线。</p>
+
+<h2>验证与限制</h2>
+<ul>
+<li>Windows 原生 D3D11：四栋楼、Hatcher 两翼，六种模式共 30 张截图；另有窄视口六张，以及实际通过 PageUp 换到 Shapiro 2–4 层的三张补充截图。截图工具加载生产 QML 和模型，但省略背景校园网格，未开启摄像头。</li>
+<li>本机检测到 Intel Iris Xe 和虚拟显示适配器；截图确认 D3D11 后端，未单独证明 Qt 选择了哪个适配器。自动截图使用 basic 渲染循环避免 Python/Qt 测试线程互锁。</li>
+<li>透视截图带近白像素比例检查，能够识别原始白块症状。拆层范围按完整高度、视野和宽高比计算，并通过宽、窄视口下包围盒所有角点的投影检查。</li>
+<li>23 项结构、目录、碰撞、取景和控制器相关检查通过；门洞连通性覆盖四栋楼全部楼层和 Hatcher 两翼，测试不含家具阻挡。</li>
+<li>全量原生测试为 23 通过、5 失败。五项失败也在 HEAD 基线代码中复现：两个旧测试输入已不符合当前手势接口，三个摄像头测试受本机手势依赖冲突影响。未为了让旧测试变绿而修改手势识别逻辑。</li>
+<li>网页端六项测试和生产构建通过。本轮没有重跑用户先前的 72 项真人手势验收，也没有宣称渲染性能提升。</li>
+</ul>
+<details><summary>复现命令与产物</summary>
+<p><code>native/.venv/Scripts/python.exe scripts/validate_native_interiors.py --output .superpowers/interior-validation/final --full</code></p>
+<p>加 <code>--narrow</code> 验证窄视口。截图和 capture.json 位于输出目录；图纸来源和模型生成规则在 native/building_references.json 与 scripts/build_native_references.py。</p>
+<p>设计：<a href="../superpowers/specs/2026-10-15-structural-xray-design.md">结构透视方案</a>。截图中的参考照片与官方图纸：University of Michigan Library，沿用仓库中的来源与 CC-BY 署名。</p>
+</details>
+</main>
+</html>

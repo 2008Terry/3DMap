@@ -136,21 +136,31 @@ def _room_zones(footprint, floor):
     if corridor.is_empty:
         point = footprint.representative_point()
         corridor = point.buffer(min(2, max(0.5, min(width, depth) / 5))).intersection(footprint)
-    return zones, corridor
+    occupied = corridor
+    clean_zones = []
+    for area, space in zones:
+        area = area.difference(occupied)
+        if area.area > 5:
+            clean_zones.append((area, space))
+            occupied = occupied.union(area)
+    return clean_zones, corridor
 
 
-def _walls_and_door(builder, polygon, corridor, height):
-    segments = []
+def _walls_and_door(builder, polygon, corridor):
+    segments, openings = [], []
     for region in polygons(polygon):
         coords = list(region.exterior.coords)
         edges = [LineString((a, b)) for a, b in zip(coords, coords[1:])]
         candidates = [edge for edge in edges if edge.length > 2]
-        door_edge = min(candidates, key=lambda edge: edge.distance(corridor), default=None)
+        door_edge = min(candidates, key=lambda edge: (
+            -edge.intersection(corridor.buffer(0.02)).length,
+            edge.interpolate(0.5, normalized=True).distance(corridor)), default=None)
         for edge in edges:
             runs = [edge]
             if edge is door_edge:
                 gap = min(1.5, edge.length * 0.4)
                 a, b = edge.interpolate((edge.length - gap) / 2), edge.interpolate((edge.length + gap) / 2)
+                openings.append(LineString((a.coords[0], b.coords[0])).buffer(0.22, cap_style=2))
                 runs = [LineString((edge.coords[0], a.coords[0])), LineString((b.coords[0], edge.coords[-1]))]
                 for point in (a, b):
                     _cube(builder, point.x, 0.12, point.y, 0.18, 2.15, 0.18, (0.42, 0.30, 0.17, 1))
@@ -159,8 +169,20 @@ def _walls_and_door(builder, polygon, corridor, height):
             for run in runs:
                 solid = run.buffer(0.09, cap_style=2)
                 segments.append(solid)
-                prism(builder, solid, 0.12, height - 0.30, (0.86, 0.85, 0.79, 1))
-    return segments
+    return segments, openings
+
+
+def _outline(builder, geometry, base, color):
+    # Thin prisms work on D3D too, unlike implementation-dependent wide GL lines.
+    for polygon in polygons(geometry):
+        prism(builder, polygon.boundary.buffer(0.045, join_style=2), base, 0.045, color)
+
+
+def _enclosed(space):
+    kind = space.get("kind", "").lower()
+    name = space["name"].lower()
+    return kind in ("office", "studio", "lab", "classroom", "room") or any(
+        word in name for word in ("room", "laboratory", "staff", "workshop"))
 
 
 def _furnish(builder, area, kind):
@@ -222,20 +244,32 @@ def build_interior(building, profile=None):
     colors = [(0.85, 0.85, 0.78, 1), (0.77, 0.84, 0.79, 1), (0.84, 0.81, 0.72, 1)]
     for index, source_floor in enumerate(catalogue):
         slab, walls, furnishings = _MeshBuilder(), _MeshBuilder(), _MeshBuilder()
+        zones_mesh, outline, ceiling = _MeshBuilder(), _MeshBuilder(), _MeshBuilder()
         prism(slab, footprint, -0.12, 0.22, colors[index % len(colors)])
         zones, corridor = _room_zones(footprint, source_floor)
-        prism(slab, corridor, 0.105, 0.02, (0.72, 0.64, 0.47, 1))
-        room_records, collision, furniture_collision = [], [], []
+        prism(zones_mesh, corridor, 0.105, 0.02, (0.64, 0.71, 0.67, 1))
+        _outline(outline, footprint, 0.13, (0.24, 0.42, 0.46, 1))
+        prism(ceiling, footprint, floor_height - 0.16, 0.10, (0.52, 0.56, 0.56, 1))
+        room_records, furniture_collision = [], []
+        collision, openings = _walls_and_door(walls, footprint, corridor)
         for room_index, (area, space) in enumerate(zones):
             tint = ((0.78, 0.82, 0.79, 1), (0.83, 0.79, 0.69, 1), (0.79, 0.81, 0.83, 1))[room_index % 3]
-            prism(slab, area, 0.10, 0.025, tint)
-            collision.extend(_walls_and_door(walls, area, corridor, floor_height))
+            prism(zones_mesh, area, 0.10, 0.025, tint)
+            _outline(outline, area, 0.14, (0.28, 0.42, 0.44, 1))
+            if _enclosed(space):
+                segments, doors = _walls_and_door(walls, area, corridor)
+                collision.extend(segments)
+                openings.extend(doors)
             furniture_collision.extend(_furnish(furnishings, area, space.get("kind", "") + " " + space["name"]))
             point = area.representative_point()
             room_records.append({"name": space["name"], "kind": space.get("kind", "study"),
                                  "x": point.x, "z": point.y, "polygon": area,
                                  "source_named": not space["name"].startswith("示意"),
                                  "mapping": "approximate source zone" if space.get("rect") else "schematic placement"})
+        # Subtract doors after union so a neighboring room cannot seal them.
+        wall_geometry = unary_union(collision).difference(unary_union(openings))
+        prism(walls, wall_geometry, 0.12, floor_height - 0.30, (0.72, 0.75, 0.72, 1))
+        _outline(outline, wall_geometry, floor_height - 0.15, (0.24, 0.42, 0.46, 1))
         # Illustrative circulation core. Its location is never presented as an official stair/elevator.
         point = corridor.representative_point()
         for step in range(10):
@@ -254,8 +288,10 @@ def build_interior(building, profile=None):
                        "name": source_floor.get("name", f"Level {index + 1}"),
                        "elevation": index * floor_height, "height": floor_height,
                        "slab": _finish(slab), "walls": _finish(walls), "furniture": _finish(furnishings),
+                       "zones": _finish(zones_mesh), "outline": _finish(outline), "ceiling": _finish(ceiling),
+                       "corridor": corridor,
                        "rooms": room_records, "walkable": footprint.buffer(-0.25),
-                       "collision": unary_union(collision), "furniture_collision": unary_union(furniture_collision),
+                       "collision": wall_geometry, "furniture_collision": unary_union(furniture_collision),
                        "start": (start.x, start.y), "start_yaw": start_yaw,
                        "reference": source_floor})
     return Interior(footprint, floors, _finish(shell), footprint.bounds, height, scope)

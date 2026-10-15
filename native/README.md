@@ -194,6 +194,32 @@ source-floor previews, wing switching, concave footprints and blocked walking.
 Native screenshots confirmed all six inspection modes. The five profiles are
 not complete surveyed building interiors or a photogrammetric campus twin.
 
+## Structural inspection update (2026-10-15)
+
+Xray now emphasizes the selected floor with faint context floors and structural
+outlines. Floor navigation preserves the current mode for gestures, buttons and
+PageUp/PageDown. Exploded camera fitting includes the complete expanded height
+and viewport aspect ratio. Room zones, partitions and ceilings are independent
+meshes; open study zones are no longer automatically enclosed. Shapiro levels
+2-4 have reviewed approximate regions from the bundled official maps. Burton's
+catalog is B plus 1-10, with its user-provided basement correction distinguished
+from the official tenth-floor bell chamber evidence.
+
+See the [research and screenshot report](../docs/research/2026-10-15-structural-xray-report.html).
+Reproduce native inspection captures with:
+
+```powershell
+.\native\.venv\Scripts\python.exe scripts\validate_native_interiors.py --output .superpowers/interior-validation/final --full
+```
+
+The capture harness uses the production inspection scene and a basic render loop,
+without starting the camera or loading campus background meshes. Add `--narrow`
+to check a narrow viewport. It checks near-white xray pixels and saves render
+backend identity and camera bounds alongside screenshots. This is not a live
+hand-recognition or a performance benchmark. Existing legacy gesture tests and
+the local MediaPipe/TensorFlow dependency conflict are recorded separately in
+the report; they are not fixed by the structural rendering changes.
+
 ## Local performance check (2026-10-11)
 
 The scene uses 10 static building geometry batches (two campus-wide meshes plus eight featured buildings), one ground model, and a selection overlay when a building is selected. Reusing vertices with identical positions, normals, and colors reduced the campus buffers from 51,600 to 27,422 vertices for Central and from 24,216 to 13,770 for North; triangle index counts are unchanged.

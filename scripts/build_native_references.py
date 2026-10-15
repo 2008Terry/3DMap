@@ -39,6 +39,45 @@ spaces = {
     "hatcher-south-floor-7": ["Staff Space (nonpublic)"],
     "hatcher-south-floor-8": ["Conference Room 806 (nonpublic)", "Papyrology (nonpublic)", "Library Administration (nonpublic)"],
 }
+
+# Reviewed against the bundled official map images on 2026-10-15. Coordinates
+# describe coarse semantic regions, not traced or measured architectural walls.
+spaces.update({
+    "shapiro-floor-2": [
+        {"name": "Askwith Media Library 2002", "kind": "collection", "rect": [0.27, 0.0, 0.59, 0.25]},
+        {"name": "Learning Programs and Initiatives 2178 (nonpublic)", "kind": "office", "rect": [0.03, 0.15, 0.24, 0.25]},
+        {"name": "Conference Room 2166 (nonpublic)", "kind": "room", "rect": [0.03, 0.25, 0.24, 0.39]},
+        {"name": "Sweetland Center for Writing 2160", "kind": "office", "rect": [0.03, 0.39, 0.24, 0.57]},
+        {"name": "Group Study Rooms 2122-2144", "kind": "room", "rect": [0.03, 0.57, 0.24, 0.85]},
+        {"name": "PC Campus Computing Site 2054", "kind": "computing", "rect": [0.73, 0.55, 0.97, 0.70]},
+        {"name": "Knox Adaptive Technology Center 2064", "kind": "room", "rect": [0.73, 0.70, 0.97, 0.90]},
+        {"name": "Mac Campus Computing Site 2000A", "kind": "computing", "rect": [0.50, 0.56, 0.69, 0.66]},
+        {"name": "Book Stacks and Current Periodicals", "kind": "stacks", "rect": [0.28, 0.43, 0.69, 0.85]},
+        {"name": "Study Space", "kind": "study", "rect": [0.25, 0.85, 0.73, 0.94]},
+    ],
+    "shapiro-floor-3": [
+        {"name": "Conference Rooms 3178 and 3180 (nonpublic)", "kind": "room", "rect": [0.10, 0.01, 0.35, 0.14]},
+        {"name": "Digital Scholarship and Michigan Publishing 3020 (nonpublic)", "kind": "office", "rect": [0.49, 0.01, 0.72, 0.17]},
+        {"name": "Deep Blue Repository and Research Data Services (nonpublic)", "kind": "office", "rect": [0.72, 0.17, 0.96, 0.30]},
+        {"name": "Shapiro Gallery 3060", "kind": "gallery", "rect": [0.03, 0.37, 0.25, 0.48]},
+        {"name": "Wellbeing Room 3021", "kind": "room", "rect": [0.45, 0.43, 0.61, 0.48]},
+        {"name": "Study Room 3042", "kind": "room", "rect": [0.79, 0.43, 0.89, 0.47]},
+        {"name": "Study Room 3046", "kind": "room", "rect": [0.87, 0.47, 0.97, 0.52]},
+        {"name": "Open Study Space", "kind": "study", "rect": [0.05, 0.50, 0.95, 0.85]},
+        {"name": "Shapiro Reading Room 3100", "kind": "reading", "rect": [0.20, 0.86, 0.73, 0.99]},
+    ],
+    "shapiro-floor-4": [
+        {"name": "Turkish American Friendship Room 4004 (nonpublic)", "kind": "room", "rect": [0.49, 0.0, 0.67, 0.14]},
+        {"name": "Michigan Publishing and University of Michigan Press 4190 (nonpublic)", "kind": "office", "rect": [0.02, 0.12, 0.24, 0.37]},
+        {"name": "Study Space", "kind": "study", "rect": [0.27, 0.18, 0.63, 0.28]},
+        {"name": "Science Oversize Book Stacks S-Z", "kind": "stacks", "rect": [0.65, 0.20, 0.88, 0.31]},
+        {"name": "Book Stacks AC-QE", "kind": "stacks", "rect": [0.08, 0.40, 0.27, 0.84]},
+        {"name": "Book Stacks QL-S", "kind": "stacks", "rect": [0.74, 0.40, 0.92, 0.46]},
+        {"name": "Computer and Video Game Archive 4041", "kind": "computing", "rect": [0.72, 0.48, 0.94, 0.69]},
+        {"name": "Shapiro 4059", "kind": "room", "rect": [0.72, 0.69, 0.94, 0.85]},
+        {"name": "Book Stacks QE-QL", "kind": "stacks", "rect": [0.29, 0.86, 0.72, 0.94]},
+    ],
+})
 groups = {
     "shapiro": {"id": "shapiro-undergraduate-library", "name": "Shapiro Library", "facility_ids": ["BLD-034816"]},
     "duderstadt": {"id": "city-BLD-034963", "name": "Duderstadt Center", "facility_ids": ["BLD-034963", "BLD-037733"]},
@@ -108,7 +147,24 @@ profiles["city-BLD-034968"]["floors"].extend(
     {"label": str(i), "name": f"示意 {i} 层（未核实）", "basis": "inferred", "spaces": []}
     for i in range(2, 5)
 )
-data = {"schema_version": 1, "accessed": "2026-10-12", "buildings": profiles,
+profiles["burton-memorial-tower"] = {
+    "name": "Burton Memorial Tower", "facility_ids": ["BLD-000825"],
+    "evidence_level": "official tenth-floor bell chamber; basement and catalog from user review",
+    "mapping_status": "schematic heights, rooms and circulation; no surveyed floor plans",
+    "interior_notice": "B + 1–10 层目录按测试反馈修正 · 官方资料确认 10 层钟室；地下室待独立核实，室内结构为示意",
+    "sources": [
+        {"label": "U-M Regents: tenth-floor bell chamber (2010)",
+         "url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf"},
+        {"label": "SMTD Burton Memorial Tower", "url": "https://smtd.umich.edu/facilities/burton-memorial-tower/"},
+    ],
+    "floors": [{"label": label, "name": "地下室（目录待独立核实）" if label == "B" else
+                "钟室 · 10 层" if label == "10" else f"{label} 层（室内示意）",
+                "basis": "inferred", "catalog_basis": "user-reviewed basement plus ten floors",
+                "catalog_source_url": "https://regents.umich.edu/files/meetings/06-10/2010-6-IX-6.pdf",
+                "spaces": []} for label in ["B"] + [str(i) for i in range(1, 11)]],
+}
+
+data = {"schema_version": 1, "accessed": "2026-10-15", "buildings": profiles,
         "asset_license": {"attribution": "University of Michigan Library", "license": "CC-BY 4.0",
                           "url": "https://creativecommons.org/licenses/by/4.0/",
                           "policy": "https://lib.umich.edu/about-us/policies/copyright-policy/",
